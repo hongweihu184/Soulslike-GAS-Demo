@@ -76,15 +76,6 @@ void ABaseCharacter::BeginPlay()
 
 	if (AbilitySystemComponent)
 	{
-		// 联调临时:盯住四个关键标签的生灭,验收后删
-		for (const TCHAR* TagName : {TEXT("State.MoveLocked"), TEXT("State.Attacking"), TEXT("State.Combo.Window.1"), TEXT("State.Combo.Window.2")})
-		{
-			AbilitySystemComponent->RegisterGameplayTagEvent(
-				FGameplayTag::RequestGameplayTag(FName(TagName)),
-				EGameplayTagEventType::NewOrRemoved
-			).AddUObject(this, &ABaseCharacter::OnDebugTagChanged);
-		}
-
 		for (const TSubclassOf<UGameplayAbility>& AbilityClass : StartupAbilities)
 		{
 			if (AbilityClass)
@@ -204,7 +195,3 @@ void ABaseCharacter::Look2D(const FVector2D Axis)
 	AddControllerPitchInput(Axis.Y);
 }
 
-void ABaseCharacter::OnDebugTagChanged(const FGameplayTag Tag, int32 NewCount)
-{
-	UE_LOG(LogTemp, Warning, TEXT("[标签] %s count=%d (owner=%s)"), *Tag.ToString(), NewCount, *GetName());
-}

@@ -97,9 +97,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UPrimitiveComponent> WeaponCollisionComp;
 
-	// 联调临时:标签生灭日志,三连击验收通过后删除
-	void OnDebugTagChanged(const FGameplayTag Tag, int32 NewCount);
-
 	UPROPERTY()
 	TSet<TObjectPtr<AActor>> HitActorsThisSwing;
 
