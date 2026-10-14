@@ -85,6 +85,10 @@
   <a href="#p20">P20 蒙太奇通知显示 None</a>
   <a href="#p21">P21 标签注册表事故</a>
   <a href="#p22">P22 蒙太奇不播:插槽名不匹配</a>
+  <a href="#p23">P23 标签注册表格式过时(5.8)</a>
+  <a href="#p24">P24 技能没授予,连击永远只有第一段</a>
+  <a href="#p25">P25 后摇被自己人打断(阻止标签只填自己)</a>
+  <a href="#p26">P26 持续移动时无法挥刀(收刀轮询竞态)</a>
 </nav>
 
 <main>
@@ -107,6 +111,10 @@
     <tr><td><a href="#p12">git push "Connection was reset"</a></td><td>给 git 配本机代理(见 P12)</td></tr>
     <tr><td><a href="#p14">GE 修饰符里找不到自定义属性 / 蓝图搜不到自己的 C++ 类</a></td><td>.uproject 的 Modules 被清空 → 补回模块注册,重启编辑器</td></tr>
     <tr><td><a href="#p16">按 W 角色向右走(轴向错误);IMC 修改器脚本设置不生效</a></td><td>修改器只能编辑器里手动加(map_key 返回副本,写不回);WASD 配法见 P16</td></tr>
+    <tr><td><a href="#p23">标签管理器缺整棵树 / "Invalid GameplayTag" / "Requested Gameplay Tag ... was not found"</a></td><td>5.8 只认 GameplayTagsSettings 段的 +GameplayTagList=,老教程的 GameplayTagsList 段不读了(见 P23)</td></tr>
+    <tr><td><a href="#p24">连击连不上 / 永远只有第一段激活 / 其他段按了没反应</a></td><td><strong>先查授予池</strong>:showdebug abilitysystem 的 Abilities 页看技能挂没挂上,别急着查配置(见 P24)</td></tr>
+    <tr><td><a href="#p25">后摇没播完被自己人打断 / 末段动画腰斩</a></td><td>阻止别的技能只填了自身标签;末段填父级 Ability.Attack.Light 封全家(见 P25)</td></tr>
+    <tr><td><a href="#p26">站着能砍、按住方向键一直走就挥不出刀</a></td><td>收刀判断别在输入回调里每帧轮询——改由 ANS 标签生灭事件驱动,时机交回时间轴(见 P26)</td></tr>
   </table>
 </section>
 
@@ -474,6 +482,106 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
   <ul>
     <li>蒙太奇不播排查三问:ABP 有 Slot 节点吗?Slot 名和蒙太奇插槽一致吗?蒙太奇引用有效吗?</li>
     <li>第三方素材包的蒙太奇插槽名不是 DefaultSlot,接入前先查二进制或打开蒙太奇看轨道名</li>
+  </ul>
+</section>
+
+<!-- ============ P23 ============ -->
+<section id="p23">
+  <h2>P23 · ini 里标签齐全,编辑器里整棵树消失 <span class="fix">已解决</span></h2>
+  <p class="sym">症状:Config/DefaultGameplayTags.ini 磁盘内容完整,但标签管理器只有 Ability/Event 各一个标签、State 树整棵缺失;启动日志刷 <code>Invalid GameplayTag State.Combo.Window found in property</code>;PIE 里 ensure 报错 <code>Requested Gameplay Tag State.MoveLocked was not found</code>(堆栈指向 C++ 的 RequestGameplayTag 调用处)</p>
+  <h4>排查过的假线索</h4>
+  <ol>
+    <li>ini 编码/BOM/拼写——全部正常,排除</li>
+    <li>Saved/Config/WindowsEditor/ 覆盖文件——不存在,排除</li>
+    <li>编辑器会话早于 ini 修复(重启即好)——重启后依旧,排除</li>
+  </ol>
+  <h4>真正根因:5.8 改了配置格式,老教程的写法不读了</h4>
+  <p>引擎源码(GameplayTagsManager.cpp → ConstructGameplayTagTree)显示:默认标签导入遍历的是 <code>UGameplayTagsSettings::GameplayTagList</code>。该类 <code>config=GameplayTags</code>、继承 UGameplayTagsList 的 GameplayTagList 属性,所以它<strong>只读 DefaultGameplayTags.ini 里 <code>[/Script/GameplayTags.GameplayTagsSettings]</code> 段的 <code>+GameplayTagList=</code> 条目</strong>。</p>
+  <p>而老教程的 <code>[/Script/GameplayTags.GameplayTagsList]</code> 段属于 UGameplayTagsList 类——5.8 里它是 <code>config=GameplayTagsList</code>(读 DefaultGameplayTagsList.ini),且仅用于 <code>Config/Tags/</code> 目录下的散文件。<strong>写在 DefaultGameplayTags.ini 里的这个段等于写给空气。</strong></p>
+  <p>迷惑点:编辑器 UI 加标签时会按 5.8 真实格式写(Settings 段 +GameplayTagList=),于是出现"一半标签有效、一半无效"的假象——本次就是 Ability.Attack.Light.1 和 Event.Combo.WindowOpen 有效,其余 8 个全无效。</p>
+  <h4>解法</h4>
+  <p>全部标签统一写到 <code>[/Script/GameplayTags.GameplayTagsSettings]</code> 段,每行 <code>+GameplayTagList=(Tag="X.Y",DevComment="...")</code>。<strong>改 ini 必须先关编辑器</strong>:编辑器若用内存旧表回写,会把修好的 ini 覆盖回去(本项目被坑过一次)。</p>
+  <h4>教训</h4>
+  <ul>
+    <li><strong>配置格式以当前引擎源码为准</strong>,网上教程(包括 Epic 旧文档)的版本可能已过时——P19 规矩(给答案前查源码)的又一次应验</li>
+    <li>"部分标签有效"是比"全部无效"更强的线索:它说明加载机制本身没坏,坏的是格式/来源不一致</li>
+    <li>改标签注册表的黄金流程:关编辑器 → 改 ini → 启动 → 日志确认无 Invalid GameplayTag 警告 → 再碰资产</li>
+  </ul>
+</section>
+
+<!-- ============ P24 ============ -->
+<section id="p24">
+  <h2>P24 · 技能没授予角色,连击永远只有第一段 <span class="fix">已解决</span></h2>
+  <p class="sym">症状:三连击怎么按都只出 GA_1;GA_1 自身完全正常(动画/判定/窗口链都工作);GE 授予标签、激活所需/阻止配置<strong>逐项查全是绿的</strong>。本工程 2026-10-09~10 连环排查四轮(GA/GE/蒙太奇资产全部 dump 过)后由用户破案的实录。</p>
+  <h4>根因</h4>
+  <p>GA_2 / GA_3 <strong>从未通过 GiveAbility 挂到角色 ASC</strong>(本工程:角色蓝图的 StartupAbilities 只给了 GA_1)。TryActivateAbilitiesByTag 只在<strong>已授予</strong>的技能里选拔——没授予 = 压根不进候选池,零报错零日志,<strong>静默得连"被拒绝了"都不告诉你</strong>。</p>
+  <h4>因果链(为什么表象是"永远 GA_1")</h4>
+  <ol>
+    <li>按父标签 Ability.Attack.Light 激活 → ASC 遍历已授予 spec → 池子里只有 GA_1</li>
+    <li>窗口期:GA_1 被 State.Combo.Window 挡住 → 什么都没发生(像"连击没开始")</li>
+    <li>窗口过期后:GA_1 自己重激活 → 日志永远只有 GA_1,越看越像"连击配置全错"</li>
+  </ol>
+  <h4>弯路实录(血的教训)</h4>
+  <p>病灶在激活链<strong>最上游(授予)</strong>,但排查从中间(GE 标签)开始,把下游配置查了个遍——下游再绿也改变不了"没进候选池"。资产级 dump(GA/GE/蒙太奇的 .uasset)天然看不见"授予"这层,因为它存在角色蓝图/运行时里。</p>
+  <h4>排查激活链的正确顺序(上游→下游)</h4>
+  <ol>
+    <li><strong>授予</strong>:showdebug abilitysystem 翻 Abilities 页,或看角色蓝图的 StartupAbilities / GrantAbility 节点——池子里有谁,一目了然</li>
+    <li>输入:按键事件是否到 BP_Player</li>
+    <li>标签条件:激活所需/阻止/BlockAbilitiesWithTag(用诊断脚本,别肉眼猜)</li>
+    <li>效果:GE 授予/时长/通知帧</li>
+  </ol>
+  <p>一次性拿全配置真值:PythonScriptPlugin 已在本工程启用,直读资产 CDO 的脚本在 <code>Saved/diag_gac_config.py</code>(命令:UnrealEditor-Cmd + -run=pythonscript,编辑器须关闭)。标签容器读法:<code>container.get_editor_property("gameplay_tags")</code>,标签名:<code>tag.get_editor_property("tag_name")</code>,无文档时 <code>dir(obj)</code> + <code>export_text()</code> 探接口。</p>
+  <h4>教训</h4>
+  <ul>
+    <li>"只有一段生效,其他段静默"时,<strong>第一反应查授予池</strong>,不是查配置</li>
+    <li>静默失败排查永远从链的上游开始;资产 dump 查不了授予层</li>
+    <li>给 AI 排查时,第一轮就该读运行时事实(showdebug / ASC 快照),而不是读静态资产</li>
+  </ul>
+</section>
+
+<!-- ============ P25 ============ -->
+<section id="p25">
+  <h2>P25 · 后摇被自己人打断:第三段没播完被第一段顶掉 <span class="fix">已解决</span></h2>
+  <p class="sym">症状:三连击能连了,但第三段(末段)动画没播完,此时按攻击键,GA_1 激活,蒙太奇 A 进插槽把 C 顶掉——后摇腰斩,手感稀烂。第二段的后摇段同理会被 GA_1 抢跑。</p>
+  <h4>根因</h4>
+  <p>GA 的<strong>阻止别的技能(BlockAbilitiesWithTag)只填了自身精确标签</strong>。语义:"本技能存活期间,带这些标签的技能禁止激活"。GA_3 活着只拦 GA_3 → GA_1 在"窗口+宽限期"之外(第三段 1.87s 蒙太奇,窗口标签 ~0.9s 就过期)随时可激活抢跑;新蒙太奇进同插槽,旧蒙太奇被顶(OnInterrupted)。</p>
+  <h4>解法:按"后摇真实"原则配阻止矩阵</h4>
+  <p>目标:任何一段的<strong>非窗口期</strong>,按键全部静默;只有窗口标签放行的下一段能激活。移动收刀(CancelAbilities)不受激活阻止影响,照常工作。</p>
+  <table>
+    <tr><th>技能</th><th>阻止别的技能</th><th>效果</th></tr>
+    <tr><td>GA_1</td><td><code>Ability.Attack.Light.1</code></td><td>拦自己重开;窗口期放行 GA_2/GA_3</td></tr>
+    <tr><td>GA_2</td><td><code>.1</code> + <code>.2</code></td><td>拦 GA_1 抢跑 + 拦自己;放行 GA_3</td></tr>
+    <tr><td>GA_3</td><td>父级 <code>Ability.Attack.Light</code></td><td>末段封全家,后摇完整播完才解锁</td></tr>
+  </table>
+  <h4>教训</h4>
+  <ul>
+    <li>"阻止别的技能"只填自己 = 只拦自己——<strong>它拦的是"激活",不是"运转"</strong></li>
+    <li>连击 = 窗口期放行兄弟 + 非窗口期封死全家,两者缺一不可;只配前者必出后摇被抢</li>
+    <li>末段没有下一段可衔接,直接上父级标签一刀切,最简单</li>
+  </ul>
+</section>
+
+<!-- ============ P26 ============ -->
+<section id="p26">
+  <h2>P26 · 持续移动时无法挥刀:收刀逻辑每帧轮询,竞态掐死激活 <span class="fix">已解决</span></h2>
+  <p class="sym">症状:站着不动三连击一切正常;<strong>只要按住方向键持续移动,按攻击键完全挥不出刀</strong>(GA 激活瞬间即被收刀)。越简单的功能越要警惕"站着行、走着不行"这类帧时序症状。</p>
+  <h4>根因(竞态)</h4>
+  <p>旧实现把收刀政策写在 <code>Move()</code> 输入回调里:每帧检查"攻击中 && State.MoveLocked 未打 → CancelAbilities"。但 GA 激活(State.Attacking 打上)到 ANS_MoveLock 把 State.MoveLocked 打上之间有<strong>几帧空窗</strong>。按住方向键时 Move() 每帧都跑,这几帧里检查全通过 → 攻击刚激活就被自己收刀,表现为"移动完全覆盖技能输入"。站着不动时没有 Move() 事件,所以永远查不出来。</p>
+  <h4>架构教训(本项目铁律)</h4>
+  <p>C++ 只当<strong>标签语义的执行器</strong>,政策(什么时候锁/什么时候收刀/什么时候衔接)全部交给配置侧的时间轴:</p>
+  <table>
+    <tr><th>闸门</th><th>配置侧(策划可拖帧)</th><th>代码侧(只执行)</th></tr>
+    <tr><td>锁移动</td><td>ANS_MoveLock 的区间</td><td>MoveLocked&gt;0 → 吞输入</td></tr>
+    <tr><td>可收刀</td><td>ANS_MoveLock 的结束帧</td><td>锁段"开始过"&&攻击中 → 按移动即收刀</td></tr>
+    <tr><td>可衔接</td><td>GE_ComboWindow 的授予帧+时长</td><td>GA 激活所需标签匹配</td></tr>
+  </table>
+  <h4>解法</h4>
+  <p>收刀不再每帧轮询,改由<strong>标签生灭事件</strong>驱动:<code>RegisterGameplayTagEvent</code> 监听 State.MoveLocked(出现=本段攻击已进锁段,置位 bAttackLockApplied)和 State.Attacking(归零=复位)。"本段攻击已经历过锁段"这个标志天然把"GA 刚激活、ANS 尚未打上"的空窗排除在收刀条件之外——因为锁段<strong>开始之前</strong>标志不可能为真。收刀点仍然是策划在蒙太奇时间轴上拖出来的 ANS 结束帧。</p>
+  <h4>教训</h4>
+  <ul>
+    <li>输入回调里做"每帧政策判断"必然引入竞态;政策判断要挂在<strong>状态迁移点</strong>(标签生灭)上,而不是挂在连续事件(每帧输入)上</li>
+    <li>"站着行、走着不行"= 有轮询在偷跑,第一反应找每帧回调里的政策代码</li>
+    <li>连"是否经历过某状态"都要由配置的帧位推出,代码里不许出现与时间轴等价的硬编码判断</li>
   </ul>
 </section>
 

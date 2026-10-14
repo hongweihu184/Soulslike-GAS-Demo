@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
-#include "InputActionValue.h"
+#include "GameplayTagContainer.h"
 #include "BaseCharacter.generated.h"
 
 class UAbilitySystemComponent;
@@ -13,8 +13,7 @@ class UGameplayAbility;
 class UPrimitiveComponent;
 class USpringArmComponent;
 class UCameraComponent;
-class UInputMappingContext;
-class UInputAction;
+struct FGameplayTag;
 
 UCLASS()
 class PROJECTUNREAL_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -28,10 +27,29 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
+	// ---- 纯动词:只执行,不含政策。策略(什么时候吞/什么时候收刀)在 BP 事件图里组合 ----
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void RequestAttack();
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void CancelAttack();
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void RequestJump();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void Move2D(const FVector2D Axis);
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void Look2D(const FVector2D Axis);
+
+	// ---- 纯查询:供 BP 策略分支读取 ----
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	bool IsMoveLocked() const;
+
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	bool IsAttacking() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -42,34 +60,30 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
 	TSubclassOf<UGameplayEffect> InitAttributesEffect;
 
+	// 语义闸门读的标签:策划可在 BP 里改指,默认 = 项目现行标签体系
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|Tags")
+	FGameplayTag MoveLockedTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|Tags")
+	FGameplayTag AttackingTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|Tags")
+	FGameplayTag AttackAbilityTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|Tags")
+	FGameplayTag AttackHitEventTag;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> MoveAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> LookAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> JumpAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> AttackAction;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float DefaultCameraPitch = -15.f;
-
-	void OnAttackInput();
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RegisterWeaponCollision(UPrimitiveComponent* Comp);
@@ -83,8 +97,13 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UPrimitiveComponent> WeaponCollisionComp;
 
-	void OnJumpInput();
+	// 联调临时:标签生灭日志,三连击验收通过后删除
+	void OnDebugTagChanged(const FGameplayTag Tag, int32 NewCount);
 
 	UPROPERTY()
 	TSet<TObjectPtr<AActor>> HitActorsThisSwing;
+
+private:
+	// 标签属性为空(注册前创建的 CDO)时回退到现行标签
+	static FGameplayTag ResolveTag(const FGameplayTag& Tag, const TCHAR* Fallback);
 };

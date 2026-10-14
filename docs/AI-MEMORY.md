@@ -2,7 +2,16 @@
 
 > 这份文件是项目 AI 助手的"记忆备份"。不是对话记录,是提炼后的关键上下文。
 > 如果你是刚被叫来协助本项目的 AI:**先读完这份文件,再开口说话**。读完约需 3 分钟,能避免你重蹈覆辙或问出用户已经回答过的问题。
-> 最近更新:2026-10-07(第 2 章收尾阶段)
+> 最近更新:2026-10-08(第 4 章施工中)
+
+## 0. 新会话引导(上下文自救,先看这个)
+
+**如果你是在一个全新的会话里被叫来继续这个项目**,用户只需对你说一句"读 docs/AI-MEMORY.md 继续"。你按顺序读:
+1. 本文件(3 分钟)
+2. `docs/checklist.html` —— 当前施工单,干活按这个走,别另起炉灶
+3. `docs/reference/troubleshooting.html` —— 错题本 P1~P23,踩过的坑都在,开口给方案前先查它(P19 铁律:节点名/命令/格式必须先在引擎源码或错题本里验证,不许凭记忆)
+
+当前状态一句话:**第 4 章三连击施工中。伤害链已全通(木桩 100→50→0),架构已定为"时间轴即状态机",正在做连击装配(移动锁迁移 ANS + GA 窗口链 + 输入改按标签激活)**。
 
 ## 1. 项目是什么
 
@@ -39,20 +48,22 @@
 
 ## 5. 当前进行中的事(接手点)
 
-**第 4 章进行中 — 里程碑:第一剑已挥出(2026-10-08)**。当前真实状态:
-- 激活:BP_BaseCharacter 事件图 IA_Attack → **TryActivateAbilityByClass(GA_Attack_Light_1)**(按类,用户的既有做法)。**注意:C++ 的 OnAttackInput(TryActivateAbilitiesByTag)绑定仍存在,存在双通道,连击实装前必须撤掉 C++ 那条**
-- 蒙太奇:ABP_Greystone 已加 Slot 节点(**插槽名必须 = UpperBody**,Paragon 蒙太奇不用 DefaultSlot;P22)
-- 武器判定:C++ sword_bottom 胶囊 + ANS_AttackWindow 开关 + Payload.Target 命中事件(扫掠方案已被用户否决)
-- GA 命中链:WaitGameplayEvent(Hit)→ Payload.Target → AbilityTargetDataFromActor → ApplyGameplayEffectToTarget(GE_Damage)
-- 标签:均已注册并统一(Event.Combo.WindowOpen / Event.Montage.Attack.Hit / State.Combo.Window / Ability.Attack.Light.1);GA 资产标签曾被编辑器剥离,已加回(P21)
+**第 4 章进行中 — 里程碑:伤害链全通,三连击施工中(2026-10-08)**。完整施工单见 **docs/checklist.html**(复工清单),当前真实状态:
+- 伤害链已打通:按键→GA激活→ANS判定窗→武器碰撞→TargetData 句柄→GA结算→木桩 100→50→0。根因修复:FGameplayEventData 的 Target(Actor) 和 TargetData(句柄) 是两个字段,C++ 补了 `Payload.TargetData = AbilityTargetDataFromActor(OtherActor)`(错题本 P24 待写)
+- 标签注册已修复(P23):5.8 只认 `[/Script/GameplayTags.GameplayTagsSettings]` 段的 `+GameplayTagList=`,共 12 个标签(含 State.Combo.Window.1/.2)
+- GA_1 配置完:阻止=父级 Ability.Attack.Light、实例化待确认 per Actor;GA_2/3 壳已复制;GE_ComboWindow_1/_2 已建
+- **架构新决策(用户拍板):时间轴即状态机**——移动锁改由 ANS_MoveLock(待建)驱动,GA 的 Activation Owned Tags 不再管 MoveLocked;GA 在窗口帧自我了结(StopWhenAbilityEnds=false)
+- 遗留破案:AN_SendGameplayEvent 改新通知标签会牵连旧通知,截图已排除图表硬编码,待跑 checklist.html 里的 Python dump 区分"没开实例可编辑"vs"对象共享"
+- 体力消耗(GE_Cost 100→80)从未验收过
 
-**接下来(第 4 章剩余):**
-1. 验证木桩掉血(武器胶囊 overlap → GE_Damage 是否真的扣血;若不掉血查胶囊贴合度/ANS 区间)
-2. GA_Attack_Light_2/3(复制 _1:蒙太奇 B/C + 标签 .2/.3 + Activation Required Tags = State.Combo.Window + 激活时 Cancel 上一段)
-3. 激活方式换回按标签(Ability.Attack.Light 父标签匹配三段),撤掉 C++ OnAttackInput
-4. 体力消耗验证(GE_Cost,Stamina -20/段)
-5. 木桩死亡/受击反应(可选,HitReact)
-- 详细见 docs/log/04-三连击与伤害.md 的"实际执行中的重大偏差"一节
+**接下来(按 checklist.html 顺序):**
+0. ~~AN_SendGameplayEvent 共享问题破案~~ **已破(2026-10-08)**:根因=EventTag 变量没开"实例可编辑",当时改的是类默认值所以全体跟着变。现已勾选,预览日志证明三个不同标签值共存、实例独立。**剩余两个小尾巴**:① 蒙太奇 A 上有一个 EventTag=None 的多余通知,要删;② 新通知错设成 `State.Combo.Window.1`(状态标签不能当事件发),要改回 `Event.Combo.WindowOpen`(三段通用,GA 内部各自决定挂 GE_1/_2)
+1. 移动锁迁移:GE_MoveLock 配 Infinite+State.MoveLocked(现为壳)→ 新建 ANS_MoveLock → GA 删 MoveLocked → 三蒙太奇拖区间
+2. GA_1/2 接窗口链:WaitGameplayEvent(WindowOpen)→ApplyGameplayEffectToOwner(GE_ComboWindow_i)→EndAbility
+3. BP_Player 输入换 TryActivateAbilitiesByTag(Ability.Attack.Light)
+4. GA_2/3 配置补全(激活所需 Window.1/.2;GA_1 激活阻止=State.Combo.Window 父级)
+5. 联调验收(含体力)→ 错题本 P24 → 文档/log/commit/push
+- 旧详细记录见 docs/log/04-三连击与伤害.md;C++ OnAttackInput 是死通道(AttackAction 为空),无需处理
 
 ## 6. 关键教训(血泪,别再犯)
 

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章研究 · 敌人与 AI(GAS × BehaviorTree × AIPerception)· UE5.8</title>
+<style>
+  :root{
+    --bg:#14161a; --bg2:#1c1f26; --bg3:#242833; --fg:#d8dce4; --dim:#8a91a0;
+    --accent:#c8a15a; --accent2:#7aa2f7; --ok:#6fbf73; --warn:#e0a050; --bad:#e06060;
+    --border:#2e3340;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--fg); font:15px/1.75 "Microsoft YaHei","PingFang SC",sans-serif;
+       display:flex; min-height:100vh;}
+  /* ---- sidebar ---- */
+  nav{width:250px; flex:0 0 250px; background:var(--bg2); border-right:1px solid var(--border);
+      position:sticky; top:0; height:100vh; overflow-y:auto; padding:20px 14px;}
+  nav h1{font-size:16px; color:var(--accent); margin-bottom:4px;}
+  nav .sub{font-size:12px; color:var(--dim); margin-bottom:16px;}
+  nav a{display:block; color:var(--fg); text-decoration:none; font-size:13.5px;
+        padding:5px 10px; border-radius:6px; border-left:2px solid transparent;}
+  nav a:hover{background:var(--bg3);}
+  nav a.active{border-left-color:var(--accent); color:var(--accent); background:var(--bg3);}
+  nav .grp{font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin:14px 0 4px 10px;}
+  /* ---- main ---- */
+  main{flex:1; max-width:920px; padding:40px 48px 120px;}
+  section{margin-bottom:56px;}
+  h2{font-size:24px; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;}
+  h3{font-size:18px; color:var(--accent2); margin:24px 0 10px;}
+  h4{font-size:15.5px; margin:18px 0 8px; color:var(--fg);}
+  p{margin:8px 0;}
+  ul,ol{margin:8px 0 8px 24px;}
+  li{margin:3px 0;}
+  code{background:var(--bg3); padding:1px 6px; border-radius:4px; font-family:Consolas,monospace; font-size:13px; color:#e8c07d;}
+  pre{background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:14px 16px;
+      overflow-x:auto; margin:10px 0; font-family:Consolas,monospace; font-size:13px; line-height:1.55;}
+  pre code{background:none; padding:0; color:var(--fg);}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px;}
+  th{background:var(--bg3); color:var(--accent); text-align:left;}
+  th,td{border:1px solid var(--border); padding:7px 10px; vertical-align:top;}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+  .card{background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:12px 0;}
+  .note{border-left:3px solid var(--accent2); background:var(--bg2); padding:10px 16px; margin:12px 0; border-radius:0 8px 8px 0;}
+  .warn{border-left:3px solid var(--warn);}
+  .bad{border-left:3px solid var(--bad);}
+  .ok{border-left:3px solid var(--ok);}
+  .tag{display:inline-block; font-size:11px; padding:1px 8px; border-radius:10px; margin-right:6px; vertical-align:middle;}
+  .t-todo{background:#3a3f4d; color:var(--dim);}
+  .t-doing{background:#4a4420; color:var(--warn);}
+  .t-done{background:#23402a; color:var(--ok);}
+  .t-cpp{background:#20344a; color:var(--accent2);}
+  .t-bp{background:#3a2340; color:#c58af0;}
+  .t-design{background:#403a20; color:var(--accent);}
+  a{color:var(--accent2);}
+  .meta{color:var(--dim); font-size:12.5px;}
+  .kpi{display:flex; gap:12px; flex-wrap:wrap; margin:14px 0;}
+  .kpi div{background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 16px; font-size:13px;}
+  .kpi b{color:var(--accent); display:block; font-size:18px;}
+  @media (max-width:900px){ nav{display:none;} main{padding:24px;} }
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <h1>第 6 章 · 敌人与 AI</h1>
+  <div class="sub">研究文档 · UE 5.8 · GAS<br>供施工时直接照做</div>
+  <a href="../index.html">← 返回总索引</a>
+  <div class="grp">本文目录</div>
+  <a href="#what">① 这个系统是什么</a>
+  <a href="#paradigm">② 主流做法对比</a>
+  <a href="#source">③ 引擎源码验证</a>
+  <a href="#plan">④ 本工程落地方案</a>
+  <a href="#pitfalls">⑤ 常见坑</a>
+  <a href="#refs">⑥ 参考链接</a>
+  <div class="grp">相关</div>
+  <a href="../tutorial.html">跟做教程</a>
+  <a href="../checklist.html">复工清单</a>
+</nav>
+
+<main>
+
+<section id="what">
+<h2>① 这个系统是什么、为什么这样做</h2>
+<p>第 6 章要把 <code>BP_Dummy</code>(继承 <code>BaseCharacter</code>,已有 ASC + 属性集,会挨打不会动)进化成真正的敌人。整套系统分三层,各自只管一件事:</p>
+<table>
+<tr><th>层</th><th>负责</th><th>用的引擎设施</th></tr>
+<tr><td><b>决策层(大脑)</b></td><td>我现在该干什么:巡逻 / 追玩家 / 攻击 / 发呆</td><td><code>AAIController</code> + BehaviorTree + Blackboard</td></tr>
+<tr><td><b>感知层(五官)</b></td><td>玩家在哪:看见没有、听见没有</td><td><code>UAIPerceptionComponent</code>(视觉/听觉)</td></tr>
+<tr><td><b>执行层(手脚)</b></td><td>攻击动作、受击、死亡——一切"战斗行为"</td><td>GAS:GA / GE / GameplayTag(和主角完全同一套)</td></tr>
+</table>
+<p>为什么这么分工——这正是本项目第 4 章立下的架构原则的延伸:<b>时间轴即状态机,状态标签生灭由蒙太奇通知管,GA 只管激活门槛和结算</b>。敌人不需要输入系统,所以"按攻击键 → <code>TryActivateAbilitiesByTag</code>"这一步换成"行为树的 Task 节点 → <code>TryActivateAbilitiesByTag</code>"。<b>GA 内部图完全不改</b>,玩家和敌人共用同一套 GA_Attack 的写法范式;伤害结算(<code>GE_Damage</code> → <code>Damage</code> 元属性 → <code>PostGameplayEffectExecute</code> 扣血)一条链路双向复用:玩家砍敌人、敌人砍玩家,走的是同一份代码。</p>
+<div class="note"><b>一句话结论:</b>AI 的"智能"放在 BehaviorTree 里,AI 的"战斗力"全部走 GAS。BT 节点只负责"在合适的时机按下技能的开关",技能内部逻辑(蒙太奇、ANS 通知、伤害)敌人与主角共享。</div>
+<h3>ASC 放 Pawn 还是 AIController?</h3>
+<p>放 <b>Pawn(Character)</b> 上。理由:</p>
+<ul>
+<li>敌人死了就销毁/刷新,不需要跨重生保留属性和 GE,ASC 没必要放到更长寿的宿主上(PlayerState 方案是给"需要重生且保留属性"的玩家英雄用的)。</li>
+<li>tranek 的 GASDocumentation 明确写:"不需要重生的东西(比如 AI 敌人、建筑、场景道具)让 Owner 和 Avatar 是同一个 Actor"——即 ASC 挂在 Pawn 上,<code>OwnerActor == AvatarActor == Pawn</code>。</li>
+<li>我们 <code>BaseCharacter</code> 构造函数里已经 <code>CreateDefaultSubobject&lt;UAbilitySystemComponent&gt;</code>,<code>BP_Dummy</code> 继承后天然自带,什么都不用挪。</li>
+</ul>
+</section>
+
+<section id="paradigm">
+<h2>② 官方与社区主流做法对比</h2>
+
+<h3>2.1 ASC 归属与初始化(OwnerActor / AvatarActor)</h3>
+<table>
+<tr><th>做法</th><th>来源</th><th>结论</th></tr>
+<tr><td>AI 敌人:ASC 挂 Pawn,<code>InitAbilityActorInfo(this, this)</code>,Owner=Avatar=Pawn</td><td><a href="https://github.com/tranek/GASDocumentation">tranek/GASDocumentation</a> §4.1.2(样例工程 GDCharacterBase / APACharacterBase 即此写法)</td><td>✅ 我们采用,且 <code>BaseCharacter</code> 已经就是这套</td></tr>
+<tr><td>玩家英雄:ASC 挂 PlayerState(重生保属性),敌人挂 Pawn;多人时敌人 ASC 用 Minimal 复制模式</td><td>同上,§4.1.5 + Fortnite 实践引用</td><td>本项目单机 Demo,用不到,知道即可</td></tr>
+<tr><td>ASC 挂 AIController</td><td>零星老帖子</td><td>❌ 非主流。Controller 换绑/重生时 ASC 生命周期尴尬,Epic 注释里 AvatarActor 定义就是"世界里的物理实体(Pawn/炮塔)"</td></tr>
+</table>
+<div class="note ok"><b>源码意外收获:</b>UE 5.8 的 <code>UAbilitySystemComponent::InitializeComponent()</code> 会<b>自动</b>调用 <code>InitAbilityActorInfo(GetOwner(), GetOwner())</code>(默认初始化为组件的外层 Owner)。ASC 作为 Character 的默认子对象时,Owner 就是 Character 自己——<b>这就是本项目从没显式调用过 InitAbilityActorInfo、三连击却照常工作的原因</b>(已验证:整个 <code>Source/ProjectUnreal</code> 无此调用,且该函数不是 UFUNCTION,蓝图里根本调不到)。单机 Demo 可以不补;但养成习惯,施工时顺手在 <code>BaseCharacter::BeginPlay</code> 里显式写一行 <code>AbilitySystemComponent-&gt;InitAbilityActorInfo(this, this);</code>,幂等无害,语义清晰。</div>
+
+<h3>2.2 BehaviorTree 驱动 GAS:三种范式</h3>
+<table>
+<tr><th>范式</th><th>做法</th><th>代表</th><th>评价</th></tr>
+<tr><td><b>A. 自定义 BTT 按标签激活(主流)</b></td><td>写一个 <code>BTTask_BlueprintBase</code> 子类,<code>ReceiveExecuteAI</code> 里拿到 Controlled Pawn 的 ASC,调 <code>TryActivateAbilitiesByTag</code>,然后 <code>FinishExecute</code></td><td>GAS Companion 插件直接内置 <code>BTTask_TriggerAbilityByClass</code> / <code>BTTask_TriggerAbilityByTags</code>(<a href="https://gascompanion.github.io/working-with-ai/">官方文档</a>);大量教程(Udemy 高级 Action RPG 课程、各 YouTube 系列)同款</td><td>✅ <b>我们采用</b>。和主角"按键 → TryActivateAbilitiesByTag(父标签选拔)"的范式完全一致,GA 不用改</td></tr>
+<tr><td>B. BT 发 GameplayEvent,GA 的 AbilityTriggers 被动响应</td><td>BTT 里调 <code>SendGameplayEventToActor</code>,GA 配置 <code>AbilityTriggers = (Event.Xxx, On Gameplay Event)</code></td><td>受击/死亡这类"被动反应"的标准做法(tranek 样例的受击动画就是这么挂的)</td><td>✅ 用于受击/死亡(见 §4 第 8、9 步);主动攻击用 A 更直观</td></tr>
+<tr><td>C. GA 自己驱动行为(GA 里写移动/寻路)</td><td>GA 里用 AbilityTask 移动角色</td><td>Motion Warping 流、部分 ARPG 教程的"冲刺攻击"</td><td>⚠️ 与 BT 的 MoveTo 抢移动控制权,决策链分裂。本项目不用;以后做"锁定目标冲砍"可考虑 Motion Warping 辅助位移,另开研究</td></tr>
+</table>
+<div class="note"><b>社区共识:</b>BT 管"什么时候打、往哪走",GA 管"怎么打、打多少血"。行为树里还可以直接用引擎自带的 <code>BTDecorator_CheckGameplayTagsOnActor</code> 装饰器读 ASC 上的标签(比如 <code>State.Dead</code>)当分支条件——BT 和 GAS 的官方桥梁,已验证存在。</div>
+
+<h3>2.3 感知:AIPerception vs PawnSensing</h3>
+<p>无脑选 <b>AIPerception</b>:多感官合一(视觉/听觉/伤害/触碰)、带刺激源注册与衰减、带 GameplayDebugger 可视化。<code>PawnSensingComponent</code> 是老系统,功能子集,新项目不推荐。官方与社区教程(Epic Developer Community、各 UE5 敌人 AI 系列)全部以 AIPerception 为准。</p>
+
+<h3>2.4 受击与死亡的触发点</h3>
+<p>tranek 样例工程明确在 <code>PostGameplayEffectExecute</code> 里"扣血之后"做受击动画、跳伤害数字、给凶手发经验——<b>和我们的 MyAttributeSet 结构一模一样</b>,钩子就挂在 Damage→Health 结算之后。死亡用标签 <code>State.Dead</code> 标记,靠 GA(Activation Owned Tags)或装饰器查询。这也是 GAS 官方社区教程里"Event 驱动被动技能"的标准用法。</p>
+</section>
+
+<section id="source">
+<h2>③ 引擎源码验证要点(UE 5.8,本机 E:\UE_5.8\Engine\Source 实测)</h2>
+<p class="meta">以下每一行都在 5.8 源码里 Grep/Read 过,不是凭记忆写的(错题本 P19)。行号可能随热修复漂移,以符号名为准。</p>
+
+<h3>3.1 GAS 侧(GameplayAbilities 插件)</h3>
+<table>
+<tr><th>类 / 函数 / 节点</th><th>文件</th><th>验证结果</th></tr>
+<tr><td><code>UAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor)</code></td><td><code>Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h:1523</code></td><td>✅ 存在。<b>非 UFUNCTION,蓝图调不到</b>。注释原文:OwnerActor 是逻辑宿主;AvatarActor 是世界里物理实体,可与 Owner 相同</td></tr>
+<tr><td>ASC 构造函数路径自动初始化:<code>InitializeComponent()</code> 内 <code>InitAbilityActorInfo(Owner, Owner)</code></td><td><code>.../Private/AbilitySystemComponent_Abilities.cpp:78-84</code></td><td>✅ 存在。"Default init to our outer owner"——解释了本项目为何不用显式初始化</td></tr>
+<tr><td>未初始化后果:<code>InternalTryActivateAbility</code> 检查 <code>OwnerActor/AvatarActor</code> 无效则静默 return false</td><td><code>.../Private/AbilitySystemComponent_Abilities.cpp:1726-1732</code></td><td>✅ 存在</td></tr>
+<tr><td><code>TryActivateAbilitiesByTag(const FGameplayTagContainer&amp;, bool bAllowRemoteActivation = true)</code></td><td><code>.../Public/AbilitySystemComponent.h:1024</code></td><td>✅ 存在(主角第 4 章已在用)</td></tr>
+<tr><td><code>CancelAbilities(WithTags, WithoutTags, Ignore)</code> / <code>CancelAllAbilities(Ignore)</code></td><td><code>.../Public/AbilitySystemComponent.h:1058/1061</code></td><td>✅ 存在(受击打断、死亡清场用)</td></tr>
+<tr><td><code>UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Actor, EventTag, Payload)</code></td><td><code>.../Public/AbilitySystemBlueprintLibrary.h:83</code></td><td>✅ 存在,BlueprintCallable(第 4 章武器命中已在用)</td></tr>
+<tr><td><code>UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(AActor*)</code>(蓝图纯函数,先走 IAbilitySystemInterface 再找组件)</td><td><code>.../Public/AbilitySystemBlueprintLibrary.h:74-75</code></td><td>✅ 存在(自定义 BTT 里取 ASC 就用它)</td></tr>
+<tr><td><code>ASC::HandleGameplayEvent(FGameplayTag, const FGameplayEventData*)</code></td><td><code>.../Public/AbilitySystemComponent.h:732</code></td><td>✅ 存在(SendGameplayEventToActor 的最终落点)</td></tr>
+<tr><td>GA 被动触发:<code>AbilityTriggers: TArray&lt;FAbilityTriggerData&gt;</code>,TriggerSource 枚举 <code>EGameplayAbilityTriggerSource::GameplayEvent / OwnedTagAdded / OwnedTagPresent</code></td><td><code>.../Public/Abilities/GameplayAbility.h:727</code>;<code>.../Public/Abilities/GameplayAbilityTriggerType.h:12-22</code></td><td>✅ 存在(GA_HitReact / GA_Death 的扳机)</td></tr>
+<tr><td><code>UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(...)</code>(GA 图内节点 "Wait Gameplay Event")</td><td><code>.../Public/Abilities/Tasks/AbilityTask_WaitGameplayEvent.h:31</code></td><td>✅ 存在(备选方案;有 AbilityTriggers 就用不上它)</td></tr>
+<tr><td><code>UAbilityTask_PlayMontageAndWait</code>(GA 图内节点 "Play Montage and Wait")</td><td><code>.../Public/Abilities/Tasks/AbilityTask_PlayMontageAndWait.h</code></td><td>✅ 存在(三连击同款)</td></tr>
+</table>
+
+<h3>3.2 AI 侧(AIModule,注意头文件在 Classes/ 而不是 Public/)</h3>
+<table>
+<tr><th>类 / 函数</th><th>文件</th><th>验证结果</th></tr>
+<tr><td><code>AAIController::RunBehaviorTree(UBehaviorTree*)</code>(蓝图节点 Run Behavior Tree)</td><td><code>Engine/Source/Runtime/AIModule/Classes/AIController.h:262</code></td><td>✅ 存在</td></tr>
+<tr><td><code>AAIController::UseBlackboard / GetBlackboardComponent / SetFocus(K2_SetFocus)</code></td><td><code>AIController.h:282 / 451-452 / 315-316</code></td><td>✅ 存在</td></tr>
+<tr><td><b>AAIController 构造函数不创建 PerceptionComponent</b>,只在 OnPossess 里 <code>FindComponentByClass&lt;UAIPerceptionComponent&gt;()</code> 缓存</td><td><code>Engine/Source/Runtime/AIModule/Private/AIController.cpp:44-54(构造函数)、100-102(缓存)</code></td><td>✅ 已验证——<b>感知组件必须自己加</b>(BP 里 Add Component)</td></tr>
+<tr><td><code>UAIPerceptionComponent</code>:<code>OnTargetPerceptionUpdated</code> 委托签名 <code>(AActor* Actor, FAIStimulus Stimulus)</code>;<code>ConfigureSense</code>;<code>SetSenseEnabled</code></td><td><code>Classes/Perception/AIPerceptionComponent.h:423 / 319 / 385;委托声明 :23</code></td><td>✅ 存在</td></tr>
+<tr><td><code>FAIStimulus::WasSuccessfullySensed()</code>(区分"感知到"与"感知丢失"两种触发)</td><td><code>Classes/Perception/AIPerceptionTypes.h:192</code></td><td>✅ 存在</td></tr>
+<tr><td><code>UAISenseConfig_Sight</code>:<code>SightRadius / LoseSightRadius / PeripheralVisionAngleDegrees / DetectionByAffiliation</code></td><td><code>Classes/Perception/AISenseConfig_Sight.h:28-41</code></td><td>✅ 存在(编辑器里显示为 "AI Sight config")</td></tr>
+<tr><td><code>UAISenseConfig_Hearing</code>:<code>HearingRange / DetectionByAffiliation</code>;旧字段 <code>LoSHearingRange</code> 5.2 起废弃</td><td><code>Classes/Perception/AISenseConfig_Hearing.h:27-38</code></td><td>✅ 存在</td></tr>
+<tr><td><code>FAISenseAffiliationFilter</code> 默认三勾全 false;无队伍系统时所有 Actor 互为 Neutral 阵营</td><td><code>Classes/Perception/AIPerceptionTypes.h:206-235</code></td><td>✅ 存在——所以 Detections 要勾 Detect Neutrals(最稳是三个全勾)</td></tr>
+<tr><td><code>UAIPerceptionStimuliSourceComponent</code>:<code>bAutoRegisterAsSource / RegisterAsSourceForSenses / RegisterWithPerceptionSystem</code></td><td><code>Classes/Perception/AIPerceptionStimuliSourceComponent.h:21-40</code></td><td>✅ 存在(给"被感知方"注册用,听觉噪声之外的精细控制)</td></tr>
+<tr><td><code>UBTTask_BlueprintBase</code>:<code>ReceiveExecuteAI(AAIController*, APawn*)</code>、<code>ReceiveTickAI</code>、<code>FinishExecute(bool)</code></td><td><code>Classes/BehaviorTree/Tasks/BTTask_BlueprintBase.h:111/125/129</code></td><td>✅ 存在(自定义 BTT 的基类,蓝图里显示为 "Event Receive Execute AI")</td></tr>
+<tr><td><code>UBTService_BlueprintBase</code>:<code>ReceiveTickAI / ReceiveActivationAI</code></td><td><code>Classes/BehaviorTree/Services/BTService_BlueprintBase.h:112-126</code></td><td>✅ 存在</td></tr>
+<tr><td><code>UBTDecorator_CheckGameplayTagsOnActor</code>:属性 <code>ActorToCheck / TagsToMatch / GameplayTags</code></td><td><code>Classes/BehaviorTree/Decorators/BTDecorator_CheckGameplayTagsOnActor.h:19-37</code></td><td>✅ 存在(BT 直接读 GAS 标签的官方桥梁)</td></tr>
+<tr><td><code>UBehaviorTreeComponent::StartTree / StopTree</code></td><td><code>Classes/BehaviorTree/BehaviorTreeComponent.h:137/140</code></td><td>✅ 存在(死亡停树可用,更常用的是 AIController 的 BrainComponent → Stop Logic)</td></tr>
+<tr><td><code>UBlackboardComponent::SetValueAsObject / SetValueAsBool / ClearValue</code></td><td><code>Classes/BehaviorTree/BlackboardComponent.h:133/148/178</code></td><td>✅ 存在(蓝图节点 Set Value as Object 等)</td></tr>
+<tr><td>内置任务:<code>BTTask_MoveTo / BTTask_Wait / BTTask_RotateToFaceBBEntry / BTTask_MakeNoise</code></td><td><code>Classes/BehaviorTree/Tasks/</code> 目录</td><td>✅ 全部存在</td></tr>
+</table>
+<div class="note"><b>待验证清单</b>(不影响主线,施工时顺手确认):① 视觉感知对未注册 StimuliSource 的 Pawn 是否默认可感知(经验上默认可,若玩家怎么都看不见,给 BP_Player 加 AIPerceptionStimuliSourceComponent 兜底);② ASC 的 <code>OnAbilityEnded</code> 委托是原生非 dynamic 委托(<code>AbilitySystemComponent.h:548</code>),蓝图里能否直接绑定未验证——所以 §4 的 BTT 用"立即 FinishExecute + Wait 节点"的简化版,不依赖它。</div>
+</section>
+
+<section id="plan">
+<h2>④ 本工程落地方案(回来施工时照此顺序做)</h2>
+<p class="meta">标记说明:<span class="tag t-design">资产/配置</span><span class="tag t-bp">蓝图</span><span class="tag t-cpp">C++</span>。除第 1、8、9 步外全程编辑器内完成,不用写代码。</p>
+
+<h3><span class="tag t-design">资产/配置</span>第 1 步:加标签(DefaultGameplayTags.ini)</h3>
+<p>用 5.8 格式 <code>+GameplayTagList=</code>(错题本 P23:老教程的 <code>GameplayTagsList</code> 段格式已失效),追加到 <code>Config/DefaultGameplayTags.ini</code>:</p>
+<pre><code>+GameplayTagList=(Tag="Event.Damaged",DevComment="受到伤害事件(伤害结算后由属性集发出)")
++GameplayTagList=(Tag="Event.Death",DevComment="死亡事件(HP 归零时由属性集发出)")
++GameplayTagList=(Tag="State.Dead",DevComment="死亡状态(GA_Death 激活期间持有)")
++GameplayTagList=(Tag="State.HitReact",DevComment="受击硬直中")
++GameplayTagList=(Tag="Ability.Attack.Enemy",DevComment="敌人普攻(父标签选拔用)")
+</code></pre>
+<div class="note warn">也可以在编辑器 Project Settings → GameplayTags 里加,效果相同,别两处混着加重复行。</div>
+
+<h3><span class="tag t-cpp">C++</span>第 2 步(可合并进第 8/9 步一起做):BaseCharacter 补一行显式初始化</h3>
+<p><code>BaseCharacter.cpp</code> 的 <code>BeginPlay()</code> 开头(Super 之后)加:</p>
+<pre><code>AbilitySystemComponent-&gt;InitAbilityActorInfo(this, this);
+</code></pre>
+<p>不改也能跑(引擎默认初始化,见 §3.1),加上是为了语义明确、以后上 PlayerState 架构时不踩坑。</p>
+
+<h3><span class="tag t-bp">蓝图</span>第 3 步:BP_Dummy 基础设置</h3>
+<ol>
+<li>打开 <code>Content/Gameplay/Characters/BP_Dummy</code>,Details 面板搜 "AI":
+  <ul>
+  <li><b>AI Controller Class</b> = 第 4 步要建的 <code>BP_EnemyAIController</code></li>
+  <li><b>Auto Possess AI</b> = <code>Placed in World or Spawned</code>(否则控制器不附身,BT 永远不跑)</li>
+  </ul></li>
+<li>Class Defaults 的 <b>Startup Abilities</b> 数组填入三个 GA:<code>GA_EnemyAttack</code>(第 6 步建)、<code>GA_HitReact</code>(第 8 步)、<code>GA_Death</code>(第 9 步)。<b>不授予就不会被事件/标签激活,这是最容易漏的一步。</b></li>
+<li>Event BeginPlay:调 <code>RegisterWeaponCollision</code>(蓝图里取武器上的碰撞盒组件传入)——和第 4 章给主角做的完全一样,敌人伤害链路直接复用。</li>
+<li>确认 <code>InitAttributesEffect</code> 已填(GE_InitAttributes),让敌人血量初始化。</li>
+</ol>
+
+<h3><span class="tag t-bp">蓝图</span>第 4 步:建 BP_EnemyAIController + 感知</h3>
+<ol>
+<li>内容浏览器右键 → Blueprint Class → 搜 <code>AIController</code> 为父类,命名 <code>BP_EnemyAIController</code>。</li>
+<li>组件面板 → Add Component → <b>AIPerception</b>(必须手动加,AAIController 默认没有,§3.2 已验证)。</li>
+<li>选中 AIPerception 组件,Details → <b>Senses Config</b> 数组加两项:
+  <ul>
+  <li><b>AI Sight config</b>:Sight Radius = 1500,Lose Sight Radius = 1800(必须 ≥ Sight Radius),Peripheral Vision Half Angle = 70,<b>Detection by Affiliation 三项全勾</b>(Detect Enemies / Neutrals / Friendlies——没配队伍系统时玩家算 Neutral,只勾 Enemies 会看不见玩家!)</li>
+  <li><b>AI Hearing config</b>(可选):Hearing Range = 1200,三项全勾。要真正产生听觉刺激,攻击/跑动处需要发噪声(<code>BTTask_MakeNoise</code> 或 Pawn 的 Make Noise 节点);第 6 章可以先不配,留到做"背后偷袭被发现"手感时再加</li>
+  </ul></li>
+<li>事件图:
+  <ul>
+  <li><b>Event OnPossess</b> → <b>Run Behavior Tree</b>(BTAsset = 第 7 步建的 <code>BT_Dummy</code>)。不要用 BeginPlay——控制器 BeginPlay 时可能还没附身</li>
+  <li>AIPerception 组件拖进图里 → 绑 <b>On Target Perception Updated</b>(Actor, Stimulus):
+    <ul>
+    <li>Stimulus → <b>Was Successfully Sensed</b> 分支</li>
+    <li>True:Get Blackboard → <b>Set Value as Object</b>(Key = <code>TargetActor</code>,Value = Actor);<b>Set Value as Bool</b>(Key = <code>HasLineOfSight</code>,true)</li>
+    <li>False:Set Value as Bool(<code>HasLineOfSight</code>,false);Set Value as Vector(<code>LastKnownLocation</code>,Stimulus.Stimulus Location);(可选)Delay 3s 后 <b>Clear Value</b>(<code>TargetActor</code>)——丢失目标后原地戒备而不是永远死追</li>
+    </ul></li>
+  </ul></li>
+</ol>
+
+<h3><span class="tag t-bp">蓝图</span>第 5 步:建黑板 BB_Dummy</h3>
+<p>右键 → Artificial Intelligence → <b>Blackboard</b>,命名 <code>BB_Dummy</code>,加三个 Key:</p>
+<table>
+<tr><th>Key 名</th><th>类型</th><th>说明</th></tr>
+<tr><td><code>TargetActor</code></td><td>Object(Base Class = Actor)</td><td>当前仇恨目标</td></tr>
+<tr><td><code>HasLineOfSight</code></td><td>Bool</td><td>此刻是否看得见</td></tr>
+<tr><td><code>LastKnownLocation</code></td><td>Vector</td><td>最后看见的位置(丢失后去查看)</td></tr>
+</table>
+
+<h3><span class="tag t-bp">蓝图</span>第 6 步:敌人攻击 GA 与自定义激活任务</h3>
+<h4>6a. GA_EnemyAttack</h4>
+<ul>
+<li>复制一个 <code>GA_Attack_Light_1</code> 改名 <code>GA_EnemyAttack</code>,换敌人的攻击蒙太奇(<b>蒙太奇必须来自敌人自己骨架的动画</b>,Paragon 各角色骨架不通用)。</li>
+<li><b>Ability Tags</b> 改为 <code>Ability.Attack.Enemy</code>(第 1 步加的)。</li>
+<li>图内部不动:Play Montage and Wait + ANS 通知(伤害帧开武器碰撞、State.MoveLocked 生灭)全部照旧——架构原则不变:GA 只管激活门槛和结算。</li>
+</ul>
+<h4>6b. BTT_ActivateGameplayAbility(自定义任务)</h4>
+<ol>
+<li>右键 → Blueprint Class → 父类搜 <code>BTTask_BlueprintBase</code>,命名 <code>BTT_ActivateGameplayAbility</code>。</li>
+<li>加变量 <code>AbilityTags</code>,类型 <b>Gameplay Tag Container</b>,开 Instance Editable(小眼睛)。</li>
+<li>重载 <b>Event Receive Execute AI</b>(节点签名:Owner Controller, Controlled Pawn):
+  <pre><code>Controlled Pawn
+  → Get Ability System Component(蓝图纯函数,库函数,先走接口再找组件)
+  → Try Activate Abilities by Tag(Tags = AbilityTags)→ 返回值 False 时打日志
+  → Finish Execute(Success = true)</code></pre></li>
+<li><b>简化策略:</b>不等技能结束,立即 Finish Execute,后接一个引擎自带 <b>Wait</b> 任务(1~1.5s)充当攻击间隔。等技能结束再返回需要绑 ASC 的 <code>OnAbilityEnded</code> 委托,蓝图侧可行性待验证,不做。</li>
+</ol>
+
+<h3><span class="tag t-bp">蓝图</span>第 7 步:行为树 BT_Dummy</h3>
+<p>右键 → Artificial Intelligence → <b>Behavior Tree</b>,命名 <code>BT_Dummy</code>,Blackboard Asset 选 <code>BB_Dummy</code>。结构:</p>
+<pre><code>Root
+└─ Selector
+   ├─ Sequence [装饰器1:Blackboard(HasLineOfSight == true)]      ← 战斗分支
+   │   ├─ Rotate to Face BB Entry(TargetActor)
+   │   ├─ Move To(TargetActor,Acceptance Radius ≈ 150)
+   │   ├─ BTT_ActivateGameplayAbility(AbilityTags = Ability.Attack.Enemy)
+   │   └─ Wait(1.0 ~ 1.5s,随机偏差 0.3)
+   ├─ Sequence [装饰器2:Blackboard(TargetActor 已设置 且 HasLineOfSight == false)]  ← 追丢分支(可选)
+   │   └─ Move To(LastKnownLocation)
+   └─ Wait(2s)                                                    ← 待机/巡逻占位
+</code></pre>
+<ul>
+<li>两个 Blackboard 装饰器的 <b>Observer Aborts</b> 都设为 <code>Self</code> 或 <code>Both</code>——否则黑板变了树不会即时换分支(社区高频坑)。</li>
+<li>装饰器条件勾 "Is Set" 判 TargetActor 是否有效。</li>
+<li>Selector 从上到下优先级递减;战斗中 HasLineOfSight 变 false 时装饰器 1 会 Self-abort 打断攻击链,自动落入分支二。</li>
+<li><b>地图里必须有 Nav Mesh Bounds Volume</b>(体积包住战斗区域),按 <code>P</code> 显示绿色可行走区域;没有 NavMesh,Move To 立即失败。</li>
+</ul>
+
+<h3><span class="tag t-cpp">C++</span>第 8 步:受击钩子(MyAttributeSet 里发 Event.Damaged)</h3>
+<p><code>MyAttributeSet.cpp</code> 顶部加 include:</p>
+<pre><code>#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayTagContainer.h"
+</code></pre>
+<p><code>PostGameplayEffectExecute</code> 的 Damage 分支,在 <code>SetHealth(...)</code> 之后追加:</p>
+<pre><code>// 受击事件:通知 GA_HitReact
+AActor* Owner = const_cast&lt;AActor*&gt;(OwnerActor); // OwnerActor 即上面已有的 GetOwningActor()
+if (Owner)
+{
+    FGameplayEventData Payload;
+    Payload.Instigator = Data.EffectSpec.GetContext().GetInstigator();
+    Payload.Target = Owner;
+    UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+        Owner, FGameplayTag::RequestGameplayTag(FName("Event.Damaged")), Payload);
+
+    // 死亡事件(第 9 步用)
+    if (GetHealth() &lt;= 0.f)
+    {
+        UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+            Owner, FGameplayTag::RequestGameplayTag(FName("Event.Death")), Payload);
+    }
+}
+</code></pre>
+<div class="note warn"><b>注意:</b>这个钩子在属性集里,玩家和敌人共用——玩家被打也会触发 GA_HitReact(只要你给玩家也授予了它)。不想要玩家受击硬直的话,第 3 步只给 BP_Dummy 授予 GA_HitReact 即可,代码不用加 if。</div>
+<h4>GA_HitReact(蓝图)</h4>
+<ul>
+<li>新建 GA,父类 GameplayAbility,命名 <code>GA_HitReact</code>。</li>
+<li>Class Defaults → <b>Ability Triggers</b> 数组加一条:Trigger Tag = <code>Event.Damaged</code>,Trigger Source = <b>On Gameplay Event</b>(§3.1 已验证枚举存在)。授予后 ASC 自动挂监听,事件到达即激活,图里不用 Wait 节点。</li>
+<li>图:<b>Event Activate Ability</b> → <b>Cancel Abilities</b>(With Tags = <code>Ability.Attack</code>,打断敌人自己正在放的攻击)→ <b>Play Montage and Wait</b>(受击蒙太奇)→ <b>End Ability</b>。</li>
+<li>Activation Owned Tags 可加 <code>State.HitReact</code>;蒙太奇里的 ANS 通知照旧发 <code>State.MoveLocked</code>,与第 4 章架构一致。</li>
+</ul>
+
+<h3><span class="tag t-bp">蓝图</span>第 9 步:死亡 GA_Death</h3>
+<ul>
+<li>新建 <code>GA_Death</code>,Ability Triggers 加 <code>Event.Death</code>(On Gameplay Event)。</li>
+<li><b>Activation Owned Tags = <code>State.Dead</code></b>(技能激活期间挂在 ASC 上,BT/其他 GA 都能查)。<b>不要在 End Ability 里移除</b>——把 <code>bResurrectOnEnd</code> 之类都别想,GA_Death 激活后不主动 End Ability,标签就一直挂着。</li>
+<li>图(Event Activate Ability 起):
+  <ol>
+  <li><b>Cancel All Abilities</b>(清掉正在进行的攻击/受击)</li>
+  <li>Get Character Movement → <b>Disable Movement</b>(停止移动与寻路)</li>
+  <li>Get Controller → <b>Get Brain Component</b> → <b>Stop Logic</b>(Reason = "Dead")——行为树停跑,比 StopTree 更顺手;不调用的话靠下一步碰撞关闭也能保证不再打人,但树会继续空转耗性能</li>
+  <li>Get Capsule Component → <b>Set Collision Enabled</b>(No Collision)(或 Set Collision Response to Channel: Pawn = Ignore,保留地面碰撞)</li>
+  <li><b>Play Montage and Wait</b>(死亡蒙太奇)→ On Completed → <b>Set Life Span</b>(如 5.0,尸体停留 5 秒后自动销毁)</li>
+  </ol></li>
+<li><b>布娃娃替代方案</b>(想要被砍飞的物理感):第 5 步换成 Mesh → <b>Set Collision Profile Name</b>("Ragdoll")→ <b>Set Simulate Physics</b>(true);记得先把胶囊体碰撞关掉,否则胶囊体继续挡路。二选一,Demo 推荐先用死亡蒙太奇(定格在最后一帧的效果 = 蒙太奇勾 bEnableAutoBlendOut = false 或不 End Ability)。</li>
+<li>行为树侧双保险:Root 下战斗 Sequence 再加一个引擎自带装饰器 <b>Check Gameplay Tags on Actor</b>(<code>BTDecorator_CheckGameplayTagsOnActor</code>,§3.2 已验证):Actor To Check = Self,Gameplay Tags = <code>State.Dead</code>,勾 Invert(即"没有 State.Dead 才执行")。</li>
+</ul>
+
+<h3>施工自检清单(每步做完打勾)</h3>
+<ol>
+<li>标签进 ini,编辑器 GameplayTags 面板能搜到 5 个新标签</li>
+<li>PIE 里敌人 ASC 上有 StartupAbilities(ShowDebug AbilitySystem 可查)</li>
+<li>敌人面前走过 → 黑板 TargetActor 被写入(行为树编辑器连 PIE 实例实时看)</li>
+<li>敌人追上来出招,玩家掉血;玩家砍敌人,敌人掉血 + 播受击</li>
+<li>敌人 HP 归零 → 死亡蒙太奇 → 不再移动不再攻击 → 5s 后消失</li>
+</ol>
+</section>
+
+<section id="pitfalls">
+<h2>⑤ 常见坑(按踩坑概率排序)</h2>
+<ol>
+<li><b>AI 完全不动:</b>99% 是 <code>Auto Possess AI</code> 没设(默认 Not Placed in World or Spawned 的反面)或没调 Run Behavior Tree。先查这两个。</li>
+<li><b>感知组件没反应:</b>AAIController <b>不自带</b> AIPerception 组件(源码已验证),必须手动 Add Component。</li>
+<li><b>看得见别人就是看不见玩家:</b>Detection by Affiliation 没勾 Neutrals。没配队伍系统(GenericTeamId)时所有 Actor 互为 Neutral(源码已验证默认三勾全 false)。</li>
+<li><b>On Target Perception Updated 丢了目标也触发:</b>必须判 <code>Stimulus.WasSuccessfullySensed()</code>,否则"丢失"会被当成"看见"再写一次黑板。</li>
+<li><b>GA 不激活:</b>没填 StartupAbilities(GiveAbility 是激活前提);或 Ability Tags 没写对;或 ini 标签格式用了废弃的 <code>GameplayTagsList</code> 段(P23)。</li>
+<li><b>Move To 瞬间失败:</b>地图没有 Nav Mesh Bounds Volume,或目标点不在 NavMesh 上。按 P 检查。</li>
+<li><b>黑板变了分支不换:</b>装饰器 Observer Aborts 还是 None,改成 Self / Both。</li>
+<li><b>蒙太奇播放失败/角色 T-Pose:</b>攻击/受击/死亡蒙太奇是从别的 Paragon 角色拷来的,骨架不匹配。敌人用哪个角色资产包就用哪个包的动画。</li>
+<li><b>死后还在挨打/出招:</b>GA_Death 里忘了 Cancel All Abilities + Disable Movement + 关胶囊体碰撞,三件事都要做。</li>
+<li><b>受击事件把玩家也打出硬直:</b>钩子在 MyAttributeSet,全员生效;不给玩家授予 GA_HitReact 就等于玩家侧不响应,事件发了没人接,无害。</li>
+<li><b>Lose Sight Radius 比 Sight Radius 小:</b>引擎要求 LoseSightRadius ≥ SightRadius,配反了感知会抖动。</li>
+<li><b>听觉永远不触发:</b>听觉是被动接收噪声事件,不像视觉主动扫描。得有人发噪声(Make Noise 节点 / BTTask_MakeNoise / StimuliSource 注册)。</li>
+</ol>
+</section>
+
+<section id="refs">
+<h2>⑥ 参考链接</h2>
+<ul>
+<li><a href="https://github.com/tranek/GASDocumentation">tranek/GASDocumentation</a> —— GAS 社区圣经。§4.1 ASC 归属与初始化(AI 敌人 Owner=Avatar=Pawn)、§4.4.6 PostGameplayEffectExecute(样例工程就在此处接受击动画/死亡)、Fortnite 实践引用(不需要重生的 Actor,Owner 和 Avatar 同一个)</li>
+<li><a href="https://gascompanion.github.io/working-with-ai/">GAS Companion · Working with AI</a> —— BT 驱动 GAS 的范式参考:内置 BTTask_TriggerAbilityByClass / ByTags,任务内取 ASC 激活技能,与本方案 §4 第 6 步同构</li>
+<li><a href="https://dev.epicgames.com/community/learning/tutorials/DPpd/unreal-engine-gameplay-ability-system-best-practices-for-setup">Epic 官方社区 · Gameplay Ability System Best Practices for Setup</a> —— InitAbilityActorInfo 官方说明</li>
+<li><a href="https://dev.epicgames.com/community/learning/tutorials/586p/unreal-engine-ai-perception-theory">Epic 官方社区 · AI Perception Theory</a> —— 感知系统概念</li>
+<li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/behavior-tree-in-unreal-engine---overview">Epic 官方文档 · Behavior Tree 总览</a> —— 行为树节点体系(Composite / Task / Decorator / Service)</li>
+<li><a href="https://www.youtube.com/watch?v=-t3PbGRazKg">YouTube · Smart Enemy AI Part 1: Behavior Trees(UE5)</a> —— 黑板/行为树/自定义任务全流程视频,纯蓝图,适合跟着点</li>
+<li>本机源码:<code>E:\UE_5.8\Engine\Plugins\Runtime\GameplayAbilities\</code> 与 <code>E:\UE_5.8\Engine\Source\Runtime\AIModule\Classes\</code>(§3 所有结论的出处)</li>
+</ul>
+<p class="meta">研究完成日期:2026-10-08(UE 5.8 源码实读验证)· 文档维护:施工时若与引擎行为不符,优先信源码,改本文档。</p>
+</section>
+
+</main>
+</body>
+</html>

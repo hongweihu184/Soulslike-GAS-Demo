@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 · UI 研究文档 · UMG × GAS</title>
+<style>
+  :root{
+    --bg:#14161a; --bg2:#1c1f26; --bg3:#242833; --fg:#d8dce4; --dim:#8a91a0;
+    --accent:#c8a15a; --accent2:#7aa2f7; --ok:#6fbf73; --warn:#e0a050; --bad:#e06060;
+    --border:#2e3340;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--fg); font:15px/1.75 "Microsoft YaHei","PingFang SC",sans-serif;
+       display:flex; min-height:100vh;}
+  /* ---- sidebar ---- */
+  nav{width:250px; flex:0 0 250px; background:var(--bg2); border-right:1px solid var(--border);
+      position:sticky; top:0; height:100vh; overflow-y:auto; padding:20px 14px;}
+  nav h1{font-size:16px; color:var(--accent); margin-bottom:4px;}
+  nav .sub{font-size:12px; color:var(--dim); margin-bottom:16px;}
+  nav a{display:block; color:var(--fg); text-decoration:none; font-size:13.5px;
+        padding:5px 10px; border-radius:6px; border-left:2px solid transparent;}
+  nav a:hover{background:var(--bg3);}
+  nav a.active{border-left-color:var(--accent); color:var(--accent); background:var(--bg3);}
+  nav .grp{font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin:14px 0 4px 10px;}
+  /* ---- main ---- */
+  main{flex:1; max-width:920px; padding:40px 48px 120px;}
+  section{margin-bottom:56px;}
+  h2{font-size:24px; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;}
+  h3{font-size:18px; color:var(--accent2); margin:24px 0 10px;}
+  h4{font-size:15.5px; margin:18px 0 8px; color:var(--fg);}
+  p{margin:8px 0;}
+  ul,ol{margin:8px 0 8px 24px;}
+  li{margin:3px 0;}
+  code{background:var(--bg3); padding:1px 6px; border-radius:4px; font-family:Consolas,monospace; font-size:13px; color:#e8c07d;}
+  pre{background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:14px 16px;
+      overflow-x:auto; margin:10px 0; font-family:Consolas,monospace; font-size:13px; line-height:1.55;}
+  pre code{background:none; padding:0; color:var(--fg);}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px;}
+  th{background:var(--bg3); color:var(--accent); text-align:left;}
+  th,td{border:1px solid var(--border); padding:7px 10px; vertical-align:top;}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+  .card{background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:12px 0;}
+  .note{border-left:3px solid var(--accent2); background:var(--bg2); padding:10px 16px; margin:12px 0; border-radius:0 8px 8px 0;}
+  .warn{border-left:3px solid var(--warn);}
+  .bad{border-left:3px solid var(--bad);}
+  .ok{border-left:3px solid var(--ok);}
+  .tag{display:inline-block; font-size:11px; padding:1px 8px; border-radius:10px; margin-right:6px; vertical-align:middle;}
+  .t-todo{background:#3a3f4d; color:var(--dim);}
+  .t-doing{background:#4a4420; color:var(--warn);}
+  .t-done{background:#23402a; color:var(--ok);}
+  .t-cpp{background:#20344a; color:var(--accent2);}
+  .t-bp{background:#3a2340; color:#c58af0;}
+  .t-design{background:#403a20; color:var(--accent);}
+  a{color:var(--accent2);}
+  .meta{color:var(--dim); font-size:12.5px;}
+  .kpi{display:flex; gap:12px; flex-wrap:wrap; margin:14px 0;}
+  .kpi div{background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 16px; font-size:13px;}
+  .kpi b{color:var(--accent); display:block; font-size:18px;}
+  @media (max-width:900px){ nav{display:none;} main{padding:24px;} }
+</style>
+</head>
+<body>
+<nav>
+  <h1>第 8 章 · UI</h1>
+  <div class="sub">研究文档 · UE 5.8 + GAS<br>撰写日期:2026-06(施工前储备)</div>
+  <div class="grp">目录</div>
+  <a href="#s1">① 这个系统是什么</a>
+  <a href="#s2">② 主流做法对比</a>
+  <a href="#s3">③ 引擎源码验证要点</a>
+  <a href="#s4">④ 本工程落地方案</a>
+  <a href="#s5">⑤ 常见坑</a>
+  <a href="#s6">⑥ 参考链接</a>
+</nav>
+<main>
+
+<section id="s0">
+  <h2>第 8 章 · UI:UMG 对接 GAS 属性</h2>
+  <p class="meta">状态:<span class="tag t-done">研究完成</span> · 关键节点名/函数名均已在本机 E:\UE_5.8 引擎源码 grep 验证 · 未能验证处标注「待验证」</p>
+  <div class="kpi">
+    <div><b>事件驱动</b>不 Tick 轮询</div>
+    <div><b>Wait For Attribute Changed</b>蓝图正统节点</div>
+    <div><b>MVVM = Beta</b>本章不引入</div>
+  </div>
+</section>
+
+<section id="s1">
+  <h2>① 这个系统是什么、为什么这样做</h2>
+  <p>本章要做四样东西:玩家 HUD 上的<b>血条/体力条</b>、敌人<b>头顶血条</b>、<b>Boss 血条</b>、<b>伤害飘字</b>。它们的共同数据源都是 <code>UMyAttributeSet</code> 里的 <code>Health / MaxHealth / Stamina / MaxStamina / Damage</code>。</p>
+  <p>核心问题是:UMG 控件(ProgressBar)怎么知道属性变了?有三条路:</p>
+  <ul>
+    <li><b>Tick 轮询</b>:每帧 <code>GetFloatAttribute</code> 再 <code>Set Percent</code>。能跑,但每帧都走蓝图虚拟机 + 字符串/结构体开销,官方和 tranek 的 GASDocumentation 都明确不推荐。入门教程爱这么写,是错题本级别的反模式。</li>
+    <li><b>进度条的 Bind 绑定</b>:右键 ProgressBar → Create Binding。看着优雅,本质也是<b>每帧调用</b>绑定函数取数,和 Tick 轮询同罪,只是藏得深。</li>
+    <li><b>事件驱动(本章采用)</b>:ASC 内部维护一张「属性 → 委托」映射表,属性真正变化时才广播。控件只在广播回调里 <code>Set Percent</code>。属性没变,UI 一行代码不执行。这是 GAS 设计里给 UI 留的官方接口。</li>
+  </ul>
+  <div class="note">对应到本项目架构原则:和第 4 章「时间轴即状态机」一样,这里也是「<b>数据流即 UI</b>」——状态变化的源头(GAS 结算)直接推动 UI,中间不要有每帧巡逻的第三者。</div>
+</section>
+
+<section id="s2">
+  <h2>② 官方与社区主流做法对比</h2>
+  <table>
+    <tr><th>做法</th><th>出处</th><th>评价</th></tr>
+    <tr><td>C++ 里 <code>GetGameplayAttributeValueChangeDelegate(...).AddUObject(...)</code></td><td><a href="https://github.com/tranek/GASDocumentation">tranek/GASDocumentation</a> §4.3.4 官方级社区标准;样例工程把回调绑在 PlayerState 上更新 HUD</td><td>C++ 项目正统做法。本项目有 C++ 基类,可采用(见④步骤0)</td></tr>
+    <tr><td>蓝图异步节点 <code>Wait For Attribute Changed</code> 包一层委托</td><td>GASDocumentation §8.1 明确建议:「为设计师造 Blueprint AsyncTask 包 ASC 委托,用于 UMG」;引擎 5.8 已内置同名节点,不用自己写</td><td><b>纯蓝图路线首选</b>,本章 HUD/血条用它</td></tr>
+    <tr><td>Epic 官方 GAS 最佳实践教程</td><td><a href="https://dev.epicgames.com/community/learning/tutorials/DPpd/unreal-engine-gameplay-ability-system-best-practices-for-setup">GAS Best Practices for Setup(Epic 官方社区教程)</a></td><td>同样点名 <code>GetGameplayAttributeValueChangeDelegate</code> 作为 UI 更新通道</td></tr>
+    <tr><td>Tick 轮询 / Bind 绑定</td><td>大量入门教程</td><td>能跑但每帧开销,属性多了以后是 HUD 卡顿来源;本项目禁用</td></tr>
+    <tr><td>UMG Viewmodel(MVVM)插件</td><td><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/umg-viewmodel-for-unreal-engine">Epic 官方文档「UMG Viewmodel」</a>;<a href="https://dev.epicgames.com/community/learning/talks-and-demos/pw3Y/unreal-engine-umg-viewmodels-building-more-robust-and-testable-uis-using-mvvm-unreal-fest-2023">Unreal Fest 2023 官方讲座</a></td><td>见下面「MVVM 现状」——5.8 仍是 Beta,本章不用</td></tr>
+    <tr><td>Lyra 样板</td><td>Lyra 的 HUD 走「属性委托 + 自研消息层」</td><td>本项目没有 Lyra 源码,<b>待验证</b>;其思路与 tranek 一致,结论不影响本章方案</td></tr>
+  </table>
+
+  <h3>MVVM 插件在 5.8 的现状(已在本机引擎目录核实)</h3>
+  <ul>
+    <li>插件本体存在:<code>E:\UE_5.8\Engine\Plugins\Runtime\ModelViewViewModel\ModelViewViewModel.uplugin</code>,FriendlyName = <b>"UMG Viewmodel"</b>。</li>
+    <li><code>EnabledByDefault: false</code> —— <b>没有内置默认启用</b>,要在插件窗口手动开。</li>
+    <li><code>IsBetaVersion: true</code> —— 5.8 里官方仍标 <b>Beta</b>。官方文档页也按 Beta 特性对待。</li>
+    <li>关键类已存在:<code>MVVMViewModelBase.h</code>(UMVVMViewModelBase)、<code>MVVMGameSubsystem.h</code>、<code>MVVMBlueprintView.h</code>(路径见③)。</li>
+  </ul>
+  <div class="warn note"><b>结论:简单项目不值得用。</b>本章只有 4 个属性 2~3 个控件,事件委托两行就接完了;MVVM 的收益(FieldNotify 解耦、可测试性)要在设置菜单、背包这种几十个字段的界面才显现。Beta 状态 + 额外学习成本,对本项目(策划单人施工)是负收益。等做设置/背包界面时再回头评估。</div>
+</section>
+
+<section id="s3">
+  <h2>③ 引擎源码验证要点(UE 5.8 本机核实)</h2>
+  <h3>GAS 属性变更委托</h3>
+  <pre><code>// Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h:539
+UE_API FOnGameplayAttributeValueChange&amp; GetGameplayAttributeValueChangeDelegate(FGameplayAttribute Attribute);
+// 注意:不是 UFUNCTION,蓝图搜不到这个函数!(蓝图路线见下)
+// :535-536 旧接口 RegisterGameplayAttributeEvent 注释已写明 "should be replaced by GetGameplayAttributeValueChangeDelegate"</code></pre>
+  <pre><code>// .../Public/GameplayEffectTypes.h:1024
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameplayAttributeValueChange, const FOnAttributeChangeData&amp;);
+// :1009-1022 FOnAttributeChangeData 字段:
+//   FGameplayAttribute Attribute;  float NewValue;  float OldValue;
+//   const FGameplayEffectModCallbackData* GEModData;  // 联机时仅服务器有值(tranek 注明)</code></pre>
+  <h3>蓝图可用节点(异步节点,引擎内置)</h3>
+  <pre><code>// .../Public/Abilities/Async/AbilityAsync_WaitAttributeChanged.h:26-31
+UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta=(BlueprintInternalUseOnly="TRUE"))
+static UAbilityAsync_WaitAttributeChanged* WaitForAttributeChanged(AActor* TargetActor, FGameplayAttribute Attribute, bool OnlyTriggerOnce = false);
+// 蓝图节点名:Wait For Attribute Changed(异步节点,左上有时钟图标)
+// 引脚:Target Actor / Attribute / Only Trigger Once
+// 输出事件 Changed(Attribute, New Value, Old Value) —— DECLARE_DYNAMIC_MULTICAST 三参数
+// OnlyTriggerOnce=false 时会一直监听(血条正需要);true 触发一次就结束</code></pre>
+  <p>另有技能图内专用的 <code>AbilityTask_WaitAttributeChange</code>(.../Public/Abilities/Tasks/AbilityTask_WaitAttributeChange.h),是 Ability Task,只能在 GA 事件图里用,UI 控件里用不了,<b>别选错</b>。</p>
+  <h3>取属性初值(蓝图)</h3>
+  <pre><code>// .../Public/AbilitySystemBlueprintLibrary.h(蓝图节点:Ability System Blueprint Library 下)
+:75  GetAbilitySystemComponent(AActor* Actor)                    → 节点 "Get Ability System Component"
+:178 GetFloatAttribute(const AActor*, FGameplayAttribute, bool&amp;)  → 节点 "Get Float Attribute"
+:186 GetFloatAttributeBase(...)                                   → 节点 "Get Float Attribute Base"</code></pre>
+  <h3>WidgetComponent(敌人头顶血条)</h3>
+  <pre><code>// Engine/Source/Runtime/UMG/Public/Components/WidgetComponent.h
+:25  enum class EWidgetSpace : uint8 { World, Screen }   // World=世界内网格渲染可被遮挡;Screen=直接画到屏幕
+:448 UPROPERTY(EditAnywhere) EWidgetSpace Space;          // 细节面板 "Space" 属性
+:344 SetWidgetSpace(EWidgetSpace)                         // 蓝图可用
+:255 SetDrawSize(FVector2D)                               // 蓝图可用,Screen 模式下条的实际尺寸
+:181 GetUserWidgetObject() → UUserWidget*                 // 蓝图可用,拿到里面的控件去 Set Percent</code></pre>
+  <h3>伤害飘字投影</h3>
+  <pre><code>// Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h:742
+ENGINE_API bool ProjectWorldLocationToScreen(FVector WorldLocation, FVector2D&amp; ScreenLocation, bool bPlayerViewportRelative=false) const;
+// 蓝图节点:Project World Location to Screen(Player Controller 类目)</code></pre>
+  <h3>MVVM 插件文件</h3>
+  <pre><code>Engine/Plugins/Runtime/ModelViewViewModel/ModelViewViewModel.uplugin  (Beta,EnabledByDefault=false)
+.../Source/ModelViewViewModel/Public/MVVMViewModelBase.h              (UMVVMViewModelBase)
+.../Source/ModelViewViewModel/Public/MVVMGameSubsystem.h              (UMVVMGameSubsystem)
+.../Source/ModelViewViewModelBlueprint/Public/MVVMBlueprintView.h     (UMVVMBlueprintView)</code></pre>
+</section>
+
+<section id="s4">
+  <h2>④ 本工程落地方案(回来施工时照做)</h2>
+  <div class="note">对接现状:<code>ABaseCharacter</code> 上 <code>AbilitySystemComponent</code> 是 <code>BlueprintReadOnly</code>(蓝图可直接读),<code>UMyAttributeSet</code> 五个属性都通过 <code>ATTRIBUTE_ACCESSORS</code> 生成了 <code>GetHealthAttribute()</code> 等静态函数。本章<b>不需要新增任何 GameplayTag</b>,UI 纯数据驱动,与标签系统无关。</div>
+
+  <h3>第 0 步(可选,C++ 两行,只为伤害飘字更干净)</h3>
+  <p>在 <code>MyAttributeSet.h</code> 加一个广播结算伤害的动态委托,在 <code>PostGameplayEffectExecute</code> 里 Damage→Health 结算处广播。这样飘字不依赖「Damage 元属性变化→又被清零」的副作用,语义最干净。不写这步也能用蓝图方案(第 5 步备选)凑合。</p>
+  <pre><code>// MyAttributeSet.h 类声明内加:
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageApplied, float, DamageAmount, AActor*, SourceActor);
+// 类里 public:
+UPROPERTY(BlueprintAssignable, Category = "Attributes|Meta")
+FOnDamageApplied OnDamageApplied;
+
+// MyAttributeSet.cpp PostGameplayEffectExecute 里 Damage 结算完成、SetHealth 之后加:
+OnDamageApplied.Broadcast(LocalDamage, /*来源*/nullptr);</code></pre>
+
+  <h3>第 1 步:WBP_StatusBar(通用状态条控件)</h3>
+  <ul>
+    <li>新建 <code>WBP_StatusBar</code>,画布放 <code>ProgressBar</code>(命名 <code>Bar</code>,勾 Is Variable)+ 可选 <code>TextBlock</code> 显示数值。</li>
+    <li>加两个变量:<code>TargetActor</code>(Actor,Object Reference,Instance Editable + Expose on Spawn)、<code>WatchedAttribute</code> / <code>WatchedMaxAttribute</code>(类型 <code>Gameplay Attribute</code>,同样 Expose on Spawn)。</li>
+    <li>Event Construct:
+      <ol>
+        <li><b>初始化</b>:<code>Get Float Attribute</code>(Target=TargetActor,Attribute=WatchedAttribute)和 <code>WatchedMaxAttribute</code> 各取一次 → <code>Bar → Set Percent</code>(Percent = 当前 / 最大)。</li>
+        <li><b>绑变化</b>:异步节点 <code>Wait For Attribute Changed</code>(Target Actor=TargetActor,Attribute=WatchedAttribute,Only Trigger Once=<b>false</b>)→ 从 <code>Changed</code> 事件拉自定义事件 → 事件里重新 <code>Set Percent</code>。</li>
+        <li>若要在控件里同时监听 Max(上限变化场景),再放一个同样节点监听 <code>WatchedMaxAttribute</code>。魂类 Demo 上限不变,可只存一次初值。</li>
+      </ol>
+    </li>
+    <li>Percent 计算需要缓存 Max 值:加一个 float 变量 <code>CachedMax</code>,初始化时填入,Changed 回调里 <code>NewValue / CachedMax</code>。</li>
+  </ul>
+
+  <h3>第 2 步:WBP_HUD(玩家 HUD)</h3>
+  <ul>
+    <li>新建 <code>WBP_HUD</code>,左下角放两个 <code>WBP_StatusBar</code> 实例:<code>HealthBar</code>、<code>StaminaBar</code>(血条红色长条、体力绿色短条,魂类布局)。</li>
+    <li>WBP_HUD 的 Event Construct:
+      <ol>
+        <li><code>Get Owning Player Pawn</code> → 直接作为两个条的 <code>TargetActor</code>(条是实例,用「Expose on Spawn」变量在 Construct 后由父控件赋值:选中条实例 → 细节面板填 TargetActor = 绑定到变量)。</li>
+        <li><code>HealthBar.WatchedAttribute</code> 选 <code>MyAttributeSet.Health</code>,<code>WatchedMaxAttribute</code> 选 <code>MyAttributeSet.MaxHealth</code>;体力条同理 <code>Stamina / MaxStamina</code>。属性下拉框来自属性集的 UPROPERTY,直接搜得到。</li>
+      </ol>
+    </li>
+    <li>创建时机:在玩家 BP(BP_ThirdPersonCharacter 或其等价物)Event BeginPlay → <code>Create Widget</code>(Class=WBP_HUD,Owning Player=Get Player Controller 0)→ <code>Add to Viewport</code>。</li>
+  </ul>
+
+  <h3>第 3 步:敌人头顶血条(BP_Dummy 挂 WidgetComponent)</h3>
+  <ul>
+    <li><code>BP_Dummy</code> 添加组件 <code>Widget</code>(WidgetComponent),命名 <code>HealthBarWidget</code>,挂到 <code>Mesh</code> 下或根组件,Location 抬到头顶(Z≈110,按 Paragon 体型微调)。</li>
+    <li>细节面板:<code>Space = Screen</code>(屏幕空间,远处不缩小、不被遮挡,魂类头顶条标准做法)、<code>Widget Class = WBP_StatusBar</code>、<code>Draw Size</code> =(120, 12) 左右。</li>
+    <li>BP_Dummy Event BeginPlay:<code>HealthBarWidget → Get User Widget Object</code> → Cast to <code>WBP_StatusBar</code> → 设置 <code>TargetActor = self</code>、属性选 <code>Health / MaxHealth</code>,再调用一次初始化(如果控件的 Construct 早于赋值,把初始化逻辑收进控件的一个公开函数 <code>Init(TargetActor, Attr, MaxAttr)</code>,这里手动调一次)。<b>建议直接做成 Init 函数</b>,HUD 那边也复用,避免 Construct 时序坑(见⑤)。</li>
+    <li>显示策略(魂类):平时隐藏,受击后显示 4 秒再隐藏。BP_Dummy 里用同一个 <code>Wait For Attribute Changed</code>(Attribute=Health,OnlyTriggerOnce=false)→ Changed → <code>HealthBarWidget → Set Visibility(Visible)</code> → <code>Set Timer by Event</code>(4s)→ 隐藏。</li>
+  </ul>
+
+  <h3>第 4 步:Boss 血条模式</h3>
+  <ul>
+    <li>不做 WidgetComponent。WBP_HUD 底部放第三个 <code>WBP_StatusBar</code> 实例 <code>BossBar</code>(更宽、带名字 TextBlock),默认 <code>Visibility = Collapsed</code>。</li>
+    <li>WBP_HUD 加公开函数 <code>ShowBossBar(AActor Boss)</code>:给 BossBar 调 <code>Init(Boss, Health, MaxHealth)</code> → <code>Set Visibility(Visible)</code>;再配 <code>HideBossBar()</code>。</li>
+    <li>触发时机:锁定到 Boss / 进入 Boss 房触发盒时由关卡蓝图或 Boss 自身 BeginPlay 调 <code>ShowBossBar</code>(拿 HUD:Get Player Controller → Get HUD Widget 存引用,或第 2 步创建 HUD 时把它存进 GameInstance/PC 变量方便全局取)。本章若没有锁定系统,先用触发盒手动演示,锁定联动留到对应章节。</li>
+  </ul>
+
+  <h3>第 5 步:伤害飘字(WBP_DamageNumber)</h3>
+  <ul>
+    <li>新建 <code>WBP_DamageNumber</code>:Canvas 里一个 <code>TextBlock</code>,做一段动画(上浮 40px + 淡出,1 秒),Animation 命名 <code>FloatUp</code>。</li>
+    <li>控件加函数 <code>Popup(float Amount, FVector2D ScreenPos)</code>:设文本 = Round(Amount)→ <code>Set Position in Viewport</code>(ScreenPos)→ <code>Play Animation(FloatUp)</code> → 动画结束 <code>Remove from Parent</code>。</li>
+    <li><b>方案 A(写了第 0 步)</b>:BP_Dummy(或 BaseCharacter 蓝图子类)Event BeginPlay → 取自己的 ASC → … 实际最省事是:谁能拿到 AttributeSet 谁绑。蓝图里 <code>Get Ability System Component</code> → <code>Get Attribute Set</code> 类节点取不到 UMyAttributeSet 的自定义委托时,把绑定放在 <b>WBP_HUD</b>:监听所有敌人的飘字需要一个「受击者注册表」——简单做法:BP_Dummy BeginPlay 里 <code>Create Widget(WBP_DamageNumber)</code> 不 Add,先存着;Damage 委托回调里 <code>Add to Viewport</code> → <code>Get Owner Actor → Get Actor Location</code>(+Z 偏移)→ <code>Project World Location to Screen</code>(Player Controller 0)→ <code>Popup</code>。<b>待验证</b>:蓝图直接 Cast AttributeSet 到 MyAttributeSet 的节点路径,施工时先试 <code>GetAbilitySystemComponent → GetAttributeSet(待验证节点名)</code>,不行就在第 0 步 C++ 里把委托挂到 BaseCharacter 上广播。</li>
+    <li><b>方案 B(纯蓝图,不写 C++)</b>:BP_Dummy 里放 <code>Wait For Attribute Changed</code>(Attribute=<b>MyAttributeSet.Damage</b>,OnlyTriggerOnce=false)→ Changed → <b>Branch:New Value &gt; 0</b>(过滤结算后清零的那次广播)→ 后续同方案 A 的投影 + Popup。原理:GE_Damage 先把 Damage 设成 50(触发一次,NewValue=50),PostGameplayEffectExecute 结算后清零(再触发一次,NewValue=0),过滤 0 即可。</li>
+    <li>飘字每次投影一次即可(1 秒动画内位置不动),不用每帧跟随;要跟随就在控件里加极少量 Tick 或 Timeline 更新位置——飘字是允许 Tick 的例外,因为它活 1 秒就死。</li>
+  </ul>
+
+  <h3>施工顺序速查</h3>
+  <table>
+    <tr><th>顺序</th><th>做什么</th><th>类型</th></tr>
+    <tr><td>第 0 步</td><td>MyAttributeSet 加 OnDamageApplied 委托(可选)</td><td><span class="tag t-cpp">C++</span></td></tr>
+    <tr><td>第 1 步</td><td>WBP_StatusBar 通用条(Init 函数 + Wait For Attribute Changed)</td><td><span class="tag t-bp">蓝图</span></td></tr>
+    <tr><td>第 2 步</td><td>WBP_HUD + 玩家 BeginPlay 创建 Add to Viewport</td><td><span class="tag t-bp">蓝图</span></td></tr>
+    <tr><td>第 3 步</td><td>BP_Dummy 头顶血条(WidgetComponent,Space=Screen)</td><td><span class="tag t-bp">蓝图</span></td></tr>
+    <tr><td>第 4 步</td><td>Boss 血条(HUD 底部第三条 + Show/HideBossBar)</td><td><span class="tag t-bp">蓝图</span></td></tr>
+    <tr><td>第 5 步</td><td>伤害飘字(方案 A C++ 委托 / 方案 B 监听 Damage 元属性)</td><td><span class="tag t-bp">蓝图</span></td></tr>
+  </table>
+</section>
+
+<section id="s5">
+  <h2>⑤ 常见坑</h2>
+  <div class="bad note"><b>1. 蓝图里搜不到 GetGameplayAttributeValueChangeDelegate。</b>它不是 UFUNCTION(③已验证)。蓝图路线是异步节点 <code>Wait For Attribute Changed</code>;要原生委托就得写 C++。凭记忆在蓝图里硬找这个函数名是本类任务的经典错题。</div>
+  <div class="bad note"><b>2. 委托只在「变化时」触发,不会发初始值。</b>控件 Construct 时必须先用 <code>Get Float Attribute</code> 读一次初值填条,否则进游戏血条是空的/满的直到第一次掉血。</div>
+  <div class="warn note"><b>3. Percent 要除以 Max,Max 变了条就错。</b>每次回调用「NewValue / CachedMax」;如果以后有加血上限的装备/Buff,Max 属性也要再挂一个 <code>Wait For Attribute Changed</code>。</div>
+  <div class="warn note"><b>4. Damage 元属性会触发两次委托</b>(设值 50 一次、结算清零一次)。方案 B 飘字必须过滤 <code>NewValue &gt; 0</code>。这是 tranek 样例里同样存在的模式,不是 bug。</div>
+  <div class="warn note"><b>5. WidgetComponent 的 Space 选错。</b>敌人头顶条用 <code>Screen</code>;<code>World</code> 模式会渲染到 RenderTarget 再贴网格,每个敌人一份 RT,敌人一多就是性能税,还会被场景遮挡。World 模式只在「要 UI 真实存在于世界里可被遮挡」时用。</div>
+  <div class="warn note"><b>6. GetUserWidgetObject 的时序。</b>WidgetComponent 的控件在组件初始化后才创建;BP_Dummy BeginPlay 里立刻拿一般没问题,但控件自身 Construct 早于你赋 TargetActor,所以第 3 步强调<b>用公开的 Init 函数手动初始化</b>,不要依赖控件 Construct 时变量已就位。</div>
+  <div class="warn note"><b>7. HUD 拿 Pawn 的时机。</b>WBP_HUD 的 Construct 里 <code>Get Owning Player Pawn</code> 可能为 null(控制器还没 Possess)。本项目 ASC 就在 Character 上且 BeginPlay 创建 HUD,一般安全;若遇到 null,把初始化延后一拍(Delay 0 或 Bind 到 OnPossessed)。</div>
+  <div class="warn note"><b>8. 联机注意(本项目单机可跳过):</b><code>FOnAttributeChangeData.GEModData</code> 只在服务器有值(tranek 注明);属性委托本身依赖复制,单机无影响。</div>
+  <div class="warn note"><b>9. MVVM 别手痒。</b>5.8 里是 Beta 且默认关闭。本章控件只有 2~3 个,引入 MVVM 纯属加复杂度。要开也在插件管理器搜 "UMG Viewmodel",但本章方案不依赖它。</div>
+  <div class="warn note"><b>10. 老教程的 GameplayTagsList 段格式在 5.8 已失效</b>(错题本 P23)。本章不加标签,但若顺手给 UI 相关功能打标签,必须用 <code>[/Script/GameplayTags.GameplayTagsSettings]</code> 段的 <code>+GameplayTagList=</code> 格式。</div>
+</section>
+
+<section id="s6">
+  <h2>⑥ 参考链接</h2>
+  <ul>
+    <li><a href="https://github.com/tranek/GASDocumentation">tranek/GASDocumentation</a> — §4.3.4 响应属性变化(GetGameplayAttributeValueChangeDelegate)、§8.1 建议为 UMG 造蓝图 AsyncTask(引擎 5.8 已内置)</li>
+    <li><a href="https://dev.epicgames.com/community/learning/tutorials/DPpd/unreal-engine-gameplay-ability-system-best-practices-for-setup">Epic 官方社区教程:GAS Best Practices for Setup</a> — 官方同样点名该委托用于 UI</li>
+    <li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/umg-viewmodel-for-unreal-engine">Epic 官方文档:UMG Viewmodel(MVVM)</a> — 插件用法;注意 5.8 仍 Beta</li>
+    <li><a href="https://dev.epicgames.com/community/learning/talks-and-demos/pw3Y/unreal-engine-umg-viewmodels-building-more-robust-and-testable-uis-using-mvvm-unreal-fest-2023">Unreal Fest 2023:UMG Viewmodels 官方讲座</a></li>
+    <li><a href="https://gascompanion.github.io/working-with-ui/">GAS Companion 插件文档:Working with UI</a> — 商用插件的 AttributeChangeDelegate → HUD 做法,思路交叉印证</li>
+    <li>本机源码:Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/ 下 AbilitySystemComponent.h、GameplayEffectTypes.h、Abilities/Async/AbilityAsync_WaitAttributeChanged.h、AbilitySystemBlueprintLibrary.h;Engine/Source/Runtime/UMG/Public/Components/WidgetComponent.h;Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h</li>
+  </ul>
+</section>
+
+</main>
+</body>
+</html>

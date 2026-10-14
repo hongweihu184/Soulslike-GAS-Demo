@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 · 锁定系统研究文档 · 魂类 ARPG Demo / UE5.8</title>
+<style>
+  :root{
+    --bg:#14161a; --bg2:#1c1f26; --bg3:#242833; --fg:#d8dce4; --dim:#8a91a0;
+    --accent:#c8a15a; --accent2:#7aa2f7; --ok:#6fbf73; --warn:#e0a050; --bad:#e06060;
+    --border:#2e3340;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--fg); font:15px/1.75 "Microsoft YaHei","PingFang SC",sans-serif;
+       display:flex; min-height:100vh;}
+  /* ---- sidebar ---- */
+  nav{width:250px; flex:0 0 250px; background:var(--bg2); border-right:1px solid var(--border);
+      position:sticky; top:0; height:100vh; overflow-y:auto; padding:20px 14px;}
+  nav h1{font-size:16px; color:var(--accent); margin-bottom:4px;}
+  nav .sub{font-size:12px; color:var(--dim); margin-bottom:16px;}
+  nav a{display:block; color:var(--fg); text-decoration:none; font-size:13.5px;
+        padding:5px 10px; border-radius:6px; border-left:2px solid transparent;}
+  nav a:hover{background:var(--bg3);}
+  nav a.active{border-left-color:var(--accent); color:var(--accent); background:var(--bg3);}
+  nav .grp{font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin:14px 0 4px 10px;}
+  /* ---- main ---- */
+  main{flex:1; max-width:920px; padding:40px 48px 120px;}
+  section{margin-bottom:56px;}
+  h2{font-size:24px; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;}
+  h3{font-size:18px; color:var(--accent2); margin:24px 0 10px;}
+  h4{font-size:15.5px; margin:18px 0 8px; color:var(--fg);}
+  p{margin:8px 0;}
+  ul,ol{margin:8px 0 8px 24px;}
+  li{margin:3px 0;}
+  code{background:var(--bg3); padding:1px 6px; border-radius:4px; font-family:Consolas,monospace; font-size:13px; color:#e8c07d;}
+  pre{background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:14px 16px;
+      overflow-x:auto; margin:10px 0; font-family:Consolas,monospace; font-size:13px; line-height:1.55;}
+  pre code{background:none; padding:0; color:var(--fg);}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px;}
+  th{background:var(--bg3); color:var(--accent); text-align:left;}
+  th,td{border:1px solid var(--border); padding:7px 10px; vertical-align:top;}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+  .card{background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:12px 0;}
+  .note{border-left:3px solid var(--accent2); background:var(--bg2); padding:10px 16px; margin:12px 0; border-radius:0 8px 8px 0;}
+  .warn{border-left:3px solid var(--warn);}
+  .bad{border-left:3px solid var(--bad);}
+  .ok{border-left:3px solid var(--ok);}
+  .tag{display:inline-block; font-size:11px; padding:1px 8px; border-radius:10px; margin-right:6px; vertical-align:middle;}
+  .t-todo{background:#3a3f4d; color:var(--dim);}
+  .t-doing{background:#4a4420; color:var(--warn);}
+  .t-done{background:#23402a; color:var(--ok);}
+  .t-cpp{background:#20344a; color:var(--accent2);}
+  .t-bp{background:#3a2340; color:#c58af0;}
+  .t-design{background:#403a20; color:var(--accent);}
+  a{color:var(--accent2);}
+  .meta{color:var(--dim); font-size:12.5px;}
+  .kpi{display:flex; gap:12px; flex-wrap:wrap; margin:14px 0;}
+  .kpi div{background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 16px; font-size:13px;}
+  .kpi b{color:var(--accent); display:block; font-size:18px;}
+  @media (max-width:900px){ nav{display:none;} main{padding:24px;} }
+</style>
+</head>
+<body>
+
+<nav>
+  <h1>第 7 章 · 锁定系统</h1>
+  <div class="sub">魂类硬锁定 · 研究储备文档<br>UE 5.8 + GAS · 施工前直接照做</div>
+  <div class="grp">目录</div>
+  <a href="#s1">① 系统是什么、为什么这样做</a>
+  <a href="#s2">② 官方与社区主流做法对比</a>
+  <a href="#s3">③ 引擎源码验证要点</a>
+  <a href="#s4">④ 本工程落地方案</a>
+  <a href="#s4-tags">4.1 加标签</a>
+  <a href="#s4-input">4.2 输入</a>
+  <a href="#s4-acquire">4.3 目标获取(按锁定键时)</a>
+  <a href="#s4-camera">4.4 锁定相机(Tick)</a>
+  <a href="#s4-strafe">4.5 移动模式切换(strafe)</a>
+  <a href="#s4-switch">4.6 右摇杆切换目标</a>
+  <a href="#s4-break">4.7 断锁条件(定时器)</a>
+  <a href="#s4-ui">4.8 锁定标记 UI</a>
+  <a href="#s5">⑤ 常见坑</a>
+  <a href="#s6">⑥ 参考链接</a>
+</nav>
+
+<main>
+
+<section id="s0">
+  <h2>第 7 章 · 锁定系统(研究文档)</h2>
+  <p class="meta">状态:<span class="tag t-todo">研究完成 · 待施工</span> · 研究日期:本项目第 4 章(三连击)施工期间 · 适用范围:第 7 章施工时照做</p>
+  <div class="note ok">
+    本文档所有节点名 / 类名 / 函数名均在 <code>E:\UE_5.8\Engine\Source</code> 中 grep 验证过存在(见第 ③ 节,含文件路径与行号)。标「待验证」的条目施工时需再确认。
+  </div>
+</section>
+
+<section id="s1">
+  <h2>① 这个系统是什么、为什么这样做</h2>
+  <p>类魂硬锁定(Hard Lock-On)由 4 个子模块组成:</p>
+  <ol>
+    <li><b>目标获取</b>:按下锁定键时,在玩家周围找出一个「最合适」的敌人(球形范围 → 视线检查 → 角度/距离评分取最优)。</li>
+    <li><b>锁定相机</b>:锁定期间相机每帧转向目标(带插值,不是硬切),玩家失去自由视角;右摇杆从「转视角」变成「切换目标」。</li>
+    <li><b>移动模式切换</b>:角色从「面朝移动方向」(<code>bOrientRotationToMovement=true</code>)切换为「面朝锁定目标」的 strafe 移动(前后左右平移环绕)。</li>
+    <li><b>断锁</b>:超距 / 目标死亡 / 视线被遮挡超时 → 解除锁定,相机和移动模式还原。</li>
+  </ol>
+  <p><b>为什么这样做(设计依据)</b>:魂系战斗的核心体验是「一对一的立回」——锁定把视角、移动、攻击方向三者锚定在目标身上,玩家只需管理距离和时机。技术上它本质是一个<b>输入驱动的状态机</b>(未锁定 ⇄ 锁定),不是技能,所以<b>不走 GA/GE,不用蒙太奇通知管状态</b>;但要把锁定状态暴露成 GameplayTag(<code>State.LockedOn</code>),让其他系统(攻击 GA、移动输入)能查询。</p>
+  <div class="note">
+    与本工程架构原则的关系:第 4 章的原则是「时间轴即状态机,蒙太奇通知管状态标签」——那只适用于<b>攻击/受击这类有明确时间段的演出状态</b>。锁定是<b>无限持续的玩家意图状态</b>,由输入开关,因此由玩家角色(BP)直接维护标签生灭,不走 ANS。
+  </div>
+</section>
+
+<section id="s2">
+  <h2>② 官方与社区主流做法对比</h2>
+
+  <h3>2.1 锁定相机的三种方案</h3>
+  <table>
+    <tr><th>方案</th><th>做法</th><th>优点</th><th>缺点</th><th>出处</th></tr>
+    <tr>
+      <td><b>A · 每帧 SetControlRotation + 插值(主流,选型 ✅)</b></td>
+      <td>锁定期间在 Tick 里算「相机→目标」的朝向(<code>FindLookAtRotation</code>),只取 Yaw(Pitch 保留玩家原俯角),用 <code>RInterpTo</code> 平滑插值后写入 <code>SetControlRotation</code>。弹簧臂保持 <code>bUsePawnControlRotation=true</code>,不用动。</td>
+      <td>实现最简单;天然兼容现有弹簧臂;插值速度可调手感;断锁时把最后视角直接交还给玩家,零状态清理。</td>
+      <td>占用玩家的控制旋转(锁定时必须屏蔽 Look 输入);想加「动态拉远/偏移」等高级镜头时要自己叠逻辑。</td>
+      <td><a href="https://theindieprofessor.wordpress.com/2025/09/28/how-to-create-a-lock-on-targeting-system-on-ue5/">TheIndieProfessor · UE5 Lock-On 教程(2025,文字版)</a>;<a href="https://www.youtube.com/watch?v=5hxFY-2rAro">Ryan Laley · Action RPG 系列(目标切换)</a>;绝大多数中文类魂教程同此方案</td>
+    </tr>
+    <tr>
+      <td><b>B · 锁定时改弹簧臂/相机朝向</b></td>
+      <td>锁定时把弹簧臂 <code>bUsePawnControlRotation</code> 关掉,改为每帧 SetWorldRotation 朝向目标;断锁时还原。</td>
+      <td>不污染控制旋转,断锁后玩家视角保持在锁定前的方向。</td>
+      <td>状态切换点多、容易留 bug;相机每帧硬写 WorldRotation 与弹簧臂自身延迟/碰撞逻辑打架;社区用得少,踩坑资料少。</td>
+      <td>知乎专栏 <a href="https://zhuanlan.zhihu.com/p/653945897">UE5 实现类魂敌人锁定机制</a> 的 C++ TargetComponent 思路(保存并切换三组旋转布尔值)接近此类</td>
+    </tr>
+    <tr>
+      <td><b>C · 自定义 CameraManager / Lyra CameraMode</b></td>
+      <td>继承 <code>APlayerCameraManager</code> 或仿 Lyra 写 CameraMode 栈,把「锁定」做成一种相机模式,在 UpdateCamera 里解算。</td>
+      <td>架构最干净,可扩展多镜头模式(锁定/处决/演出镜头自由叠加)。</td>
+      <td>工程量是 A 的 5~10 倍;对「无 C++ 基础的施工者」不友好;Demo 阶段过度设计。</td>
+      <td>Lyra 样板的 Camera 系统(5.8 样板,非锁定专用,无现成锁定模式);<a href="https://www.reddit.com/r/unrealengine/comments/1cgg516/creating_a_more_advanced_lockon_camera/">社区关于进阶锁定相机的讨论</a></td>
+    </tr>
+  </table>
+  <div class="note ok"><b>选型结论:方案 A</b>。理由:① 本工程 <code>BaseCharacter</code> 已是「弹簧臂 <code>bUsePawnControlRotation=true</code> + 角色不跟随控制旋转」的标准 TPS 配置,方案 A 只加逻辑不改结构;② 所有主流 UE5 类魂教程(中英文)都用它,施工时参考资料最多;③ 断锁后不需要「还原相机」这一步,天然防残留 bug。方案 C 留作后期(演出镜头/处决镜头)再评估。</div>
+
+  <h3>2.2 目标获取:Tick 还是定时器?</h3>
+  <table>
+    <tr><th>子任务</th><th>结论</th><th>理由</th></tr>
+    <tr><td>按下锁定键时的候选筛选(Overlap + Trace + 评分)</td><td><b>一次性执行</b>,不进 Tick 也不进循环定时器</td><td>只在「上锁」和「切换目标」两个瞬间需要;持续扫描没有意义</td></tr>
+    <tr><td>相机朝向插值</td><td><b>Event Tick 每帧</b></td><td>插值必须每帧做才平滑;只有每帧一次的向量运算,开销可忽略;锁定解除时用 <code>SetActorTickEnabled</code> 或分支短路</td></tr>
+    <tr><td>断锁检查(距离 / 遮挡 LOS)</td><td><b>循环定时器 0.1~0.25s</b></td><td>LineTrace 每帧打是浪费;0.1s 粒度对「断锁」这种秒级事件完全够;遮挡超时在定时器里累加计时最自然</td></tr>
+  </table>
+  <p class="meta">依据:<a href="https://theindieprofessor.wordpress.com/2025/09/28/how-to-create-a-lock-on-targeting-system-on-ue5/">TheIndieProfessor 教程</a>用 Event Tick 驱动相机更新并按距离断锁;<a href="https://www.youtube.com/watch?v=_92I9S69hrY">视线检查(LOS)专项教程</a>演示了 Trace 视线校验;把低频检查挪到定时器是引擎通用优化共识(SphereOverlap/LineTrace 均有场景查询开销)。</p>
+
+  <h3>2.3 目标切换算法</h3>
+  <p>社区有两种做法:</p>
+  <ul>
+    <li><b>索引循环法</b>(<a href="https://forums.unrealengine.com/t/how-do-i-make-a-souls-like-lock-on-and-target-switching-sysem/2697920">Epic 官方论坛答疑实例</a>):候选存数组,按键 +1/-1 取模循环。实现简单,但「方向感」差——玩家向右拨摇杆却切到左边的怪。</li>
+    <li><b>角度最近邻法(选型 ✅)</b>:右摇杆拨动方向作为参考向量,对每个候选算「当前目标 → 候选」与摇杆方向的夹角(点积),取夹角最小且超过阈值(死区)者。<a href="https://www.reddit.com/r/unrealengine/comments/1obf61y/directional_target_lock_swapping/">Reddit: Directional target lock swapping</a> 讨论的就是这种;魂系原作即此手感。</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>③ 引擎源码验证要点(UE 5.8 已 grep 确认)</h2>
+  <table>
+    <tr><th>符号</th><th>签名 / 说明</th><th>源码位置</th></tr>
+    <tr>
+      <td><code>AController::SetControlRotation</code></td>
+      <td><code>virtual void SetControlRotation(const FRotator&amp; NewRotation)</code>,<code>BlueprintCallable</code>(蓝图节点名 Set Control Rotation)</td>
+      <td><code>Engine/Source/Runtime/Engine/Classes/GameFramework/Controller.h:163</code></td>
+    </tr>
+    <tr>
+      <td><code>AController::GetControlRotation</code></td>
+      <td><code>virtual FRotator GetControlRotation() const</code></td>
+      <td><code>Controller.h:159</code></td>
+    </tr>
+    <tr>
+      <td><code>UKismetSystemLibrary::SphereOverlapActors</code></td>
+      <td><code>static bool SphereOverlapActors(const UObject* WorldContextObject, const FVector SpherePos, float SphereRadius, const TArray&lt;TEnumAsByte&lt;EObjectTypeQuery&gt;&gt;&amp; ObjectTypes, UClass* ActorClassFilter, const TArray&lt;AActor*&gt;&amp; ActorsToIgnore, TArray&lt;AActor*&gt;&amp; OutActors)</code>;蓝图节点显示名 <b>Sphere Overlap Actors</b>。注意:返回数组<b>无序</b>,需自行评分排序</td>
+      <td><code>Engine/Source/Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h:1092</code></td>
+    </tr>
+    <tr>
+      <td><code>UKismetSystemLibrary::LineTraceSingle</code></td>
+      <td>蓝图节点显示名 <b>Line Trace By Channel</b>;参数含 <code>ETraceTypeQuery TraceChannel</code>(选 Visibility)、<code>ActorsToIgnore</code>、<code>EDrawDebugTrace</code>(调试期选 For Duration 可视化)</td>
+      <td><code>KismetSystemLibrary.h:1270</code></td>
+    </tr>
+    <tr>
+      <td><code>UCharacterMovementComponent::bOrientRotationToMovement</code></td>
+      <td>true = 朝加速度方向转身(用 <code>RotationRate</code>);<b>优先级高于</b> <code>bUseControllerDesiredRotation</code>,两者同开时前者生效</td>
+      <td><code>Engine/Source/Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h:446</code></td>
+    </tr>
+    <tr>
+      <td><code>UCharacterMovementComponent::bUseControllerDesiredRotation</code></td>
+      <td>true = 朝控制旋转方向转身(锁定时 strafe 用)</td>
+      <td><code>CharacterMovementComponent.h:439</code></td>
+    </tr>
+    <tr>
+      <td><code>UCharacterMovementComponent::RotationRate</code></td>
+      <td>本工程现为 <code>(0, 540, 0)</code>,锁定时沿用即可</td>
+      <td><code>CharacterMovementComponent.h:410</code>;</td>
+    </tr>
+    <tr>
+      <td><code>USpringArmComponent::bUsePawnControlRotation</code></td>
+      <td>本工程 <code>CameraBoom</code> 已 = true,锁定方案 A 下<b>不用动</b></td>
+      <td><code>Engine/Source/Runtime/Engine/Classes/GameFramework/SpringArmComponent.h:57</code></td>
+    </tr>
+    <tr>
+      <td><code>APawn::bUseControllerRotationYaw / Pitch</code></td>
+      <td>本工程 Yaw 已 = false(<code>BaseCharacter.cpp:32</code>),方案 A 下<b>不用动</b></td>
+      <td><code>Engine/Source/Runtime/Engine/Classes/GameFramework/Pawn.h:73,77</code></td>
+    </tr>
+    <tr>
+      <td><code>UKismetMathLibrary::FindLookAtRotation</code></td>
+      <td><code>static FRotator FindLookAtRotation(const FVector&amp; Start, const FVector&amp; Target)</code>;蓝图节点 <b>Find Look at Rotation</b></td>
+      <td><code>Engine/Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h:2300</code></td>
+    </tr>
+    <tr>
+      <td><code>UKismetMathLibrary::RInterpTo</code> / <code>RInterpTo_Constant</code></td>
+      <td><code>static FRotator RInterpTo(FRotator Current, FRotator Target, float DeltaTime, float InterpSpeed)</code>;蓝图节点 <b>RInterp To</b> / <b>RInterp To Constant</b>(等速版)</td>
+      <td><code>KismetMathLibrary.h:4098 / 4110</code></td>
+    </tr>
+    <tr>
+      <td><code>UKismetMathLibrary::Dot_VectorVector</code>、<code>GetForwardVector</code>、<code>NormalizedDeltaRotator</code></td>
+      <td>切换目标的角度最近邻、候选评分用;蓝图节点 <b>Dot (Vector)</b> / <b>Get Forward Vector</b> / <b>Normalized Delta Rotator</b></td>
+      <td><code>KismetMathLibrary.h:1437 / 2347 / 2383</code></td>
+    </tr>
+  </table>
+  <div class="note">
+    <b>本工程现状核对</b>(<code>Source/ProjectUnreal/BaseCharacter.cpp</code>):<br>
+    · 弹簧臂 <code>bUsePawnControlRotation=true</code>(:26)、相机 false(:30)——方案 A 直接兼容;<br>
+    · <code>bUseControllerRotationYaw=false</code> + <code>bOrientRotationToMovement=true</code>(:32-33)——锁定时需切换为 <code>bOrientRotationToMovement=false</code> + <code>bUseControllerDesiredRotation=true</code>,断锁还原;<br>
+    · ⚠ <code>PrimaryActorTick.bCanEverTick = false</code>(:18)——C++ 基类关了 Tick,<b>BP 子类需在 Class Settings 里重新勾选 Actor Tick</b>,否则 Event Tick 不触发(见常见坑 1)。
+  </div>
+</section>
+
+<section id="s4">
+  <h2>④ 本工程落地方案(施工步骤)</h2>
+  <p>整体位置:锁定系统放在 <b>BP_Player(玩家角色蓝图)</b> 里,纯蓝图即可,不改 C++(唯一例外:若想在 C++ 侧做,先把 <code>BaseCharacter</code> 的 Tick 打开;不推荐,见常见坑 1)。状态通过 GameplayTag 暴露,GAS 侧不加新 GA/GE。</p>
+
+  <h3 id="s4-tags">4.1 加标签 <span class="tag t-doing">回来施工时第 1 步</span></h3>
+  <p>在 <code>Config/DefaultGameplayTags.ini</code> 的 <code>[/Script/GameplayTags.GameplayTagsSettings]</code> 段末尾追加(5.8 用 <code>+GameplayTagList</code>,不是老教程的 GameplayTagsList——错题本 P23):</p>
+  <pre><code>+GameplayTagList=(Tag="State.LockedOn",DevComment="锁定状态中(由锁定系统维护,非蒙太奇通知)")
++GameplayTagList=(Tag="State.Dead",DevComment="死亡状态(未来章节用;锁定系统断锁判断预留)")</code></pre>
+  <p class="meta">改完 ini 需重启编辑器让标签生效。<code>State.Dead</code> 本章只用于「断锁条件」的预留查询,死亡系统落地前该条件恒为假,不影响施工。</p>
+
+  <h3 id="s4-input">4.2 输入 <span class="tag t-doing">回来施工时第 2 步</span></h3>
+  <ol>
+    <li><code>Content/Input/</code> 下新建 <b>IA_LockOn</b>(Value Type = Digital bool),在 <b>IMC_Default</b> 绑定:手柄 = 右摇杆按下(Right Thumbstick),键鼠 = 鼠标中键或 Tab。</li>
+    <li>切换目标<b>不新建 IA</b>:复用现有 <b>IA_Look</b>(右摇杆)。锁定时 Look 输入不再转视角,而是当横向偏移超过死区时触发切换(见 4.6)。</li>
+    <li>BP_Player 中:IA_LockOn 的 Started 事件 → 调自定义事件 <code>ToggleLockOn</code>(已锁 → <code>BreakLock</code>;未锁 → <code>TryAcquireTarget</code>)。</li>
+  </ol>
+  <div class="note warn">若 BP_Player 目前输入走 C++ <code>SetupPlayerInputComponent</code> 绑定(<code>BaseCharacter.cpp:98</code>),IA_LockOn 需要也在 C++ 注册或在 BP 里用 Enhanced Input 组件补绑。施工时确认 BP_Player 里是否已有「增强输入」事件图;如已有 IA_Attack 的 BP 处理方式,照抄即可。</div>
+
+  <h3>变量清单(在 BP_Player 建)</h3>
+  <table>
+    <tr><th>变量</th><th>类型</th><th>默认</th><th>用途</th></tr>
+    <tr><td><code>LockTarget</code></td><td>Actor(对象引用)</td><td>null</td><td>当前锁定目标</td></tr>
+    <tr><td><code>AcquireRadius</code></td><td>float</td><td>1500</td><td>候选搜索半径(cm)</td></tr>
+    <tr><td><code>AcquireMaxAngle</code></td><td>float</td><td>60</td><td>候选必须在相机前方 ±60° 内</td></tr>
+    <tr><td><code>BreakDistance</code></td><td>float</td><td>2000</td><td>断锁距离(略大于 AcquireRadius,留出迟滞)</td></tr>
+    <tr><td><code>CameraInterpSpeed</code></td><td>float</td><td>8.0</td><td>RInterpTo 插值速度(5~10 之间调手感)</td></tr>
+    <tr><td><code>LockCameraPitchOffset</code></td><td>float</td><td>0</td><td>锁定时俯角偏移,先 0,仰角问题再调</td></tr>
+    <tr><td><code>LOSToleranceTime</code></td><td>float</td><td>1.0</td><td>遮挡容忍秒数</td></tr>
+    <tr><td><code>LOSLostTimer</code></td><td>float</td><td>0</td><td>遮挡累计计时(内部用)</td></tr>
+    <tr><td><code>SwitchDeadzone</code></td><td>float</td><td>0.7</td><td>右摇杆切换死区</td></tr>
+    <tr><td><code>SwitchCooldown</code></td><td>float</td><td>0.25</td><td>切换冷却秒数</td></tr>
+  </table>
+
+  <h3 id="s4-acquire">4.3 目标获取 <code>TryAcquireTarget</code> <span class="tag t-doing">回来施工时第 3 步</span></h3>
+  <p>节点流程(BP 自定义事件):</p>
+  <ol>
+    <li><b>Sphere Overlap Actors</b>(已验证,KismetSystemLibrary.h:1092):SpherePos = GetActorLocation;Radius = <code>AcquireRadius</code>;ObjectTypes = [Pawn];Class Filter = <code>BaseCharacter</code>;ActorsToIgnore = [self]。</li>
+    <li>ForEach 候选,三连过滤:
+      <ol>
+        <li><b>排除自己/无效</b>:候选 ≠ self 且 IsValid。</li>
+        <li><b>排除死尸</b>:候选 → 调接口 <code>GetAbilitySystemComponent</code>(候选是 BaseCharacter,直接有 ASC)→ <code>HasMatchingGameplayTag(State.Dead)</code> 为 true 则跳过(死亡系统未做前恒 false,逻辑先写好)。</li>
+        <li><b>视线检查</b>:<b>Line Trace By Channel</b>(KismetSystemLibrary.h:1270),Channel = Visibility,Start = 玩家相机位置(GetFollowCamera → GetWorldLocation),End = 候选 GetActorLocation + Z 偏移 50(瞄躯干),ActorsToIgnore = [self]。<b>命中的是候选自己才可见</b>;命中别的(墙)则跳过。</li>
+        <li><b>角度过滤</b>:相机 <b>Get Forward Vector</b> 与「相机→候选」单位向量做 <b>Dot (Vector)</b>(KismetMathLibrary.h:1437),结果 &lt; cos(<code>AcquireMaxAngle</code>)≈ 0.5 则跳过。</li>
+      </ol>
+    </li>
+    <li><b>评分取最优</b>:对每个通过过滤的候选算 <code>Score = 点积 × 1000 − 距离 × 0.1</code>(角度优先、距离次要,系数可调),取 Score 最大者。蓝图里用「局部变量 BestScore/BestTarget」循环比较即可。</li>
+    <li>有最优 → <code>EngageLock(BestTarget)</code>;没有 → 什么都不做(或播个 UI 提示)。</li>
+  </ol>
+
+  <h3 id="s4-camera">4.4 锁定相机 <code>EngageLock</code> / Event Tick <span class="tag t-doing">回来施工时第 4 步</span></h3>
+  <p><b>EngageLock(Target)</b>:</p>
+  <ol>
+    <li><code>LockTarget = Target</code>;</li>
+    <li>玩家 ASC → <b>Add Loose Gameplay Tag</b>(<code>State.LockedOn</code>);</li>
+    <li>切换移动模式(见 4.5);</li>
+    <li>开循环定时器 <b>Set Timer by Event</b>(0.1s,Looping)→ <code>CheckBreakLock</code>(见 4.7);</li>
+    <li>显示锁定 UI(见 4.8);</li>
+    <li><b>Set Actor Tick Enabled(true)</b>(若 BP 默认关 Tick)。</li>
+  </ol>
+  <p><b>Event Tick(每帧,先 Branch:<code>State.LockedOn</code> 有标签才执行,否则直接返回)</b>:</p>
+  <ol>
+    <li><b>Find Look at Rotation</b>(KismetMathLibrary.h:2300):Start = FollowCamera 世界位置,Target = <code>LockTarget</code> 位置 + Z 50;</li>
+    <li>Break Rotator → <b>只取 Yaw</b> + 可选 <code>LockCameraPitchOffset</code>;Pitch 和 Roll 用 <b>Get Control Rotation</b>(Controller.h:159)的现值 → Make Rotator。⚠ 不要把 Pitch 也对准目标,否则近身时相机会仰头看天(常见坑 3);</li>
+    <li><b>RInterp To</b>(KismetMathLibrary.h:4098):Current = Get Control Rotation,Target = 上面的合成 Rotator,DeltaTime = Tick 的 Delta Seconds,InterpSpeed = <code>CameraInterpSpeed</code>;</li>
+    <li>GetController → <b>Set Control Rotation</b>(Controller.h:163)。</li>
+  </ol>
+  <div class="note">由于弹簧臂 <code>bUsePawnControlRotation=true</code>(工程现状),写控制旋转即带动相机,相机碰撞/臂长逻辑全部保留,无需碰 CameraManager。</div>
+
+  <h3 id="s4-strafe">4.5 移动模式切换(strafe)<span class="tag t-doing">回来施工时第 5 步</span></h3>
+  <p>上锁时(EngageLock 内),对 GetCharacterMovement:</p>
+  <ul>
+    <li><code>bOrientRotationToMovement = false</code>(Set Orient Rotation to Movement)</li>
+    <li><code>bUseControllerDesiredRotation = true</code>(Set Use Controller Desired Rotation)</li>
+  </ul>
+  <p>断锁时(BreakLock 内)还原:<code>bOrientRotationToMovement = true</code>、<code>bUseControllerDesiredRotation = false</code>。</p>
+  <p>原理:控制旋转已被 Tick 锁向目标,<code>bUseControllerDesiredRotation=true</code> 让角色身体按 <code>RotationRate(540°/s)</code> 转向控制旋转方向 → 角色始终面朝目标,而移动输入仍是相机相对的八方向 → 自然形成环绕 strafe。⚠ 两个布尔<b>优先级</b>:<code>bOrientRotationToMovement</code> 为 true 时会覆盖 <code>bUseControllerDesiredRotation</code>(CharacterMovementComponent.h:442 注释),所以必须先关前者。</p>
+  <p class="meta">动画:Demo 阶段继续用现有移动动画即可(角色会「螃蟹走」但能用);有 strafe BlendSpace 后按方向输入混合,属动画章节任务。</p>
+
+  <h3 id="s4-switch">4.6 右摇杆切换目标(角度最近邻)<span class="tag t-doing">回来施工时第 6 步</span></h3>
+  <ol>
+    <li>Look 输入处理(现有 IA_Look 链路)开头加 Branch:有 <code>State.LockedOn</code> 标签 → <b>不再 Add Controller Yaw/Pitch Input</b>,改走 <code>TrySwitchTarget(LookX)</code>;无标签 → 走原逻辑。</li>
+    <li><code>TrySwitchTarget(Direction)</code>:
+      <ol>
+        <li>|Direction| &lt; <code>SwitchDeadzone</code>(0.7)或冷却未到 → 返回(用 GetGameTimeInSeconds 存 LastSwitchTime);</li>
+        <li>重新执行 4.3 的候选筛选(复用为函数 <code>GatherCandidates</code>,返回数组;上锁和切换共用,范围可放宽到 360°,即跳过角度过滤);</li>
+        <li>对每个候选(排除当前 <code>LockTarget</code>):算「相机→当前目标」与「相机→候选」两个<b>水平方向</b>单位向量(Z 清零再 Normalize)的 <b>Dot (Vector)</b> → 夹角;只保留与拨杆方向同侧(候选在右侧 if Direction&gt;0,用右向量点积判正负);</li>
+        <li>取夹角最小者 → <code>EngageLock(新目标)</code>(内部先清旧 UI,移动模式和定时器保持不变),记录 LastSwitchTime;</li>
+        <li>无合格候选 → 不切。</li>
+      </ol>
+    </li>
+  </ol>
+  <p class="meta">参考:Epic 论坛答疑的索引取模法(简单但无方向感,<a href="https://forums.unrealengine.com/t/how-do-i-make-a-souls-like-lock-on-and-target-switching-sysem/2697920">帖子</a>);角度最近邻是魂系手感的关键,多花 20 个节点值得。</p>
+
+  <h3 id="s4-break">4.7 断锁条件 <code>CheckBreakLock</code>(0.1s 定时器)<span class="tag t-doing">回来施工时第 7 步</span></h3>
+  <p>任一成立即调 <code>BreakLock</code>:</p>
+  <ol>
+    <li><b>超距</b>:GetDistanceTo(LockTarget) &gt; <code>BreakDistance</code>(2000);</li>
+    <li><b>目标失效/死亡</b>:LockTarget 无效,或其 ASC <code>HasMatchingGameplayTag(State.Dead)</code> 为 true(死亡系统落地后自动生效);</li>
+    <li><b>遮挡超时</b>:Line Trace By Channel(Visibility,相机→目标躯干,Ignore self)未命中目标 → <code>LOSLostTimer += 0.1</code>;命中 → 清零。<code>LOSLostTimer &gt; LOSToleranceTime</code>(1.0s)→ 断锁。容忍时间防止柱子后闪一下就断锁的烦躁感。</li>
+  </ol>
+  <p><b>BreakLock</b>:清定时器(Clear and Invalidate Timer by Handle)→ 移除标签 <code>State.LockedOn</code>(Remove Loose Gameplay Tag)→ <code>LockTarget = null</code> → 还原移动模式(4.5)→ 隐藏 UI → Set Actor Tick Enabled(false)。⚠ 顺序:先摘标签再清目标,保证 Tick 里的分支立即失效。</p>
+
+  <h3 id="s4-ui">4.8 锁定标记 UI <span class="tag t-doing">回来施工时第 8 步(可最后做)</span></h3>
+  <p>最小方案:在 BP_Dummy(及未来敌人基类)上加 <b>Widget 组件</b>(Space = Screen,Widget Class = 新建 WBP_LockOnReticle,一张菱形/圆点图),默认 Hidden in Game = true;上锁时向目标发接口消息(BPI_LockOn → ShowReticle(true)),断锁/切换时 ShowReticle(false)。与 <a href="https://theindieprofessor.wordpress.com/2025/09/28/how-to-create-a-lock-on-targeting-system-on-ue5/">TheIndieProfessor 教程</a>的 Widget Component + Interface 方案一致。</p>
+
+  <h3>与其他章节的对接点</h3>
+  <ul>
+    <li><b>攻击 GA(第 4 章已有)</b>:锁定状态下,GA_Attack_Light 起手时可把角色瞬时/快速转向 <code>LockTarget</code>(面向修正)。本章先做相机+移动,攻击吸附留到施工时视手感再加——角色已因 <code>bUseControllerDesiredRotation</code> 面朝目标,大概率不用改 GA。</li>
+    <li><b>State.MoveLocked(已有)</b>:与锁定正交,互不影响。</li>
+    <li><b>死亡系统(未来)</b>:死亡时给 ASC 打 <code>State.Dead</code>,断锁条件 2 自动接通,无需回头改本章代码。</li>
+  </ul>
+</section>
+
+<section id="s5">
+  <h2>⑤ 常见坑</h2>
+  <table>
+    <tr><th>#</th><th>坑</th><th>对策</th></tr>
+    <tr><td>1</td><td><code>BaseCharacter</code> 构造函数写了 <code>PrimaryActorTick.bCanEverTick = false</code>(BaseCharacter.cpp:18),C++ 侧 Tick 不跑;BP 子类若没勾选 Tick,Event Tick 也不触发</td><td>BP_Player 的 Class Settings → Actor Tick → 勾选 <b>Start with Tick Enabled / Tick Enabled</b>(BP 的类默认值覆盖 C++ 构造函数值);或全程用「EngageLock 时 Set Actor Tick Enabled(true)」开关</td></tr>
+    <tr><td>2</td><td>锁定期间忘屏蔽 Look 输入 → 玩家右摇杆和 Tick 写的控制旋转打架,相机抖动</td><td>Look 输入链路开头 Branch <code>State.LockedOn</code>(见 4.6);<b>不要</b>用「锁定期间移除 IMC」的做法,会和后续技能输入系统纠缠</td></tr>
+    <tr><td>3</td><td>Find Look at Rotation 的 Pitch 也写进控制旋转 → 贴近大个子敌人时相机仰头看天/钻地</td><td>只取 Yaw,Pitch 保留玩家原值 + 小偏移(见 4.4 第 2 步);这是 TheIndieProfessor 教程同款处理</td></tr>
+    <tr><td>4</td><td>Sphere Overlap Actors 返回数组<b>无序</b>,直接取 [0] 会锁到背后的怪</td><td>必须自己做角度/距离评分排序(4.3);ActorsToIgnore 记得加 self</td></tr>
+    <tr><td>5</td><td>断锁后忘还原 <code>bOrientRotationToMovement=true</code> / <code>bUseControllerDesiredRotation=false</code> → 角色永远面朝断锁时的方向,移动手感诡异</td><td>BreakLock 里成对还原;且注意 <code>bOrientRotationToMovement</code> 优先级更高,上锁时必须先关它(CharacterMovementComponent.h:442)</td></tr>
+    <tr><td>6</td><td>LOS Trace 没把 self 和目标处理好:没 Ignore self → 永远打中自己;命中目标本身被误判为「遮挡」</td><td>ActorsToIgnore 加 self;判断逻辑是「命中目标 = 可见」,不是「无命中 = 可见」</td></tr>
+    <tr><td>7</td><td>切换目标无死区/无冷却 → 摇杆轻轻一抖连跳三四个目标</td><td>死区 0.7 + 冷却 0.25s(4.6);论坛帖里的教训(index 法 % 节点没接导致切不回去)也提醒我们:切换逻辑写完立刻双目标实测</td></tr>
+    <tr><td>8</td><td>标签加在旧格式 <code>GameplayTagsList</code> 段 → 5.8 不识别(错题本 P23)</td><td>用 <code>[/Script/GameplayTags.GameplayTagsSettings]</code> 段的 <code>+GameplayTagList=(Tag=...,DevComment=...)</code>,改完重启编辑器</td></tr>
+    <tr><td>9</td><td>把断锁检查也塞进 Event Tick,每帧打 LineTrace</td><td>低频检查放 0.1s 定时器(4.7);Tick 里只做纯向量运算的相机插值</td></tr>
+    <tr><td>10</td><td>锁定时角色朝向「瞬转」突兀</td><td><code>bUseControllerDesiredRotation</code> 走 <code>RotationRate(540°/s)</code> 天然带转身速率;若还嫌快可临时调小 Yaw 速率,断锁还原</td></tr>
+  </table>
+</section>
+
+<section id="s6">
+  <h2>⑥ 参考链接</h2>
+  <ul>
+    <li><a href="https://theindieprofessor.wordpress.com/2025/09/28/how-to-create-a-lock-on-targeting-system-on-ue5/">TheIndieProfessor · How to create a Lock-On/Targeting System on UE5(2025,文字版教程,本文档方案 A 的主要参照)</a></li>
+    <li><a href="https://forums.unrealengine.com/t/how-do-i-make-a-souls-like-lock-on-and-target-switching-sysem/2697920">Epic 官方论坛 · 魂系锁定与目标切换答疑帖(索引取模切换法 + 摇杆 Axis1D 改法)</a></li>
+    <li><a href="https://www.youtube.com/watch?v=5hxFY-2rAro">Ryan Laley · Unreal Engine Action RPG Tutorial – Target Switching Lock On(视频,含目标死亡后自动切换)</a></li>
+    <li><a href="https://www.youtube.com/watch?v=fNAqYUAT18M">Ali Elzoheiry · Souls-Like Melee Combat Tutorial – Target Lock On System #5(视频)</a></li>
+    <li><a href="https://www.youtube.com/watch?v=_92I9S69hrY">Target Lock System Part 2: Line of Sight Limits(视频,LOS 过滤与视口限制)</a></li>
+    <li><a href="https://www.reddit.com/r/unrealengine/comments/1obf61y/directional_target_lock_swapping/">Reddit · Directional target lock swapping(角度最近邻切换讨论)</a></li>
+    <li><a href="https://www.reddit.com/r/unrealengine/comments/1cgg516/creating_a_more_advanced_lockon_camera/">Reddit · Creating a more advanced lock-on camera(方案 C 的动机与痛点)</a></li>
+    <li><a href="https://zhuanlan.zhihu.com/p/653945897">知乎 · UE5 实现类魂敌人锁定机制(C++ TargetComponent 思路;正文 403 未抓取,仅参考摘要)</a></li>
+  </ul>
+  <p class="meta">源码验证环境:E:\UE_5.8\Engine\Source(UE 5.8);验证方式:ripgrep 逐符号确认签名与行号,见第 ③ 节表格。</p>
+</section>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章技术储备 · 体力/翻滚/无敌帧 · GAS / UE5.8</title>
+<style>
+  :root{
+    --bg:#14161a; --bg2:#1c1f26; --bg3:#242833; --fg:#d8dce4; --dim:#8a91a0;
+    --accent:#c8a15a; --accent2:#7aa2f7; --ok:#6fbf73; --warn:#e0a050; --bad:#e06060;
+    --border:#2e3340;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--fg); font:15px/1.75 "Microsoft YaHei","PingFang SC",sans-serif;
+       display:flex; min-height:100vh;}
+  /* ---- sidebar ---- */
+  nav{width:250px; flex:0 0 250px; background:var(--bg2); border-right:1px solid var(--border);
+      position:sticky; top:0; height:100vh; overflow-y:auto; padding:20px 14px;}
+  nav h1{font-size:16px; color:var(--accent); margin-bottom:4px;}
+  nav .sub{font-size:12px; color:var(--dim); margin-bottom:16px;}
+  nav a{display:block; color:var(--fg); text-decoration:none; font-size:13.5px;
+        padding:5px 10px; border-radius:6px; border-left:2px solid transparent;}
+  nav a:hover{background:var(--bg3);}
+  nav a.active{border-left-color:var(--accent); color:var(--accent); background:var(--bg3);}
+  nav .grp{font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin:14px 0 4px 10px;}
+  /* ---- main ---- */
+  main{flex:1; max-width:920px; padding:40px 48px 120px;}
+  section{margin-bottom:56px;}
+  h2{font-size:24px; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;}
+  h3{font-size:18px; color:var(--accent2); margin:24px 0 10px;}
+  h4{font-size:15.5px; margin:18px 0 8px; color:var(--fg);}
+  p{margin:8px 0;}
+  ul,ol{margin:8px 0 8px 24px;}
+  li{margin:3px 0;}
+  code{background:var(--bg3); padding:1px 6px; border-radius:4px; font-family:Consolas,monospace; font-size:13px; color:#e8c07d;}
+  pre{background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:14px 16px;
+      overflow-x:auto; margin:10px 0; font-family:Consolas,monospace; font-size:13px; line-height:1.55;}
+  pre code{background:none; padding:0; color:var(--fg);}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px;}
+  th{background:var(--bg3); color:var(--accent); text-align:left;}
+  th,td{border:1px solid var(--border); padding:7px 10px; vertical-align:top;}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+  .card{background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:12px 0;}
+  .note{border-left:3px solid var(--accent2); background:var(--bg2); padding:10px 16px; margin:12px 0; border-radius:0 8px 8px 0;}
+  .warn{border-left:3px solid var(--warn);}
+  .bad{border-left:3px solid var(--bad);}
+  .ok{border-left:3px solid var(--ok);}
+  .tag{display:inline-block; font-size:11px; padding:1px 8px; border-radius:10px; margin-right:6px; vertical-align:middle;}
+  .t-todo{background:#3a3f4d; color:var(--dim);}
+  .t-doing{background:#4a4420; color:var(--warn);}
+  .t-done{background:#23402a; color:var(--ok);}
+  .t-cpp{background:#20344a; color:var(--accent2);}
+  .t-bp{background:#3a2340; color:#c58af0;}
+  .t-design{background:#403a20; color:var(--accent);}
+  a{color:var(--accent2);}
+  .meta{color:var(--dim); font-size:12.5px;}
+  .kpi{display:flex; gap:12px; flex-wrap:wrap; margin:14px 0;}
+  .kpi div{background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px 16px; font-size:13px;}
+  .kpi b{color:var(--accent); display:block; font-size:18px;}
+  @media (max-width:900px){ nav{display:none;} main{padding:24px;} }
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <h1>第 5 章 · 研究储备</h1>
+  <div class="sub">体力 / 翻滚 / 无敌帧<br>GAS · UE5.8 · 施工前必读</div>
+  <a href="../index.html">← 返回主文档</a>
+  <div class="grp">本文目录</div>
+  <a href="#what">0. 这个系统是什么</a>
+  <a href="#stamina">1. 体力消耗与自动回复</a>
+  <a href="#roll">2. 翻滚 GA 的位移方案</a>
+  <a href="#iframes">3. 无敌帧(i-frame)</a>
+  <a href="#cancel">4. 翻滚↔攻击取消衔接</a>
+  <a href="#plan">5. 施工步骤总表</a>
+  <a href="#pitfalls">6. 常见坑</a>
+  <a href="#refs">7. 参考链接</a>
+</nav>
+
+<main>
+
+<p class="meta">研究日期:2025(第 4 章三连击施工期间) · 引擎:UE 5.8 源码版(E:\UE_5.8) · 工程:ProjectUnreal ·
+本文所有类名/函数名均已在本机引擎源码 grep 验证(铁律 P19),未能验证处标 <span class="tag t-doing">待验证</span>。</p>
+
+<section id="what">
+<h2>0. 这个系统是什么、为什么这样做</h2>
+<p>第 5 章要给主角加三样东西,它们共享同一个内核:<b>把"资源"和"状态窗口"都交给 GAS 和动画时间轴管理</b>。</p>
+<ul>
+  <li><b>体力(Stamina)</b>:翻滚/攻击消耗资源,耗尽就不能再动作 → 用 GA 自带的 <b>Cost Gameplay Effect</b> 机制扣,用 <b>Infinite + Period 的 GE</b> 自动回。</li>
+  <li><b>翻滚(Roll/Dodge)</b>:一个位移技能 → 用 GA + 蒙太奇 + (可选)Root Motion 位移。</li>
+  <li><b>无敌帧(i-frame)</b>:翻滚中若干帧不吃伤害 → 不是一个"计时器",而是<b>蒙太奇上的一个 ANS 窗口,窗口期间给角色挂 <code>State.Invulnerable</code> 标签</b>,伤害结算处检查这个标签。</li>
+</ul>
+<div class="note">
+<b>为什么延续"时间轴即状态机":</b>本工程第 4 章已经确立架构——状态标签(<code>State.MoveLocked</code>、<code>State.Combo.Window</code>)的生灭由蒙太奇 ANS 通知管,GA 只管激活门槛和结算。无敌帧是同一类东西:<b>它就是动画上的某一段帧区间</b>。如果把无敌帧写成 GA 里的 0.4 秒 Delay,动画师一调蒙太奇时长,计时器和动画就对不上了(人还在空中翻滚,无敌已经没了)。把窗口挂在蒙太奇上,改动画时窗口自动跟着走。这也是商业魂类(Lords of the Fallen 开发者的 Quod Combat Framework)的做法,见 §3 引用。
+</div>
+<div class="card">
+<b>三个系统的关系一句话:</b>体力是"准入证"(Cost GE 决定你能不能滚),无敌帧是"翻滚时间轴上的一段标签窗口",取消衔接是"两段窗口标签相遇时谁取消谁"。三样东西全部是<b>标签 + GE + ANS</b>,新增 C++ 只有约 10 行。
+</div>
+</section>
+
+<section id="stamina">
+<h2>1. 体力消耗与自动回复</h2>
+
+<h3>1.1 官方与社区主流做法</h3>
+<table>
+<tr><th>做法</th><th>机制</th><th>评价</th></tr>
+<tr>
+  <td><b>消耗:GA 的 CostGameplayEffectClass</b>(官方机制)</td>
+  <td>GA 类默认值里填一个 <b>Instant GE</b>(Modifier:Stamina −X)。<code>CanActivateAbility</code> 自动调 <code>CheckCost</code> 检查够不够,蓝图 GA 里调 <code>Commit Ability</code> 节点时 <code>ApplyCost</code> 真正扣掉。</td>
+  <td class="ok">✔ 官方正道。体力不足时 <code>TryActivateAbilitiesByTag</code> <b>直接激活失败</b>,不用自己写判断。tranek 文档 4.5.14 节讲的就是它。</td>
+</tr>
+<tr>
+  <td><b>回复:Infinite GE + Period</b></td>
+  <td>一个 <code>DurationPolicy = Infinite</code> 的 GE,填 <code>Period</code>(如 0.2s)和每周期 Modifier(Stamina +X),BeginPlay 时 <code>ApplyGameplayEffectSpecToSelf</code> 挂一次,常驻。</td>
+  <td class="ok">✔ tranek 文档与 GAS Companion 的标配套路。回复速率改一个数字即可,天然支持预测与网络。</td>
+</tr>
+<tr>
+  <td>回复:Tick / Timer 手动加属性</td>
+  <td>角色 Tick 里 <code>SetStamina(...)</code></td>
+  <td class="bad">✘ 绕过 GAS:不复制、不参与预测、不吃 GE 增减益,不要在 GAS 工程里这么干。</td>
+</tr>
+<tr>
+  <td>回复抑制(进阶):攻击/翻滚时不回体力</td>
+  <td>GE 上加 <code>UTargetTagRequirementsGameplayEffectComponent</code>,把 <code>State.StaminaRegenBlocked</code> 填进 <b>Ongoing Tag Requirements</b> 的 Blocked;动作期间由 ANS 挂该标签。</td>
+  <td>第 5 章可不做,列为可选。类魂里"翻滚后短暂延迟再回体力"用这套(抑制时再配 <code>PeriodicInhibitionPolicy</code>)。</td>
+</tr>
+</table>
+
+<h3>1.2 引擎源码验证要点</h3>
+<ul>
+  <li><code>TSubclassOf&lt;UGameplayEffect&gt; CostGameplayEffectClass</code> — <code>Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/GameplayAbility.h:723</code>。蓝图 GA 类默认值里显示为 <b>Cost Gameplay Effect Class</b>。</li>
+  <li><code>CheckCost</code> / <code>ApplyCost</code> / <code>GetCostGameplayEffect</code> — <code>GameplayAbility.h:354/363/366</code>;实现在 <code>Private/Abilities/GameplayAbility.cpp:1115/1138/1052</code>。<code>CheckCost</code> 内部调 <code>ASC-&gt;CanApplyAttributeModifiers(CostGE, ...)</code>(模拟扣完会不会把属性扣到 0 以下,不够则失败并打 <code>ActivateFailCostTag</code>)。</li>
+  <li><b>关键:</b><code>UGameplayAbility::CanActivateAbility</code> 里已经调了 <code>CheckCost</code>(<code>GameplayAbility.cpp:518</code>),所以 <code>TryActivateAbilitiesByTag</code> 在体力不足时<b>自动激活失败</b>——本工程不用改输入代码。</li>
+  <li><b>扣费时机:</b><code>CommitAbility</code>(<code>GameplayAbility.cpp:595/639-644</code>)内部 <code>CommitCheck → CheckCost → ApplyCost</code>。蓝图节点 <b>Commit Ability</b> 对应 <code>K2_CommitAbility</code>(<code>GameplayAbility.h:318</code>)。<b>蓝图 GA 必须显式调 Commit Ability 才会扣体力</b>。</li>
+  <li><code>CanApplyAttributeModifiers</code> — <code>AbilitySystemComponent.h:800</code>(确认存在,被 CheckCost 调用)。</li>
+  <li>周期回复:<code>UGameplayEffect::Period</code>(<code>GameplayEffect.h:2268</code>),EditCondition 为 <code>DurationPolicy != Instant</code> → <b>Infinite 策略下 Period 可编辑,已确认</b>。<code>bExecutePeriodicEffectOnApplication</code>(<code>GameplayEffect.h:2272</code>)<b>默认 = true</b>(<code>GameplayEffect.cpp:187</code>)——挂上瞬间会立即执行一次,回复 GE 一般把它关掉(见坑 P5-1)。</li>
+</ul>
+
+<h3>1.3 本工程落地方案</h3>
+<p><span class="tag t-bp">纯资产+蓝图</span> 体力部分不改 C++(<code>Stamina/MaxStamina</code> 属性和 <code>PreAttributeChange</code> 的 clamp 在 <code>MyAttributeSet</code> 里已经有了)。</p>
+<ol>
+  <li><b>GE_Cost_Roll</b>(GameplayEffect 蓝图):
+    <ul>
+      <li>Duration Policy = <b>Instant</b>(Cost GE 必须是 Instant,见坑 P5-2)</li>
+      <li>Modifiers → 加一条:Attribute = <code>MyAttributeSet.Stamina</code>,Op = <b>Add</b>,Magnitude = <b>-25</b>(数值策划可调)</li>
+    </ul>
+  </li>
+  <li><b>GE_StaminaRegen</b>:
+    <ul>
+      <li>Duration Policy = <b>Infinite</b>;Period = <b>0.2</b>;取消勾选 <b>Execute Periodic Effect on Application</b></li>
+      <li>Modifiers → Stamina Add <b>+2</b>(= 每秒回 10 点;调节奏改这两个数)</li>
+    </ul>
+  </li>
+  <li><b>挂载回复:</b><code>BaseCharacter.cpp</code> 的 <code>BeginPlay</code> 里,现有 <code>InitAttributesEffect</code> 应用处的旁边,同样用 <code>ApplyGameplayEffectSpecToSelf</code> 把 GE_StaminaRegen 挂上。<b>施工时第 6 步做</b>(如果想零 C++,也可在 BP 角色 BeginPlay 用蓝图节点 <code>Make Outgoing Spec</code>(ASC 成员,<code>AbilitySystemComponent.h:372</code> 已验证 BlueprintCallable)→ <code>ApplyGameplayEffectSpecToSelf</code>(显示名已验证,<code>AbilitySystemComponent.h:342</code>))。</li>
+  <li><b>GA_Roll 配消耗:</b>GA_Roll 类默认值 → <b>Cost Gameplay Effect Class = GE_Cost_Roll</b>;事件图里 <b>Activate 后第一节点就调 Commit Ability</b>,返回 false 则 <code>EndAbility</code>。<b>施工时第 4 步做</b>。</li>
+  <li>(可选,第 5 章可跳过)<b>攻击也耗体力:</b>给 GA_Attack_Light_1/2/3 同样配 Cost GE(Stamina −10),同样在事件图开头调 Commit Ability。注意三连击是事件触发激活,Cost 检查在 <code>CanActivateAbility</code> 阶段就会拦。</li>
+</ol>
+</section>
+
+<section id="roll">
+<h2>2. 翻滚 GA 的设计:位移方案怎么选</h2>
+
+<h3>2.1 三种方案对比(官方/社区观点)</h3>
+<table>
+<tr><th>方案</th><th>机制</th><th>手感</th><th>网络</th><th>代价</th><th>结论</th></tr>
+<tr>
+  <td><b>A. Root Motion 蒙太奇</b><br>(位移烘焙在动画里)</td>
+  <td>动画序列开 Enable Root Motion,动画蓝图 Root Motion Mode = <b>Root Motion from Montages Only</b>;GA 里 <code>PlayMontageAndWait</code>,CMC 自动走位移。CMC 有专门的"网络蒙太奇根运动"路径(<code>ACharacter::IsPlayingNetworkedRootMotionMontage</code>,<code>Character.h:1193</code> 已验证)。</td>
+  <td class="ok">最好:位移与动画逐帧对齐,脚部不打滑</td>
+  <td class="ok">CMC 原生支持</td>
+  <td>调翻滚距离要回去改动画;素材必须带根位移</td>
+  <td><b>素材带 RM 就用它</b>。类魂主机游戏主流。</td>
+</tr>
+<tr>
+  <td><b>B. AbilityTask_ApplyRootMotion*</b><br>(代码算位移)</td>
+  <td>GA 里用 <b>Apply Root Motion Constant Force</b> 节点:任务构造一个 <code>FRootMotionSource</code> 交给 CMC,Duration 内按给定速度推胶囊体;蒙太奇播<b>无根位移</b>的动画纯做表现。</td>
+  <td>良好:匀速/曲线推位移,动画要挑"原地版"</td>
+  <td class="ok">走 CMC saved-moves 预测,任务参数自动复制(<code>AbilityTask_ApplyRootMotion_Base.h</code>)</td>
+  <td>动画与位移分离,需调 Strength/Duration 对齐动画节奏</td>
+  <td><b>素材不带 RM 时用它</b>。Lords of the Fallen 开发者的冲刺/击退全用这套。</td>
+</tr>
+<tr>
+  <td><b>C. LaunchCharacter</b></td>
+  <td>给胶囊体一次性速度</td>
+  <td class="bad">飘:无时长控制,落地靠摩擦</td>
+  <td class="bad">不走预测,联网橡皮筋;单机也常被摩擦力吃掉距离</td>
+  <td>最低</td>
+  <td><b>不推荐</b>,原型凑合可以,作品集不要用。</td>
+</tr>
+</table>
+<div class="note">
+<b>本工程选型:</b>素材是 Paragon 系列。施工时<b>先打开候选翻滚动画看底部时间轴有没有根骨骼(Root)位移曲线</b>:有 → 方案 A;没有 → 方案 B(Apply Root Motion Constant Force + 原地翻滚动画)。<span class="tag t-doing">待验证</span> Paragon 翻滚/闪避动画是否带 Root Motion(第 4 章施工时已复制过 Paragon 蒙太奇,届时直接看)。<b>两条路的 GA 骨架完全相同,差别只在"位移谁驱动",先按方案 B 做最稳</b>——距离/时长是 GA 上的两个数字,策划随时调。
+</div>
+
+<h3>2.2 引擎源码验证要点(方案 B 参数签名)</h3>
+<p><code>UAbilityTask_ApplyRootMotionConstantForce</code> 存在,头文件 <code>Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/Tasks/AbilityTask_ApplyRootMotionConstantForce.h</code>,蓝图节点函数(无 DisplayName,蓝图里搜 <b>Apply Root Motion Constant Force</b>):</p>
+<pre><code>static UAbilityTask_ApplyRootMotionConstantForce* ApplyRootMotionConstantForce(
+    UGameplayAbility* OwningAbility, FName TaskInstanceName,
+    FVector WorldDirection,        // 方向:取 GetActorForwardVector() 或输入方向
+    float Strength,                // 注意:是速度 cm/s,不是"力"!距离 = Strength × Duration
+    float Duration,                // 秒
+    bool bIsAdditive,              // 翻滚用 false(完全接管移动,无视输入/摩擦)
+    UCurveFloat* StrengthOverTime, // 可选:0→1 归一化曲线,调"前快后慢"手感
+    ERootMotionFinishVelocityMode VelocityOnFinishMode,  // 翻滚用 ClampVelocity
+    FVector SetVelocityOnFinish,
+    float ClampVelocityOnFinish,   // 收束到跑步速度(如 600),防止滚完滑出去
+    bool bEnableGravity);          // 平地翻滚 false</code></pre>
+<ul>
+  <li><code>ERootMotionFinishVelocityMode</code> 枚举(MaintainLastRootMotionVelocity / SetVelocity / ClampVelocity)在 <code>Engine/Source/Runtime/Engine/Classes/GameFramework/RootMotionSource.h:140</code> 已验证。<b>不要用 MaintainLastRootMotionVelocity</b>——翻滚速度(1500+ cm/s)会带进普通移动,滚完人飞出去。</li>
+  <li>同族任务(均已验证存在于同目录):<code>ApplyRootMotionMoveToForce</code>(定点移动,参数 TargetLocation/Duration/bSetNewMovementMode/<code>bRestrictSpeedToExpected</code> 防卡墙末段加速)、<code>ApplyRootMotionJumpForce</code>、<code>ApplyRootMotionMoveToActorForce</code>、<code>ApplyRootMotionRadialForce</code>。第 5 章只需要 ConstantForce。</li>
+  <li><b>取消安全:</b>位移源存在 CMC 里,只有任务的 <code>OnDestroy</code> 会移除它 → <b>GA_Roll 的所有取消路径都必须走到 EndAbility/CancelAbility</b>,否则人被取消后还会继续滑行(详见坑 P5-6)。</li>
+  <li>预测机制:RootMotionSource 不走 GAS 预测键,走 CMC saved moves;服务器拒绝激活时表现为 CMC 位置修正(轻微橡皮筋),所以 <b>Cost/激活检查要 client/server 一致</b>(CheckCost 天然满足)。本工程单机,知道即可。</li>
+</ul>
+
+<h3>2.3 本工程落地方案(GA_Roll 骨架)</h3>
+<pre><code>GA_Roll(蓝图 GA)
+├─ 类默认值
+│   ├─ Ability Tags = Ability.Roll          (父标签选拔,与现有攻击一致)
+│   ├─ Cancel Abilities With Tag = Ability.Attack.Light   ← 翻滚激活时取消攻击(见 §4)
+│   ├─ Activation Owned Tags = State.Rolling(技能存活期间自动挂,激活门槛也能查)
+│   ├─ Block Abilities With Tag = Ability.Roll + Ability.Attack.Light(翻滚期间挡二次翻滚和新攻击;
+│   │     攻击的解封由蒙太奇 ANS 摘 State.MoveLocked 控制,见 §4)
+│   └─ Cost Gameplay Effect Class = GE_Cost_Roll
+└─ 事件图
+    Activate → Commit Ability(false→EndAbility)
+             → Play Montage And Wait(AM_Roll)
+             → [方案B] Apply Root Motion Constant Force(参数如上)
+             → Montage 完成/打断 → End Ability</code></pre>
+<ul>
+  <li>输入:新建 <code>IA_Roll</code> + IMC 绑定(空格或 Alt);<code>BaseCharacter</code> 加 <code>OnRollInput()</code> 调 <code>TryActivateAbilitiesByTag(Ability.Roll)</code>,照抄现有 <code>OnAttackInput</code> 的写法。<b>施工时第 7 步做</b>。</li>
+  <li>蒙太奇 <code>AM_Roll</code> 由翻滚动画剪出;上面要挂的 ANS 见 §3、§4。</li>
+</ul>
+</section>
+
+<section id="iframes">
+<h2>3. 无敌帧(i-frame)的 GAS 实现</h2>
+
+<h3>3.1 伤害闸门放在哪一层:三种放法对比</h3>
+<table>
+<tr><th>闸门位置</th><th>做法</th><th>评价</th></tr>
+<tr>
+  <td><b>A. AttributeSet::PostGameplayEffectExecute</b><br>(本工程现状的 Damage→Health 结算处)</td>
+  <td>结算 Damage 元属性前,查目标 ASC 有没有 <code>State.Invulnerable</code>,有则 <code>SetDamage(0)</code> 直接 return,不扣血。</td>
+  <td class="ok">✔ 本工程最省:已有结算函数里加 4 行。tranek 文档的元属性结算范式就发生在这里,加标签闸门是同一位置的自然延伸。<b>本工程选这个。</b></td>
+</tr>
+<tr>
+  <td>B. GE 的 TargetTagRequirements<br>(<code>UTargetTagRequirementsGameplayEffectComponent</code>)</td>
+  <td>在 GE_Damage 上加组件,Application Tag Requirements 的 Blocked 填 <code>State.Invulnerable</code> → 整个伤害 GE 应用失败。</td>
+  <td>✔ 最上游、最"配置化",不用改 C++;但 <b>整个 GE 被吞掉,无法得知"这一刀被无敌帧躲了"</b>(做不了完美闪避/提示音)。组件已在 5.8 源码验证存在(<code>GameplayEffectComponents/TargetTagRequirementsGameplayEffectComponent.h</code>,编辑器显示名 "Require Tags to Apply/Continue This Effect")。</td>
+</tr>
+<tr>
+  <td>C. PreGameplayEffectExecute 返回 false</td>
+  <td>属性集里 <code>PreGameplayEffectExecute</code>(<code>AttributeSet.h:200</code> 已验证)判断标签,返回 false 撤销本次 modifier。</td>
+  <td>可行但语义偏底层(撤销的是单个 modifier 应用),可读性不如 A;社区用得少。</td>
+</tr>
+</table>
+<div class="note">
+<b>商业实践佐证(Quod Combat Framework,Lords of the Fallen / Killsquad 开发者):</b>"翻滚技能本身不含任何无敌逻辑"——无敌窗口是蒙太奇上的 <b>Anim Notify State</b>,窗口期间给角色挂一个 Infinite GE(只授予 <code>Combat.State.Intangible</code> 一个标签);伤害管线在扣血前查这个标签;<b>被挡下的命中不丢弃</b>,向目标 ASC 发一个 <code>Event.Combat.HitNegated</code> Gameplay Event,翻滚 GA 里 <code>WaitGameplayEvent</code> 监听它,若此时还在更窄的"完美闪避窗口"标签内,就升级成完美闪避奖励。标签只陈述"现在不能被命中",不说为什么——招架、过场、出生保护都可以授同一个标签,伤害代码一行不改。这套与本工程"时间轴即状态机"完全一致。
+</div>
+
+<h3>3.2 引擎源码验证要点</h3>
+<ul>
+  <li><b>闸门读标签:</b><code>Data.Target</code> 就是目标的 ASC 引用(<code>FGameplayEffectModCallbackData</code> 结构:<code>GameplayEffectExtension.h:17-30</code>,含 <code>EffectSpec / EvaluatedData / Target</code> 三个成员,已验证)。用 <code>Data.Target.GetOwnedGameplayTags()</code>(<code>AbilitySystemComponent.h:602</code>)或 <code>Data.Target.HasMatchingGameplayTag(Tag)</code>(<code>AbilitySystemComponent.h:581</code>)。</li>
+  <li>若需要<b>来源</b>标签(比如以后区分伤害类型):<code>Data.EffectSpec.CapturedSourceTags / CapturedTargetTags</code>(<code>GameplayEffect.h:1232/1236</code> 已验证)。第 5 章用不到。</li>
+  <li><b>挂标签的 GE:</b><code>UTargetTagsGameplayEffectComponent</code>(<code>GameplayEffectComponents/TargetTagsGameplayEffectComponent.h</code> 已验证,编辑器显示名 <b>"Grant Tags to Target Actor"</b>)——GE 资产上加这个组件,Add Tags 填 <code>State.Invulnerable</code> 即可。<b>DurationPolicy 用 Infinite</b>,由 ANS 负责挂上/摘除(给 GE 自己设 Duration 会出现"两个时钟":hitstop/播放速率变化时和蒙太奇对不上)。</li>
+  <li><b>摘除:</b><code>RemoveActiveGameplayEffectBySourceEffect</code>(<code>AbilitySystemComponent.h:368</code>,BlueprintCallable 已验证)——按 GE 类移除一层栈。</li>
+  <li><b>通用窗口 ANS(C++,推荐):</b>照 Quod 框架写一个 <code>ANS_GameplayEffectWindow</code>:<code>NotifyBegin</code> 里 <code>MakeOutgoingSpec + ApplyGameplayEffectSpecToSelf</code> 挂 GE,<code>NotifyEnd</code> 里 <code>RemoveActiveGameplayEffectBySourceEffect</code> 摘除。以后"完美闪避窗口""霸体窗口"全是这个类换一个 GE 资产,动画师自己拖通知。</li>
+</ul>
+
+<h3>3.3 本工程落地方案</h3>
+<ol>
+  <li><b>加标签</b>(<code>Config/DefaultGameplayTags.ini</code>,注意用 5.8 的 <code>+GameplayTagList=</code> 格式,错题本 P23):
+<pre><code>+GameplayTagList=(Tag="Ability.Roll",DevComment="翻滚/闪避技能")
++GameplayTagList=(Tag="State.Rolling",DevComment="翻滚中")
++GameplayTagList=(Tag="State.Invulnerable",DevComment="无敌帧窗口内,伤害闸门检查")
++GameplayTagList=(Tag="Event.HitNegated",DevComment="命中被无敌帧挡掉(完美闪避预留,可暂缓)")</code>
+  <b>施工时第 1 步做</b>。</li>
+  <li><b>伤害闸门(C++ 唯一必改处)</b>,<code>Source/ProjectUnreal/MyAttributeSet.cpp</code> 的 <code>PostGameplayEffectExecute</code> 里,Damage 分支开头加:
+<pre><code>if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+{
+    const float LocalDamage = GetDamage();
+    SetDamage(0.f);
+
+    // ↓ 新增:无敌帧闸门——目标带着 State.Invulnerable 时本次伤害直接吞掉
+    static const FGameplayTag InvulnerableTag =
+        FGameplayTag::RequestGameplayTag(FName("State.Invulnerable"));
+    if (Data.Target.HasMatchingGameplayTag(InvulnerableTag))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[伤害结算] 目标处于无敌帧,伤害 %.1f 被闪避"), LocalDamage);
+        // (可选)Data.Target.HandleGameplayEvent(Event.HitNegated, ...) —— 完美闪避预留
+        return;
+    }
+    // ↓ 以下保持现有扣血逻辑不变</code>
+  <b>施工时第 2 步做</b>,改完编译验证:Dummy 被打照常掉血。</li>
+  <li><b>GE_Invulnerable</b>(资产):Duration Policy = Infinite;Components 加 <b>Grant Tags to Target Actor</b>,Add Tags = <code>State.Invulnerable</code>;不加任何 Modifier。<b>施工时第 3 步做</b>。</li>
+  <li><b>无敌帧窗口 ANS</b>:二选一——
+    <ul>
+      <li><b>(推荐)C++ 通用类</b> <code>ANS_GameplayEffectWindow</code>(代码照 §3.2 描述/Quod 文章抄,约 40 行;<code>UAnimNotifyState</code> 基类是引擎标准类),资产侧建子类或直接指定 GE_Invulnerable;<b>施工时第 3 步做</b>。</li>
+      <li><b>(零 C++ 替代)蓝图 AnimNotifyState</b>:<code>Received_NotifyBegin</code> → Get Ability System Component(Owner)→ <code>Make Outgoing Spec</code>(GE_Invulnerable, Level 1)→ <code>ApplyGameplayEffectSpecToSelf</code>;<code>Received_NotifyEnd</code> → <code>Remove Active Gameplay Effect By Source Effect</code>。节点均已验证 BlueprintCallable。<span class="tag t-doing">待验证</span> 第 4 章挂 State.MoveLocked 用的 ANS 是蓝图还是 C++——若已有现成的"挂标签 ANS",直接复用其模式。</li>
+    </ul>
+  </li>
+  <li><b>在 AM_Roll 上摆窗口</b>:把 ANS 拖进蒙太奇,覆盖"双脚离地到落地前"那一段(参考:法环中滚无敌帧约占总时长 40%)。窗口起点别贴第 0 帧——按键到无敌之间留 2~3 帧"启动帧",魂类手感来自这个空隙。<b>施工时第 5 步做</b>。</li>
+  <li><b>验证:</b>让 Dummy 能反击(临时用触发盒子对它自己 ApplyGameplayEffect GE_Damage,或直接在 PIE 控制台给玩家发 GE_Damage),滚过命中帧不掉血、日志打印"被闪避"即通。</li>
+</ol>
+</section>
+
+<section id="cancel">
+<h2>4. 翻滚取消攻击、攻击取消翻滚的衔接窗口</h2>
+
+<h3>4.1 设计原理:取消 = "标签相遇规则",不是状态机 if-else</h3>
+<p>沿用"时间轴即状态机":<b>能不能取消,由蒙太奇上的窗口标签生灭决定;GA 只声明标签规则。</b>GAS 自带的两条规则(均在 <code>GameplayAbility.h:739/743</code> 已验证):</p>
+<ul>
+  <li><code>CancelAbilitiesWithTag</code>:"我激活时,把身上带这些标签的激活中技能取消掉"。</li>
+  <li><code>BlockAbilitiesWithTag</code>:"我存活期间,带这些标签的技能不许激活"。</li>
+</ul>
+<p>类魂的规则映射:</p>
+<table>
+<tr><th>衔接</th><th>规则</th><th>实现</th></tr>
+<tr>
+  <td><b>翻滚取消攻击</b>(任何攻击阶段都能滚)</td>
+  <td>翻滚几乎无门槛;激活时打断攻击</td>
+  <td>GA_Roll 的 <b>Activation Blocked Tags 不含 State.Attacking</b>(攻击中允许激活);<code>CancelAbilitiesWithTag = Ability.Attack.Light</code>(激活瞬间取消三连击 GA,蒙太奇被停 → 攻击蒙太奇上的 ANS End 触发 → State.Attacking / State.MoveLocked 自动摘除,这正是第 4 章已有机制的复用)。</td>
+</tr>
+<tr>
+  <td><b>攻击取消翻滚</b>(只能取消翻滚后摇)</td>
+  <td>翻滚前半段(位移+无敌帧期)不许攻击;后段"取消窗口"开启后可以</td>
+  <td><b>不改攻击 GA 的门槛</b>——攻击 GA 现在已被 <code>State.MoveLocked</code> 挡住(第 4 章现状)。做法:<b>AM_Roll 上用 ANS 挂 <code>State.MoveLocked</code>,但只挂到"取消窗口开启帧"就摘掉</b>(窗口帧 = 动画师在蒙太奇上拖的通知终点)。之后攻击自然能激活;再给三段攻击 GA 加 <code>CancelAbilitiesWithTag = Ability.Roll</code>,激活攻击时把还没播完的翻滚 GA 取消掉,位移源随之被任务 OnDestroy 移除,干净收尾。</td>
+</tr>
+<tr>
+  <td>翻滚取消翻滚(连滚)</td>
+  <td>同样只能在取消窗口后</td>
+  <td>GA_Roll 的 <code>BlockAbilitiesWithTag</code> 含 <code>Ability.Roll</code> 自带防连滚;窗口期后上一段 GA 已被 Cancel/End,自然解封。</td>
+</tr>
+</table>
+<div class="card">
+<b>AM_Roll 蒙太奇时间轴全景(施工时照这个摆通知):</b>
+<pre><code>0%        15%        40%             65%        100%
+|启动帧|  位移+无敌帧窗口        |无敌帧结束|  取消窗口  |结束|
+|       |←ANS_MoveLocked 挂──────|──────────摘→|        |
+|       |←ANS_GameplayEffectWindow(GE_Invulnerable)挂──摘→|
+|       |←RootMotion 位移(方案A)或 ConstantForce(方案B)→|</code></pre>
+<ul>
+  <li>无敌帧窗口(15%→65%)<b>窄于</b>位移窗口——落地后一小段"可被打"的破绽帧是魂类标配。</li>
+  <li>取消窗口(65% 起)由 <code>State.MoveLocked</code> 的摘除点表达,<b>不需要新标签</b>。</li>
+  <li>改手感 = 拖通知条,不改一行代码。这就是把状态交给时间轴的回报。</li>
+</ul>
+</div>
+
+<h3>4.2 源码验证</h3>
+<ul>
+  <li><code>CancelAbilitiesWithTag</code> / <code>BlockAbilitiesWithTag</code> / <code>ActivationOwnedTags</code> / <code>ActivationBlockedTags</code> — <code>GameplayAbility.h:739/743/747/755</code> 全部验证存在,蓝图 GA 类默认值里同名可配。</li>
+  <li>蒙太奇被取消时 ANS 的 <code>NotifyEnd</code> 会正常触发(第 4 章三连击已实证此机制:攻击蒙太奇被打断会摘 MoveLocked——若第 4 章实测不是这样,施工时先验证再照搬)。<span class="tag t-doing">待验证</span>(依赖第 4 章实测结论)</li>
+  <li><code>UAbilityTask_WaitGameplayEvent</code>(完美闪避监听用)— <code>Abilities/Tasks/AbilityTask_WaitGameplayEvent.h</code> 已验证存在。第 5 章可不做。</li>
+</ul>
+</section>
+
+<section id="plan">
+<h2>5. 施工步骤总表(回来施工时按这个顺序)</h2>
+<table>
+<tr><th>步</th><th>做什么</th><th>位置</th><th>类型</th></tr>
+<tr><td>0</td><td>git commit 备份(第 0 章规矩)</td><td>—</td><td>—</td></tr>
+<tr><td>1</td><td>加 4 个标签(§3.3 第 1 条的 ini 片段,<code>+GameplayTagList=</code> 格式)</td><td>Config/DefaultGameplayTags.ini</td><td><span class="tag t-design">配置</span></td></tr>
+<tr><td>2</td><td>无敌帧闸门 4 行(§3.3 第 2 条)</td><td>Source/ProjectUnreal/MyAttributeSet.cpp</td><td><span class="tag t-cpp">C++</span></td></tr>
+<tr><td>3</td><td>GE_Invulnerable(Infinite + Grant Tags 组件);(推荐)C++ 通用类 ANS_GameplayEffectWindow</td><td>Content/Gameplay + Source/</td><td><span class="tag t-bp">资产</span><span class="tag t-cpp">C++</span></td></tr>
+<tr><td>4</td><td>GE_Cost_Roll(Instant,Stamina −25);GA_Roll 类默认值 + 事件图(Commit Ability → PlayMontageAndWait → [方案B]ApplyRootMotionConstantForce)</td><td>Content/Gameplay</td><td><span class="tag t-bp">资产/蓝图</span></td></tr>
+<tr><td>5</td><td>AM_Roll 摆三条通知:MoveLocked(到 65%)、无敌帧 GE 窗口(15%→65%);确认素材是否带 Root Motion 决定方案 A/B</td><td>蒙太奇资产</td><td><span class="tag t-bp">资产</span></td></tr>
+<tr><td>6</td><td>GE_StaminaRegen(Infinite,Period 0.2,+2,关 Execute on Application);BeginPlay 挂载</td><td>BaseCharacter.cpp / BP</td><td><span class="tag t-cpp">C++</span></td></tr>
+<tr><td>7</td><td>IA_Roll 输入 + OnRollInput → TryActivateAbilitiesByTag(Ability.Roll);三段攻击 GA 加 CancelAbilitiesWithTag=Ability.Roll</td><td>Content/Input + GA</td><td><span class="tag t-bp">蓝图</span></td></tr>
+<tr><td>8</td><td>验收:体力不足滚不动 / 滚后体力自动回 / 滚过攻击不掉血(日志"被闪避")/ 攻击中按滚立即取消攻击 / 翻滚 65% 前按攻击无效、之后有效</td><td>PIE</td><td>—</td></tr>
+</table>
+</section>
+
+<section id="pitfalls">
+<h2>6. 常见坑</h2>
+<ul>
+  <li><b>P5-1 回复 GE 挂上瞬间先 + 一次:</b><code>bExecutePeriodicEffectOnApplication</code> 默认 <b>true</b>(<code>GameplayEffect.cpp:187</code>),回复 GE 要手动关掉,否则每次挂上白送一跳回复。</li>
+  <li><b>P5-2 Cost GE 必须 Instant:</b><code>CheckCost → CanApplyAttributeModifiers</code> 只按 Instant modifier 试算;填 Duration/Infinite GE 当 Cost 语义错误。同理 Cost GE 上不要挂标签授予组件当"消耗标记"用。</li>
+  <li><b>P5-3 体力不足时激活是"静默失败":</b><code>TryActivateAbilitiesByTag</code> 失败无任何表现,玩家会觉得"按键失灵"。第 5 章可先 UI 显示体力条兜底;"体力不足提示音/图标闪红"留给后续 GameplayCue 章节。</li>
+  <li><b>P5-4 蓝图 GA 忘调 Commit Ability 就不扣体力:</b>Cost GE 只是"门槛+扣费定义",扣费动作在 <code>K2_CommitAbility</code>。Commit 要在 Play Montage 之前,且 Commit 返回 false 必须 EndAbility。</li>
+  <li><b>P5-5 PreAttributeChange 的 clamp 救不了 CheckCost:</b>本工程 Stamina 已在 <code>PreAttributeChange</code> clamp 到 [0, MaxStamina],但 <code>CanApplyAttributeModifiers</code> 试算发生在 clamp 之前/之外——体力 10 时消耗 25,CheckCost 仍会判失败(这正是要的行为);不要试图靠 clamp 放行负数。</li>
+  <li><b>P5-6 取消路径不走 EndAbility,人会"幽灵滑行":</b>ConstantForce 的位移源住在 CMC 里,只有任务的 OnDestroy 能移除。翻滚被眩晕/攻击取消时,必须保证 GA 的 Cancel 链走到 <code>EndAbility/CancelAbility</code>——用 <code>CancelAbilitiesWithTag</code> 自动取消的路径是安全的,手写"直接停蒙太奇"是危险的。</li>
+  <li><b>P5-7 结束速度模式选错,滚完漂移:</b><code>MaintainLastRootMotionVelocity</code> 会把 1500cm/s 的翻滚速度带进普通移动。翻滚用 <code>ClampVelocity</code> + 跑步速度上限。</li>
+  <li><b>P5-8 标签 ini 格式:</b>5.8 只认 <code>[/Script/GameplayTags.GameplayTagsSettings]</code> 段的 <code>+GameplayTagList=</code>,老教程的 <code>GameplayTagsList</code> 段已失效(错题本 P23)。</li>
+  <li><b>P5-9 RemoveActiveGameplayEffectBySourceEffect 按栈移除:</b>同一 GE 类如果可能同时存在两个窗口(未来多段翻滚),要改存 <code>FActiveGameplayEffectHandle</code> 按句柄摘;第 5 章单窗口不用管。</li>
+  <li><b>P5-10 动画与位移二选一驱动:</b>蒙太奇开了 Root Motion 又叠 ConstantForce = 两套系统抢胶囊体,位移结果不可预期(Quod 原文警告)。方案 A/B 互斥。</li>
+</ul>
+</section>
+
+<section id="refs">
+<h2>7. 参考链接</h2>
+<ul>
+  <li><a href="https://www.quodsoler.com/blog/i-frames-are-animation-data-not-code">Dodge i-Frames with GAS: Anim Notify Windows and Perfect Dodges</a> — Quod Soler(Lords of the Fallen / Killsplash 战斗开发者),本文无敌帧方案的直接来源,含完整 C++ 代码。</li>
+  <li><a href="https://www.quodsoler.com/blog/dashes-and-knockbacks-with-root-motion-sources">Dashes and Knockbacks with Root Motion Sources</a> — 同作者,ApplyRootMotionConstantForce 的机理、参数语义(Strength=cm/s)、取消与网络行为,本文 §2 的主要来源。</li>
+  <li><a href="https://www.quodsoler.com/learn-unreal-engine/gameplay-ability-system">Quod Soler 的 GAS 笔记总目</a> — GE Duration/Period、PlayMontageAndWait 复制等配套文章入口。</li>
+  <li><a href="https://github.com/tranek/GASDocumentation">tranek/GASDocumentation</a> — 社区事实标准;4.5.14 Cost Gameplay Effect(含 <code>GetCostGameplayEffect</code> 重载做动态消耗)、元属性结算范式。</li>
+  <li><a href="https://gascompanion.github.io/quick-start/">GAS Companion 快速上手</a> — Infinite 常驻回复 GE 的配置示范(Stamina Regen 例子)。</li>
+  <li>Epic 官方:<a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/gameplay-ability-system-for-unreal-engine">Gameplay Ability System 官方文档</a>;论坛实例 <a href="https://forums.unrealengine.com/t/pause-unpause-gameplayeffect-has-hiccups/851657">Infinite GE 暂停/抑制讨论</a>(回复抑制的社区语境)。</li>
+  <li>本地源码锚点(均 5.8 验证):
+    <code>GameplayAbility.h:723/354/363/366/739/743</code> · <code>GameplayAbility.cpp:518/595/639/1115/1138</code> ·
+    <code>GameplayEffect.h:2268/2272/1232/1236</code> · <code>GameplayEffect.cpp:187</code> ·
+    <code>AbilitySystemComponent.h:342/368/372/581/602/800</code> ·
+    <code>GameplayEffectExtension.h:17</code> ·
+    <code>GameplayEffectComponents/TargetTagsGameplayEffectComponent.h</code> ·
+    <code>GameplayEffectComponents/TargetTagRequirementsGameplayEffectComponent.h</code> ·
+    <code>Abilities/Tasks/AbilityTask_ApplyRootMotionConstantForce.h</code> ·
+    <code>Abilities/Tasks/AbilityTask_ApplyRootMotionMoveToForce.h</code> ·
+    <code>Abilities/Tasks/AbilityTask_WaitGameplayEvent.h</code> ·
+    <code>Engine/Source/Runtime/Engine/Classes/GameFramework/RootMotionSource.h:140</code> ·
+    <code>Character.h:1193</code>
+  </li>
+</ul>
+</section>
+
+</main>
+</body>
+</html>

@@ -4,10 +4,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
-#include "InputMappingContext.h"
-#include "InputAction.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
 #include "Components/PrimitiveComponent.h"
@@ -33,26 +29,16 @@ ABaseCharacter::ABaseCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCFinder(TEXT("/Game/Input/IMC_Default.IMC_Default"));
-	if (IMCFinder.Succeeded())
-	{
-		DefaultMappingContext = IMCFinder.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UInputAction> MoveFinder(TEXT("/Game/Input/IA_Move.IA_Move"));
-	if (MoveFinder.Succeeded())
-	{
-		MoveAction = MoveFinder.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UInputAction> LookFinder(TEXT("/Game/Input/IA_Look.IA_Look"));
-	if (LookFinder.Succeeded())
-	{
-		LookAction = LookFinder.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UInputAction> JumpFinder(TEXT("/Game/Input/IA_Jump.IA_Jump"));
-	if (JumpFinder.Succeeded())
-	{
-		JumpAction = JumpFinder.Object;
-	}
+	// 默认标签(CDO 创建时若标签未注册则为空,BeginPlay 里有回退解析)
+	MoveLockedTag = FGameplayTag::RequestGameplayTag(TEXT("State.MoveLocked"));
+	AttackingTag = FGameplayTag::RequestGameplayTag(TEXT("State.Attacking"));
+	AttackAbilityTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.Attack.Light"));
+	AttackHitEventTag = FGameplayTag::RequestGameplayTag(TEXT("Event.Montage.Attack.Hit"));
+}
+
+FGameplayTag ABaseCharacter::ResolveTag(const FGameplayTag& Tag, const TCHAR* Fallback)
+{
+	return Tag.IsValid() ? Tag : FGameplayTag::RequestGameplayTag(FName(Fallback));
 }
 
 UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
@@ -63,6 +49,11 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	MoveLockedTag = ResolveTag(MoveLockedTag, TEXT("State.MoveLocked"));
+	AttackingTag = ResolveTag(AttackingTag, TEXT("State.Attacking"));
+	AttackAbilityTag = ResolveTag(AttackAbilityTag, TEXT("Ability.Attack.Light"));
+	AttackHitEventTag = ResolveTag(AttackHitEventTag, TEXT("Event.Montage.Attack.Hit"));
 
 	if (AController* C = GetController())
 	{
@@ -85,6 +76,15 @@ void ABaseCharacter::BeginPlay()
 
 	if (AbilitySystemComponent)
 	{
+		// 联调临时:盯住四个关键标签的生灭,验收后删
+		for (const TCHAR* TagName : {TEXT("State.MoveLocked"), TEXT("State.Attacking"), TEXT("State.Combo.Window.1"), TEXT("State.Combo.Window.2")})
+		{
+			AbilitySystemComponent->RegisterGameplayTagEvent(
+				FGameplayTag::RequestGameplayTag(FName(TagName)),
+				EGameplayTagEventType::NewOrRemoved
+			).AddUObject(this, &ABaseCharacter::OnDebugTagChanged);
+		}
+
 		for (const TSubclassOf<UGameplayAbility>& AbilityClass : StartupAbilities)
 		{
 			if (AbilityClass)
@@ -95,57 +95,36 @@ void ABaseCharacter::BeginPlay()
 	}
 }
 
-void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (PC && DefaultMappingContext)
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
-
-	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		if (MoveAction)
-		{
-			EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABaseCharacter::Move);
-		}
-		if (LookAction)
-		{
-			EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABaseCharacter::Look);
-		}
-		if (JumpAction)
-		{
-			EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ABaseCharacter::OnJumpInput);
-			EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		}
-		if (AttackAction)
-		{
-			EnhancedInput->BindAction(AttackAction, ETriggerEvent::Started, this, &ABaseCharacter::OnAttackInput);
-		}
-	}
-}
-
-void ABaseCharacter::OnAttackInput()
+void ABaseCharacter::RequestAttack()
 {
 	if (AbilitySystemComponent)
 	{
-		AbilitySystemComponent->TryActivateAbilitiesByTag(FGameplayTagContainer(FGameplayTag::RequestGameplayTag(FName("Ability.Attack.Light"))));
+		AbilitySystemComponent->TryActivateAbilitiesByTag(FGameplayTagContainer(AttackAbilityTag));
 	}
 }
 
-void ABaseCharacter::OnJumpInput()
+void ABaseCharacter::RequestJump()
 {
-	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.MoveLocked"))))
-	{
-		return;
-	}
-
 	Jump();
+}
+
+void ABaseCharacter::CancelAttack()
+{
+	if (AbilitySystemComponent)
+	{
+		const FGameplayTagContainer AttackTags(AttackAbilityTag);
+		AbilitySystemComponent->CancelAbilities(&AttackTags);
+	}
+}
+
+bool ABaseCharacter::IsMoveLocked() const
+{
+	return AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(MoveLockedTag);
+}
+
+bool ABaseCharacter::IsAttacking() const
+{
+	return AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(AttackingTag);
 }
 
 void ABaseCharacter::RegisterWeaponCollision(UPrimitiveComponent* Comp)
@@ -153,6 +132,7 @@ void ABaseCharacter::RegisterWeaponCollision(UPrimitiveComponent* Comp)
 	WeaponCollisionComp = Comp;
 	if (!WeaponCollisionComp)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[武器碰撞] 注册失败:Comp 为空"));
 		return;
 	}
 
@@ -161,10 +141,14 @@ void ABaseCharacter::RegisterWeaponCollision(UPrimitiveComponent* Comp)
 	WeaponCollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	WeaponCollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	WeaponCollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::OnWeaponOverlap);
+
+	UE_LOG(LogTemp, Warning, TEXT("[武器碰撞] 注册成功:%s"), *WeaponCollisionComp->GetName());
 }
 
 void ABaseCharacter::SetWeaponCollisionEnabled(bool bEnabled)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[武器碰撞] 开关=%d,已注册=%s"), bEnabled ? 1 : 0, WeaponCollisionComp ? TEXT("是") : TEXT("否"));
+
 	if (!WeaponCollisionComp)
 	{
 		return;
@@ -189,20 +173,18 @@ void ABaseCharacter::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, A
 	}
 	HitActorsThisSwing.Add(OtherActor);
 
+	UE_LOG(LogTemp, Warning, TEXT("[武器碰撞] 命中:%s"), *OtherActor->GetName());
+
 	FGameplayEventData Payload;
 	Payload.Instigator = this;
 	Payload.Target = OtherActor;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, FGameplayTag::RequestGameplayTag(FName("Event.Montage.Attack.Hit")), Payload);
+	Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(OtherActor);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, AttackHitEventTag, Payload);
 }
 
-void ABaseCharacter::Move(const FInputActionValue& Value)
+void ABaseCharacter::Move2D(const FVector2D Axis)
 {
-	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.MoveLocked"))))
-	{
-		return;
-	}
-
-	const FVector2D Axis = Value.Get<FVector2D>();
+	// 纯移动动词:锁吞输入/收刀策略已迁到 BP_Player 事件图(读 IsMoveLocked/IsAttacking/HasAttackLockApplied 组合)
 	if (!Controller)
 	{
 		return;
@@ -216,9 +198,13 @@ void ABaseCharacter::Move(const FInputActionValue& Value)
 	AddMovementInput(Right, Axis.X);
 }
 
-void ABaseCharacter::Look(const FInputActionValue& Value)
+void ABaseCharacter::Look2D(const FVector2D Axis)
 {
-	const FVector2D Axis = Value.Get<FVector2D>();
 	AddControllerYawInput(Axis.X);
 	AddControllerPitchInput(Axis.Y);
+}
+
+void ABaseCharacter::OnDebugTagChanged(const FGameplayTag Tag, int32 NewCount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[标签] %s count=%d (owner=%s)"), *Tag.ToString(), NewCount, *GetName());
 }

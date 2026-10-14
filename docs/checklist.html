@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>复工清单 · 第 4 章三连击(2026-10-08)</title>
+<style>
+  :root{
+    --bg:#14161a; --bg2:#1c1f26; --bg3:#242833; --fg:#d8dce4; --dim:#8a91a0;
+    --accent:#c8a15a; --accent2:#7aa2f7; --ok:#6fbf73; --warn:#e0a050; --bad:#e06060;
+    --border:#2e3340;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--fg); font:15px/1.75 "Microsoft YaHei","PingFang SC",sans-serif;}
+  main{max-width:920px; margin:0 auto; padding:40px 48px 120px;}
+  h1{font-size:26px; color:var(--accent); margin-bottom:4px;}
+  .sub{font-size:13px; color:var(--dim); margin-bottom:24px;}
+  h2{font-size:20px; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:6px; margin:32px 0 12px;}
+  h4{font-size:15.5px; margin:16px 0 6px;}
+  p{margin:8px 0;}
+  ul,ol{margin:8px 0 8px 24px;}
+  li{margin:4px 0;}
+  code{background:var(--bg3); padding:1px 6px; border-radius:4px; font-family:Consolas,monospace; font-size:13px; color:#e8c07d;}
+  pre{background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:14px 16px;
+      overflow-x:auto; margin:10px 0; font-family:Consolas,monospace; font-size:13px; line-height:1.55;}
+  pre code{background:none; padding:0; color:var(--fg);}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px;}
+  th{background:var(--bg3); color:var(--accent); text-align:left;}
+  th,td{border:1px solid var(--border); padding:7px 10px; vertical-align:top;}
+  .card{background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:12px 0;}
+  .note{border-left:3px solid var(--accent2); background:var(--bg2); padding:10px 16px; margin:12px 0; border-radius:0 8px 8px 0;}
+  .warn{border-left:3px solid var(--warn); background:var(--bg2); padding:10px 16px; margin:12px 0; border-radius:0 8px 8px 0;}
+  .ok{border-left:3px solid var(--ok); background:var(--bg2); padding:10px 16px; margin:12px 0; border-radius:0 8px 8px 0;}
+  .step{border-left:3px solid var(--accent); background:var(--bg2); padding:12px 18px; margin:14px 0; border-radius:0 8px 8px 0;}
+  .step h3{font-size:16.5px; color:var(--accent); margin-bottom:6px;}
+  .tag{display:inline-block; font-size:11px; padding:1px 8px; border-radius:10px; margin-right:6px; vertical-align:middle;}
+  .t-done{background:#23402a; color:var(--ok);}
+  .t-todo{background:#3a3f4d; color:var(--dim);}
+  .t-doing{background:#4a4420; color:var(--warn);}
+  a{color:var(--accent2);}
+  .meta{color:var(--dim); font-size:12.5px;}
+  input[type=checkbox]{transform:scale(1.2); margin-right:6px; vertical-align:middle;}
+</style>
+</head>
+<body>
+<main>
+
+<h1>复工清单 · 第 4 章三连击</h1>
+<div class="sub">存档时间 2026-10-08 早上 · 三连击尚未实现,这是回来后的完整施工单 · <a href="index.html">回主文档</a> · <a href="reference/troubleshooting.html">故障速查手册</a></div>
+
+<!-- ============ 已完成 ============ -->
+<h2>已完成(不要再重做)</h2>
+<div class="card">
+  <ul>
+    <li><span class="tag t-done">✓</span><strong>标签注册修复</strong>(错题本 P23):5.8 只认 <code>DefaultGameplayTags.ini</code> 里 <code>[/Script/GameplayTags.GameplayTagsSettings]</code> 段的 <code>+GameplayTagList=</code>,老教程的 GameplayTagsList 段写给空气。已全部重写,12 个标签齐全</li>
+    <li><span class="tag t-done">✓</span><strong>伤害链打通</strong>:命中日志 → GA 收到事件 → <code>[伤害结算] 100→50→0</code> 木桩两剑倒地。根因是 C++ 事件载荷只填了 <code>Target</code>(Actor)没填 <code>TargetData</code>(句柄),GA 的 ApplyGameplayEffectToTarget 吃句柄,拿空句柄静默空转——<strong>已修但错题本 P24 还没写</strong></li>
+    <li><span class="tag t-done">✓</span><strong>ANS_AttackWindow 收尾修复</strong>:之前只重写了 NotifyBegin,判定关闭从没真关碰撞(日志从无"开关=0")。已补 Received_NotifyEnd → SetWeaponCollisionEnabled(false),日志验证通过</li>
+    <li><span class="tag t-done">✓</span><strong>GA_1 标签配置</strong>:资产标签 .Light.1 / 阻止=父级 Ability.Attack.Light / 已拥有 State.Attacking+State.MoveLocked</li>
+    <li><span class="tag t-done">✓</span><strong>窗口标签已注册</strong>:State.Combo.Window.1 / .2(标签管理器 UI 加的,ini 已验证落盘)</li>
+    <li><span class="tag t-done">✓</span><strong>GE_ComboWindow_1 / _2 已建</strong>(授予 .Window.1 / .Window.2,Has Duration,宽限秒数自定);旧 GE_ComboWindow 已删</li>
+    <li><span class="tag t-done">✓</span><strong>GA_2 / GA_3 壳已复制</strong>(蒙太奇 B/C、资产标签 .Light.2/.Light.3)</li>
+    <li><span class="tag t-done">✓</span><strong>AN_SendGameplayEvent 截图排除硬编码</strong>:Received_Notify 图表连的是 EventTag 变量,不是写死的字面量</li>
+  </ul>
+</div>
+
+<h2>关键架构决策(回来先读这段)</h2>
+<div class="note">
+  <p><strong>时间轴即状态机(用户拍板)</strong>:移动锁、连击窗口、判定区间全部归蒙太奇时间轴上的通知管;GA 只管激活门槛和结算。理由:Activation Owned Tags 只能"GA 活多久锁多久",表达不了"部分帧锁定"和"移动攻击"。</p>
+  <p><strong>方案甲</strong>:GA 在窗口帧自我了结(EndAbility),蒙太奇 StopWhenAbilityEnds=false 继续播。移动锁、父标签阻挡随之解除 → GA_2 凭窗口标签放行。窗口期还能走位(魂系手感)。</p>
+  <p><strong>两个时间旋钮互相独立</strong>:开启帧=蒙太奇上通知的位置;宽限期=GE_ComboWindow_i 的 Duration。蒙太奇播完 ≠ 连段结束。</p>
+  <p><strong>硬约束</strong>:蒙太奇里 判定区间(ANS_AttackWindow)结束帧 <strong>必须早于</strong> 连击窗口开启帧,否则 GA 先死、命中监听器陪葬。</p>
+  <p><strong>攻击键输入必须按父标签激活</strong>:TryActivateAbilitiesByTag(Ability.Attack.Light),三段 GA 同时被尝试,由条件自动选拔。C++ 的 OnAttackInput 通道确认是死的(AttackAction 为空),不用拆。</p>
+  <p><strong>移动取消后摇不上 C++(用户拍板,2026-10-09)</strong>:曾在 BaseCharacter::Move() 里加"窗口期移动 → CancelAbilities",已回滚。理由:① 方案甲里 GA 在窗口帧自我了结,ANS_MoveLock 的结束帧=恢复移动帧,收刀走位天然成立,蒙太奇照常播完;② 想调整"第几帧可走动",动画师拖 ANS 结束帧即可,纯拖帧零代码;③ 符合"GA 只管激活门槛和结算,时间轴管状态"的总架构。已验证引擎 5.8 带 WaitGameplayTagAdd/WaitGameplayTagRemove 任务(仅 GA 图表内可见,BlueprintInternalUseOnly),纯蓝图路线的节点储备在。</p>
+</div>
+
+<h2>配置真值表(2026-10-10 命令行 Python 诊断,终审)</h2>
+<div class="card">
+  <p>诊断方法:PythonScriptPlugin 命令行直读资产 CDO(Saved/diag_gac_config.py,可复跑)。二进制猜配置的时代结束。</p>
+  <table>
+    <tr><th>配置项</th><th>GA_1</th><th>GA_2</th><th>GA_3</th></tr>
+    <tr><td>资产标签</td><td>.Light.1 ✓</td><td>.Light.2 ✓</td><td>.Light.3 ✓</td></tr>
+    <tr><td>激活所需</td><td>空 ✓</td><td>State.Combo.Window.1 ✓</td><td>State.Combo.Window.2 ✓</td></tr>
+    <tr><td>激活阻止</td><td class="bad">Window.1(应为父级 Window)</td><td>Window.2(无害,保留)</td><td>Window.3(无害,保留)</td></tr>
+    <tr><td>激活已拥有</td><td>State.Attacking ✓</td><td>同左 ✓</td><td>同左 ✓</td></tr>
+    <tr><td>阻止别的技能</td><td>.1 ✓(自身)</td><td>.2 ✓</td><td>.3 ✓</td></tr>
+    <tr><td>取消别的技能</td><td>空 ✓</td><td>空 ✓</td><td>空 ✓</td></tr>
+    <tr><td>实例化策略</td><td class="bad">Instanced per Execution</td><td class="bad">同左</td><td class="bad">同左</td></tr>
+  </table>
+  <p>GE_ComboWindow_1:HasDuration,<strong>宽限 0.5s</strong>,授予 +State.Combo.Window.1 ✓;GE_ComboWindow_2 同,授予 .2 ✓。蒙太奇总长:A=1.67s B=1.40s C=1.87s。<strong>窗口期约 0.4~0.9s</strong>(窗口帧按旧日志在 ~0.4s,加 0.5s 宽限)。</p>
+  <p><strong>真凶(用户 2026-10-10 破案)</strong>:GA_2/GA_3 从未授予角色 ASC(授予池只有 GA_1),下游配置全绿也进不了候选池 → 错题本 <a href="reference/troubleshooting.html#p24">P24</a>。已修:三 GA 全部授予,三连击打通。</p>
+  <p><strong>新坑(已定位,解法见 <a href="reference/troubleshooting.html#p25">P25</a>)</strong>:后摇被自己人打断——"阻止别的技能"只填自身标签,末段后摇期 GA_1 抢跑顶掉 GA_3。修复矩阵:GA_1 阻止=.1 / GA_2 阻止=.1+.2 / GA_3 阻止=父级 Ability.Attack.Light。</p>
+  <p class="meta">诊断工具沉淀:PythonScriptPlugin 已启用;Saved/diag_gac_config.py 一键 dump GA/GE 配置真值(编辑器关闭时命令行跑)。</p>
+</div>
+
+<h2>验收卡点记录(2026-10-10  redesign)</h2>
+<div class="warn">
+  <p><strong>症状 1  redesign(用户拍板,取代"取消勾选 StopWhenAbilityEnds"的旧建议)</strong>:攻击是插槽蒙太奇,盖在移动状态机上。GA 在窗口帧自我了结、蒙太奇却继续播 → 移动时上身攻击动画悬空、下身滑步平移,手感错误。<strong>正确设计(用户 2026-10-10 定稿):三条时间轴闸门各司其职——①锁移动=State.MoveLocked(ANS_MoveLock 区间);②可打断收刀=移动锁摘掉的帧;③可衔接=State.Combo.Window.i(GE)。GA 活到"自然播完/被下一段顶掉/玩家移动"三者之一才结束</strong>,死了才停蒙太奇(Stop When Ability Ends <strong>保持勾选</strong>,停止自带混合过渡,移动动画接管全身)。打断触发 = C++ Move() 里"攻击中(State.Attacking)且未锁移动"→ CancelAbilities——输入只有 C++ 输入层看得见,但许可完全在时间轴上;<strong>不要用 Combo.Window 当打断触发器,衔接和打断是两个独立闸门</strong>。</p>
+  <p><strong>配套四改</strong>:① GA_1/2 窗口链删掉 EndAbility 节点(只留 WaitGameplayEvent → Apply GE);② 播蒙太奇节点的 OnCompleted / OnCancelled / OnInterrupted 都接 EndAbility;③ BlockAbilitiesWithTag 由父级 Ability.Attack.Light 改成<strong>自身精确标签</strong>(.1/.2/.3)——GA 活过收刀段后,父级阻止会把窗口期激活的 GA_2 挡死;④ 三蒙太奇 ANS_MoveLock 结束帧 = 连击窗口开启帧(移动放行与可收刀点对齐;硬约束升级为:判定区间结束 ≤ MoveLock 结束 = 窗口开启,否则顶段时旧蒙太奇的 ANS 收尾会摘掉新一段的移动锁)。</p>
+  <p><strong>症状 2 现状</strong>:GE_ComboWindow_1/2 授予标签已确认改为 .1/.2(资产取证 + 文件时间吻合),但最近一次 PIE 日志仍然只有 GA_1 激活。剩余嫌疑:GA_2 激活所需标签内容、GE 宽限时长、ANS_MoveLock 帧位。已备编辑器 Python 一键诊断脚本 Saved/diag_gac_config.py,跑一次全部现形。</p>
+  <p class="meta">已排除:BP_Player 按标签激活通道有效(GA_1 能激活就是证明);GE_MoveLock=Infinite+State.MoveLocked ✓;ANS_MoveLock 挂/摘逻辑 ✓;GA_1 激活已拥有里 MoveLocked 已删 ✓。</p>
+</div>
+
+<h2>施工单(按顺序做)</h2>
+
+<div class="step">
+  <h3>0 · AN_SendGameplayEvent 标签共享 <span class="tag t-done">已破案</span></h3>
+  <p><strong>根因</strong>:EventTag 变量没开"实例可编辑",当时改的是类默认值,所以所有实例跟着变。已勾选"可编辑实例"(截图存证),预览日志显示 None / WindowOpen / Window.1 三个值共存——实例已各自独立。</p>
+  <p><strong>剩余两个小尾巴</strong>:</p>
+  <ol>
+    <li>蒙太奇 A 上有一个 EventTag=<strong>None</strong> 的多余通知 → 删掉(否则游戏里每次触发刷 Error)</li>
+    <li>新通知错设成 <code>State.Combo.Window.1</code>(状态标签不能当事件发)→ 改回 <code>Event.Combo.WindowOpen</code>。分工:通知发事件(三段通用),GA 收到后各自决定挂 GE_ComboWindow_1 还是 _2</li>
+  </ol>
+  <p class="meta">预览日志里的 AnimationEditorPreviewActor 无 ASC 报错是无害噪音,无视。</p>
+</div>
+
+<div class="step">
+  <h3>1 · 移动锁迁移到时间轴(新架构) <span class="tag t-todo">待做</span></h3>
+  <ol>
+    <li><strong>配 GE_MoveLock</strong>(现在是空壳!):持续时间策略 = <strong>Infinite</strong>;授予的标签 += <code>State.MoveLocked</code></li>
+    <li><strong>新建 ANS_MoveLock</strong>(Gameplay/Notify/ANS,父类 AnimNotifyState,照抄 ANS_AttackWindow 模式):
+      <ul>
+        <li>Received_NotifyBegin:GetOwner → Cast to BaseCharacter → Get Ability System Component → <strong>Apply Gameplay Effect to Self</strong>(GE_MoveLock)</li>
+        <li>Received_NotifyEnd:同 ASC → <strong>Remove Active Effects with Granted Tags</strong>(容器加 State.MoveLocked)</li>
+        <li><strong>不要把 GE 句柄存变量</strong>——同一蒙太奇被多个角色同时播时通知对象共享,存句柄会串;按标签摘除没这问题</li>
+      </ul></li>
+    <li><strong>GA_1/2/3 的 Activation Owned Tags 里删掉 State.MoveLocked</strong>(锁移动从此归 ANS 管;State.Attacking 保留)</li>
+    <li><strong>三个蒙太奇放 ANS_MoveLock</strong>:通知轨道右键 → Add Notify State → ANS_MoveLock,拖帧区间(普攻:0 帧 → 应恢复移动的那帧)。将来的移动攻击不放这个 ANS 即可</li>
+  </ol>
+</div>
+
+<div class="step">
+  <h3>2 · GA 窗口链(D 步骤) <span class="tag t-todo">待做</span></h3>
+  <p>GA_1 和 GA_2 的事件图各加一条并行链(GA_3 是末段,不加):</p>
+  <ol>
+    <li><strong>Wait Gameplay Event</strong>,Event Tag = <code>Event.Combo.WindowOpen</code>(与 WaitGameplayEvent(Hit) 平行挂着)</li>
+    <li>→ <strong>Apply Gameplay Effect to Owner</strong>:GA_1 选 GE_ComboWindow_1,GA_2 选 GE_ComboWindow_2</li>
+    <li>→ <strong>End Ability</strong>(自我了结,阻挡和状态随之释放)</li>
+    <li>选中播蒙太奇的节点,<strong>Stop When Ability Ends 取消勾选</strong>(否则动画被拦停)</li>
+  </ol>
+</div>
+
+<div class="step">
+  <h3>3 · 输入改按标签激活(E 步骤) <span class="tag t-todo">待做</span></h3>
+  <p>BP_Player 事件图:IA_Attack 后面的 <code>TryActivateAbilityByClass</code> 换成 <strong>TryActivateAbilitiesByTag</strong>,Tags 容器里加父标签 <code>Ability.Attack.Light</code>。</p>
+</div>
+
+<div class="step">
+  <h3>4 · GA_2/GA_3 配置补全(对着表检查) <span class="tag t-todo">待确认</span></h3>
+  <table>
+    <tr><th>配置项</th><th>GA_1</th><th>GA_2</th><th>GA_3</th></tr>
+    <tr><td>资产标签</td><td>.Light.1 ✓</td><td>.Light.2</td><td>.Light.3</td></tr>
+    <tr><td>用标签阻止能力</td><td>Ability.Attack.Light(父级)</td><td>同左</td><td>同左</td></tr>
+    <tr><td>激活已拥有标签</td><td>State.Attacking(删掉 MoveLocked 后)</td><td>同左</td><td>同左</td></tr>
+    <tr><td>激活所需标签</td><td>空</td><td><strong>State.Combo.Window.1</strong></td><td><strong>State.Combo.Window.2</strong></td></tr>
+    <tr><td>激活阻止标签</td><td><strong>State.Combo.Window</strong>(父级,防窗口期 GA_1 抢跑)</td><td>空</td><td>空</td></tr>
+    <tr><td>实例化策略</td><td colspan="3"><strong>Instanced per Actor(确认三个都改了,不再 per Execution)</strong></td></tr>
+    <tr><td>蒙太奇</td><td>Attack_PrimaryA_Montage</td><td>B</td><td>C</td></tr>
+  </table>
+</div>
+
+<div class="step">
+  <h3>5 · 联调验收(全部过了才算三连击实现) <span class="tag t-todo">待做</span></h3>
+  <ul>
+    <li>□ 点一下 → <code>GA_Attack_Light_1</code> 激活,<code>[伤害结算]</code> 恰好一次</li>
+    <li>□ 窗口期再点 → <code>GA_Attack_Light_2</code> 激活;再窗口期点 → <code>GA_Attack_Light_3</code></li>
+    <li>□ 窗口外乱点 → 无任何 GA 激活(静默拒绝,不报错)</li>
+    <li>□ 攻击前段 WASD/空格无效;过了 ANS_MoveLock 结束帧可以走;窗口期可以走位</li>
+    <li>□ 每次挥剑日志只有一条"技能激活"(实例编号不连号堆积)</li>
+    <li>□ 体力:showdebug abilitysystem 切回自己(PageUp/PageDown),挥剑 <strong>100→80</strong>(此验收点从未确认过!)</li>
+    <li>□ 木桩三剑应死:100→50→0→0(每段 50 伤)</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>6 · 章节收尾(老规矩,全绿之后) <span class="tag t-todo">待做</span></h3>
+  <ol>
+    <li><strong>错题本 P24</strong>(reference/troubleshooting.html):TargetData 空句柄——FGameplayEventData 有 Target(Actor)和 TargetData(句柄)两个字段,C++ 只填了前者,GA 的 ApplyGameplayEffectToTarget 吃句柄,拿空句柄<strong>静默空转不掉血不报错</strong>。修法:Payload.TargetData = AbilityTargetDataFromActor(OtherActor)。教训:静默失败先查"数据有没有真的传到下一环"</li>
+    <li>index.html 第 4 章标完成 + 填"实际执行记录"(重点写:武器碰撞注册制、TargetData 坑、时间轴即状态机架构)</li>
+    <li>docs/log/04 更新;本清单页可以把待办都勾掉或归档</li>
+    <li>双仓库 commit + push(外层推 GitHub,代理 127.0.0.1:7897)</li>
+    <li>docs/AI-MEMORY.md 接手点更新</li>
+  </ol>
+</div>
+
+<h2>参考:当前系统全貌(已验证的部分)</h2>
+<div class="card">
+  <pre><code>按键 → BP_Player: IA_Attack → TryActivateAbilitiesByTag(Ability.Attack.Light)
+  → GA_i 激活(条件选拔)→ 扣体力 GE_Cost → 播蒙太奇 i
+    ├─ ANS_AttackWindow 区间:武器碰撞盒开/关(开关=1/0 日志)
+    │    └─ 命中 → C++ OnWeaponOverlap → SendGameplayEvent(Event.Montage.Attack.Hit,
+    │         Payload 带 Target + TargetData 句柄)→ GA WaitGameplayEvent(Hit)
+    │         → ApplyGameplayEffectToTarget(GE_Damage 50)→ 木桩扣血 [伤害结算] 日志
+    ├─ ANS_MoveLock 区间:挂/摘 State.MoveLocked(移动锁,时间轴控制)
+    └─ 窗口帧 AN_SendGameplayEvent(Event.Combo.WindowOpen)→ GA 挂 GE_ComboWindow_i
+         → GA EndAbility(蒙太奇继续播)→ 窗口期 GA_{i+1} 凭 Window.i 放行</code></pre>
+  <p class="meta">资产路径:GA 在 /Game/Gameplay/GAS/Abilities/,GE 在 /Game/Gameplay/GAS/Effects/,蒙太奇在 /Game/Gameplay/Anims/Combo/(Attack_PrimaryA/B/C_Montage),通知在 /Game/Gameplay/Notify/(AN 与 ANS),木桩 /Game/Gameplay/Characters/BP_Dummy。</p>
+</div>
+
+</main>
+</body>
+</html>

@@ -32,9 +32,14 @@ void UMyAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 		const float LocalDamage = GetDamage();
 		SetDamage(0.f);
 
+		const AActor* OwnerActor = GetOwningActor();
+		UE_LOG(LogTemp, Warning, TEXT("[伤害结算] 目标=%s 伤害=%.1f 结算前HP=%.1f"),
+			OwnerActor ? *OwnerActor->GetName() : TEXT("未知"), LocalDamage, GetHealth());
+
 		if (LocalDamage > 0.f)
 		{
 			SetHealth(FMath::Clamp(GetHealth() - LocalDamage, 0.f, GetMaxHealth()));
+			UE_LOG(LogTemp, Warning, TEXT("[伤害结算] 结算后HP=%.1f"), GetHealth());
 		}
 	}
 }
