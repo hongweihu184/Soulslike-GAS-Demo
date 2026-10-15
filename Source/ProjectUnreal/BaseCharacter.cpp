@@ -118,6 +118,24 @@ bool ABaseCharacter::IsAttacking() const
 	return AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(AttackingTag);
 }
 
+float ABaseCharacter::GetHealthPercent() const
+{
+	if (!AttributeSet || AttributeSet->GetMaxHealth() <= 0.f)
+	{
+		return 0.f;
+	}
+	return AttributeSet->GetHealth() / AttributeSet->GetMaxHealth();
+}
+
+float ABaseCharacter::GetStaminaPercent() const
+{
+	if (!AttributeSet || AttributeSet->GetMaxStamina() <= 0.f)
+	{
+		return 0.f;
+	}
+	return AttributeSet->GetStamina() / AttributeSet->GetMaxStamina();
+}
+
 void ABaseCharacter::RegisterWeaponCollision(UPrimitiveComponent* Comp)
 {
 	WeaponCollisionComp = Comp;

@@ -1,0 +1,3 @@
+System.ArgumentNullException: Value cannot be null. (Parameter 'path1')
+   at System.IO.Path.Combine(String path1, String path2)
+   at Doorstop.Entrypoint.Start() in /home/runner/work/BepInEx/BepInEx/Runtimes/Unity/BepInEx.Unity.IL2CPP/DoorstopEntrypoint.cs:line 30

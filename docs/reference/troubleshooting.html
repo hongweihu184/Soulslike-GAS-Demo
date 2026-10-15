@@ -89,6 +89,7 @@
   <a href="#p24">P24 技能没授予,连击永远只有第一段</a>
   <a href="#p25">P25 后摇被自己人打断(阻止标签只填自己)</a>
   <a href="#p26">P26 持续移动时无法挥刀(收刀轮询竞态)</a>
+  <a href="#p27">P27 体力配置全对但永不消耗(缺 CommitAbility)</a>
 </nav>
 
 <main>
@@ -115,6 +116,7 @@
     <tr><td><a href="#p24">连击连不上 / 永远只有第一段激活 / 其他段按了没反应</a></td><td><strong>先查授予池</strong>:showdebug abilitysystem 的 Abilities 页看技能挂没挂上,别急着查配置(见 P24)</td></tr>
     <tr><td><a href="#p25">后摇没播完被自己人打断 / 末段动画腰斩</a></td><td>阻止别的技能只填了自身标签;末段填父级 Ability.Attack.Light 封全家(见 P25)</td></tr>
     <tr><td><a href="#p26">站着能砍、按住方向键一直走就挥不出刀</a></td><td>收刀判断别在输入回调里每帧轮询——改由 ANS 标签生灭事件驱动,时机交回时间轴(见 P26)</td></tr>
+    <tr><td><a href="#p27">GE_Cost 挂对了但体力永不消耗</a></td><td>GA 激活图缺 CommitAbility 节点——Cost/Cooldown 由 Commit 统一执行,激活 ≠ 扣款(见 P27)</td></tr>
   </table>
 </section>
 
@@ -582,6 +584,22 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
     <li>输入回调里做"每帧政策判断"必然引入竞态;政策判断要挂在<strong>状态迁移点</strong>(标签生灭)上,而不是挂在连续事件(每帧输入)上</li>
     <li>"站着行、走着不行"= 有轮询在偷跑,第一反应找每帧回调里的政策代码</li>
     <li>连"是否经历过某状态"都要由配置的帧位推出,代码里不许出现与时间轴等价的硬编码判断</li>
+  </ul>
+</section>
+
+<!-- ============ P27 ============ -->
+<section id="p27">
+  <h2>P27 · 体力配置全对但永不消耗:GA 激活图里没有 CommitAbility <span class="fix">已解决</span></h2>
+  <p class="sym">症状:GE_Cost 挂在三个 GA 的 Cost 上、修改器 -20  targeting Stamina,磁盘真值逐项验证无误;但挥刀体力纹丝不动,体力条和日志均无变化。中途误报:出生时 GE_InitAttributes 打的一条 <code>[体力] 变动=+0.0</code> 日志在时间轴上与攻击相近,被误判为"Cost 执行了但幅度是 0",排查方向被带偏两轮。</p>
+  <h4>根因</h4>
+  <p><strong>GAS 的 Cost 不是激活时自动扣的</strong>。扣款(以及扣款前的"付不付得起"检查)由 <code>CommitAbility</code> 节点统一执行;蓝图 GA 的激活图如果直接从 ActivateAbility 跳去 PlayMontageAndWait,Cost 和 Cooldown 永远不走。日志指认法:给 AttributeSet 的结算日志加上 <code>GE=%s</code>(EffectSpec.Def 名)字段,挥刀后若看不到 GE_Cost 的执行行,即坐实"Cost 从未被调用"。</p>
+  <h4>解法</h4>
+  <p>三个 GA 的 ActivateAbility 入口插入 <code>Commit Ability</code> 节点:成功支 → 原流程;失败支(体力不足)→ EndAbility 退场。附带收益:<strong>空体挥不出刀</strong>从"想要的规则"变成引擎白送(Cost 检查自动拒绝激活)。</p>
+  <h4>教训</h4>
+  <ul>
+    <li>GAS 三件套分工:Activation 只负责"能不能激活"(标签),<strong>Commit 才负责"付不付得起+扣款"</strong>;激活成功 ≠ 资源已扣</li>
+    <li>"配置全对但没生效"时,下一步不是反复验配置,是验<strong>调用方到底调没调</strong>——在结算回调里打印 GE 名字,一行日志定位整条链路断在哪一环</li>
+    <li>联调日志带上数据源头标识(GE 名/事件名),别只打数值——没有源头的数值日志会把排查带进沟里(本例:把出生时的初始化 GE 当成了攻击时的 Cost)</li>
   </ul>
 </section>
 

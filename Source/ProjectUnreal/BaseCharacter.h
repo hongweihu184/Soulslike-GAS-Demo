@@ -51,6 +51,13 @@ protected:
 	UFUNCTION(BlueprintPure, Category = "Combat")
 	bool IsAttacking() const;
 
+	// UI 数据接口:血/体力百分比(UMG ProgressBar 绑定用)。纯查询。
+	UFUNCTION(BlueprintPure, Category = "Attributes")
+	float GetHealthPercent() const;
+
+	UFUNCTION(BlueprintPure, Category = "Attributes")
+	float GetStaminaPercent() const;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
