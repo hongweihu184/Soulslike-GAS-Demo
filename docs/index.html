@@ -67,7 +67,7 @@
   <h1>魂类 ARPG Demo</h1>
   <div class="sub">GAS · UE5.8 · 求职作品集<br>落地与复习文档</div>
   <a href="tutorial.html">★ 跟做教程(全程实录)</a>
-  <a href="checklist.html">★ 复工清单(第 4 章施工单)</a>
+  <a href="checklist.html">★ 复工清单(当前开发基线)</a>
   <div class="grp">总览</div>
   <a href="#overview">项目总览</a>
   <a href="#plan">总体计划表</a>
@@ -158,7 +158,7 @@
     <tr><td>1</td><td>工程 C++ 化</td><td>生成 Source 与空模块，编译通过，编辑器正常打开</td><td>模块 / Build.cs / UBT</td><td>1 次</td><td><span class="tag t-done">完成</span></td></tr>
     <tr><td>2</td><td>GAS 地基</td><td>ASC + AttributeSet(HP/体力) + 初始化 GE，属性面板可见数值</td><td>ASC / AttributeSet / GE / GameplayTag</td><td>2 次</td><td><span class="tag t-done">完成</span></td></tr>
     <tr><td>3</td><td>主角接入</td><td>Greystone 可跑跳、相机/输入完整，替代默认角色</td><td>Enhanced Input / AnimBP / CharacterMovement</td><td>1–2 次</td><td><span class="tag t-done">完成</span></td></tr>
-    <tr><td>4</td><td>三连击 + 伤害</td><td>鼠标连点出三段连击；命中木桩扣血；体力消耗</td><td>GA / AbilityTask / GameplayEvent / 伤害 GE</td><td>2–3 次</td><td><span class="tag t-doing">进行中</span></td></tr>
+    <tr><td>4</td><td>三连击 + 伤害</td><td>鼠标连点出三段连击；命中木桩扣血；体力消耗</td><td>GA / AbilityTask / GameplayEvent / 伤害 GE</td><td>2–3 次</td><td><span class="tag t-done">完成</span></td></tr>
     <tr><td>5</td><td>翻滚 + 无敌帧 + 受击死亡</td><td>翻滚躲伤害；被打有硬直；血空播死亡</td><td>AnimNotifyState / GrantedTag / Immunity</td><td>2 次</td><td><span class="tag t-todo">待做</span></td></tr>
     <tr><td>6</td><td>敌人与 AI</td><td>小兵会巡逻/追击/攻击/受击/死亡，2–3 只围殴有走位</td><td>StateTree / EQS / AI 挂 ASC</td><td>2–3 次</td><td><span class="tag t-todo">待做</span></td></tr>
     <tr><td>7</td><td>锁定系统</td><td>按键锁定最近敌人，相机注视，可切换/断锁</td><td>目标打分 / 相机控制 / LOS</td><td>1–2 次</td><td><span class="tag t-todo">待做</span></td></tr>
@@ -189,10 +189,11 @@
   <h3>一次攻击的完整管线（魂游 demo 版）</h3>
   <pre>玩家按 LMB
   → Enhanced Input 触发
-  → ASC.TryActivateAbility(GA_Attack_Light_1)      // 检查体力够不够（Cost GE）
+  → RequestAttack → ASC.TryActivateAbilitiesByTag(Ability.Attack.Light)
+  → GA 检查条件并 CommitAbility(检查并应用 Cost GE)
   → GA 播放 Attack_PrimaryA 蒙太奇
-  → 动画上的 AN_AttackDamage 通知发出 GameplayEvent (Event.Montage.Attack.Hit)
-  → GA 的 WaitGameplayEvent 收到 → 球体扫掠 (SphereTrace)
+  → ANS_AttackWindow 开启武器碰撞,重叠命中后发送 GameplayEvent (Event.Montage.Attack.Hit)
+  → GA 的 WaitGameplayEvent 收到带目标的 TargetData
   → 命中敌人 → ApplyGameplayEffectToTarget(GE_Damage)
   → 敌人 ASC 结算：查 State.Invulnerable → 扣血 → PostGameplayEffectExecute
   → 血 ≤ 0 → 打 State.Dead 标签 → 播死亡动画
@@ -311,26 +312,20 @@
 
 <!-- ============ 第 4 章 ============ -->
 <section id="ch4">
-  <h2>第 4 章 · 三连击与伤害 <span class="tag t-doing">进行中</span></h2>
+  <h2>第 4 章 · 三连击与伤害 <span class="tag t-done">完成</span></h2>
   <div class="card">
     <h4>目标</h4>
     <p>本项目的核心章节。鼠标连点打出一/二/三段普攻；命中帧对敌人结算伤害；每次攻击消耗体力。</p>
-    <h4>知识点：连击的 GAS 做法（融合格斗模板与 tranek 范式）</h4>
+    <h4>当前实现与执行记录(2026-10-17)</h4>
     <ul>
-      <li>素材：<code>Attack_PrimaryA/B/C_Montage</code> 三段现成蒙太奇。</li>
-      <li>每个 GA 播一段；段间衔接用"连击窗口"：动画上放 AnimNotifyState，窗口期间 GA 持有 <code>State.Combo.Window</code> 标签；窗口内再按 LMB → TryActivate 下一段 GA。</li>
-      <li>命中帧：动画放 <code>AN_AttackDamage</code>（自定义 AnimNotify，C++ 或蓝图），发出 <code>Event.Montage.Attack.Hit</code> GameplayEvent；GA 里 WaitGameplayEvent 收到后做 SphereTrace（参考模板 BPI_Attacker.DoAttackTrace 的扫掠参数）。</li>
-      <li>命中 → ApplyGameplayEffectToTarget(GE_Damage_Light)，GE 里用 Modifier 扣血（进阶：ExecutionCalculation 算攻防）。</li>
-      <li>体力：GA 的 Cost GameplayEffect 配置 GE_Cost_Stamina_Light（-20 体力），体力不足自动无法激活——GAS 自带，无需手写判断。</li>
-      <li>测试对象：先做 <code>BP_Dummy</code> 木桩（继承 ABaseCharacter，无 AI）。</li>
+    <li>BP_Player 按父标签请求攻击,GA_2/3 分别要求 State.Combo.Window.1/2;GA_1/2 将窗口事件转为对应 GE。</li>
+    <li>ANS_AttackWindow 控制武器碰撞,C++ 按挥击去重并携带 TargetData 发送命中事件;GA 应用 GE_Damage,属性集扣血。</li>
+    <li>ANS_MoveLock / ANS_MoveCancelWindow 表达移动锁与收刀窗,BP 组合策略,C++ 只执行动作。</li>
+    <li>三个攻击 GA 调用 CommitAbility,每段消耗 20 体力,失败时结束;空中禁普攻使用虚幻自带功能配置。</li>
+    <li>窗口事件不立即结束 GA;动画完成/取消/打断时结束,Stop When Ability Ends 保持勾选。</li>
     </ul>
-    <h4>产出物</h4>
-    <p><code>GA_Attack_Light_1/2/3</code>（蓝图）、<code>GE_Damage_Light</code>、<code>GE_Cost_Stamina_*</code>、AnimNotify 两个、Tag 若干、<code>BP_Dummy</code>。</p>
-    <h4>验收</h4>
-    <p>三段连击节奏正确（狂点不乱、不吞段）；木桩血条下降；体力不足时攻击打不出；<code>showdebug abilitysystem</code> 全流程可见。</p>
-    <h4>实际执行记录</h4>
-    <p class="meta">（执行后填写）</p>
-    <div class="note warn"><strong>2026-10-08 施工中</strong>:伤害链已打通(木桩 100→50→0),三连击未实现。当前施工单与架构决策(时间轴即状态机)见 <a href="checklist.html">复工清单</a>。</div>
+    <p>近期提交已记录以上功能及 WBP_HUD 玩家生命/体力显示。2026-10-17 用户确认最新版本正常。本轮仅同步资料,未新增运行验收。下一步为体力回复、翻滚、无敌帧和受击死亡;第 8 章敌人血条与锁定指示仍待完成。</p>
+    <p>当前入口见 <a href="checklist.html">复工清单</a>;历史见 <a href="log/04-三连击与伤害.md">第 4 章日志</a> 和错题本 P24~P27。</p>
   </div>
 </section>
 

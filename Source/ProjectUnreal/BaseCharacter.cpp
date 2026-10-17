@@ -193,7 +193,7 @@ void ABaseCharacter::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, A
 
 void ABaseCharacter::Move2D(const FVector2D Axis)
 {
-	// 纯移动动词:锁吞输入/收刀策略已迁到 BP_Player 事件图(读 IsMoveLocked/IsAttacking/HasAttackLockApplied 组合)
+	// 纯移动动词:锁吞输入/收刀策略已迁到 BP_Player 事件图(读取 IsMoveLocked 与 State.MoveCancelWindow)
 	if (!Controller)
 	{
 		return;

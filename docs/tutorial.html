@@ -63,7 +63,7 @@
   <a href="#step3">第 3 步 · 编辑器配置</a>
   <a href="#step4">第 4 步 · 验收</a>
   <a href="#step5">第 5 步 · 主角接入</a>
-  <a href="#step6">第 6 步 · 三连击(进行中)</a>
+  <a href="#step6">第 6 步 · 三连击(已完成)</a>
   <div class="grp">之后</div>
   <a href="#next">后续路线</a>
   <a href="#map">文档地图</a>
@@ -200,9 +200,10 @@ GameplayTagList=(Tag="Event",DevComment="")</pre>
 
 <!-- ============ 第 6 步 ============ -->
 <section id="step6">
-  <h2>第 6 步 · 三连击与伤害(进行中)</h2>
+  <h2>第 6 步 · 三连击与伤害(已完成)</h2>
   <p><strong>目标</strong>:左键三段普攻,命中扣血,体力消耗,连击窗口。</p>
-  <h4>设计一句话</h4>
+  <p class="meta">2026-10-17 用户确认最新版本正常。三连击、体力消耗与玩家血条/体力条已完成。当前配置以 <a href="checklist.html">复工清单</a> 及策划案为准。</p>
+<h4>设计一句话</h4>
   <p>输入统一发 <code>Ability.Attack.Light</code>;三个 GA(标签 .Light.1/2/3)利用标签父子匹配同时被尝试,GA2/3 靠 <code>State.Combo.Window</code> 门槛卡死窗口外激活;命中帧和窗口开启都是<strong>蒙太奇时间轴上可拖的通知</strong>(自定义 AN_SendGameplayEvent 发 GameplayEvent),伤害走第 2 章就位的元属性通道。</p>
   <div class="note"><strong>调试心法</strong>:GameplayEvent 链路故障全部静默丢失、零报错。WaitGameplayEvent 后先接 Print String 验证链路,再接正式逻辑。排查三问:通知放对帧了吗?标签两边拼写一致吗?事件发给对的 Actor 了吗?</div>
   <p class="meta">详细构建步骤(GE_Damage/GE_ComboWindow/GA×3/木桩)见 <code>docs/log/04-三连击与伤害.md</code>。</p>
