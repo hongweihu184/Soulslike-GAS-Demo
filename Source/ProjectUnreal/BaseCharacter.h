@@ -25,6 +25,10 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	// 临时转向诊断:从输入事件和攻击转向通知记录输入及角色朝向。
+	UFUNCTION(BlueprintCallable, Category = "Debug|Combat")
+	void DebugLogAttackTurn(const FVector2D MoveInput, const FVector TargetDirection, const FString Phase);
+
 protected:
 	virtual void BeginPlay() override;
 

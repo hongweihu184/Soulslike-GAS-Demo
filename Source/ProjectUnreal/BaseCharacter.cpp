@@ -46,6 +46,32 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void ABaseCharacter::DebugLogAttackTurn(const FVector2D MoveInput, const FVector TargetDirection, const FString Phase)
+{
+	const float TargetYaw = TargetDirection.IsNearlyZero()
+		? 0.f
+		: TargetDirection.Rotation().Yaw;
+	const float MeshYaw = GetMesh()
+		? GetMesh()->GetComponentRotation().Yaw
+		: GetActorRotation().Yaw;
+	const float ControlYaw = Controller
+		? Controller->GetControlRotation().Yaw
+		: 0.f;
+	const FVector Velocity = GetVelocity();
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[转向调试][%s] 输入=(X %.2f, Y %.2f) 目标方向=(%.2f, %.2f, %.2f) 目标Yaw=%.1f 角色Yaw=%.1f 网格Yaw=%.1f 控制器Yaw=%.1f 速度=(%.1f, %.1f, %.1f) OrientToMovement=%d"),
+		*Phase,
+		MoveInput.X, MoveInput.Y,
+		TargetDirection.X, TargetDirection.Y, TargetDirection.Z,
+		TargetYaw,
+		GetActorRotation().Yaw,
+		MeshYaw,
+		ControlYaw,
+		Velocity.X, Velocity.Y, Velocity.Z,
+		GetCharacterMovement()->bOrientRotationToMovement ? 1 : 0);
+}
+
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();

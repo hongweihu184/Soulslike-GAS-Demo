@@ -603,6 +603,36 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
   </ul>
 </section>
 
+<!-- ============ P28 ============ -->
+<section id="p28">
+  <h2>P28 · 攻击转向不生效: Set Actor Rotation 的 Target 引脚接错 <span class="fix">已解决</span></h2>
+  <p class="sym">症状:攻击转向通知能算出正确的输入方向和目标 Yaw,节点也执行了,但角色没有按期望转向。</p>
+  <h4>根因</h4>
+  <p><code>Set Actor Rotation</code> 的 <code>Target</code> 没有接到 <code>Cast To BP_Player</code> 的 <code>As BP_Player</code>,所以旋转被施加到了错误对象。目标旋转本身正确,不能证明被旋转的是玩家角色。</p>
+  <h4>解法</h4>
+  <p>通知里所有针对玩家的角色读取和写入都使用同一个 <code>As BP_Player</code> 引用,尤其检查 <code>Set Actor Rotation.Target</code>。用户确认改正后转向生效。</p>
+  <h4>教训</h4>
+  <ul>
+    <li>Blueprint 的节点执行成功、输入值正确,不代表节点作用对象正确;调试时同时核对 Target 引脚</li>
+    <li>角色 Actor 的 Yaw 与 Skeletal Mesh 的相对 Yaw 可能不同,先确认真正被修改的对象再解释角度差</li>
+  </ul>
+</section>
+
+<!-- ============ P29 ============ -->
+<section id="p29">
+  <h2>P29 · 平滑转向仍然瞬间切换:旧的直接旋转链绕过插值节点 <span class="fix">已解决</span></h2>
+  <p class="sym">症状:加入 <code>RInterp To Constant</code> 并设置角速度后,攻击依然瞬间跳到目标方向。</p>
+  <h4>根因</h4>
+  <p><code>Set Actor Rotation.New Rotation</code> 仍接着旧的“方向向量 → Rotation From X Vector”直连输出;新插值节点虽然存在,但它的 <code>Return Value</code> 没有进入实际设置旋转的引脚。</p>
+  <h4>解法</h4>
+  <p>将 <code>Get Actor Rotation</code> 接到插值的 Current,目标方向生成的 Rotation 接到 Target,通知事件的 Frame Delta Time 接到 Delta Time;最后把 <code>RInterp To Constant.Return Value</code> 接到 <code>Set Actor Rotation.New Rotation</code>。旧的直接输出链断开。攻击通知状态每帧读取输入,窗口结束即停止更新。用户确认新方案有效。</p>
+  <h4>教训</h4>
+  <ul>
+    <li>平滑/限速节点只有进入最终执行链才生效;检查“最终写入节点的输入来源”,不要只看插值节点是否已放进图表</li>
+    <li>改接线后检查旧路径是否仍然直连,避免两条逻辑并存时旧路径继续覆盖新结果</li>
+  </ul>
+</section>
+
 </main>
 </body>
 </html>

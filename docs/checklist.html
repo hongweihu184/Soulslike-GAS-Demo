@@ -56,9 +56,11 @@
 <li>ANS_AttackWindow 开关武器碰撞,C++ 每次挥击目标去重,发送带 TargetData 的命中事件,GA 应用 GE_Damage。</li>
 <li>三个攻击 GA 均调用 CommitAbility,每段 -20 体力,失败时结束技能。WBP_HUD 读取生命/体力百分比接口。</li>
 </ul>
+<h2>攻击转向窗口(用户确认可用)</h2>
+<p>三个攻击 Montage 使用蓝图 AnimNotifyState <code>ANS_AttackTurnWindow</code>。状态 Tick 持续读取 <code>BP_Player.Current Move Input</code>,按控制器 Yaw 合成相机相对目标方向,通过 <code>RInterp To Constant</code> (初始 360°/秒) 平滑更新角色旋转。旧单次通知 <code>AN_AttackTurnToInput</code> 不再使用且资产已删除;攻击冲量通知 <code>AN_AttackStepForward</code> 保留。临时诊断 C++ 函数仍被 BP_Player 引用,清理前先在蓝图里移除调用。详细步骤见 <a href="log/05-体力回复与攻击转向.md">行动日志 05</a>。</p>
 <h2>下一步 · 第 5 章</h2>
 <ol>
-<li>确定体力回复速率与回复时机,实现并验证属性上下限。</li>
+<li>✅ 体力回复已通过无限周期 Gameplay Effect 配置,攻击标签作为持续标签排除条件,用户已验证生效。</li>
 <li>翻滚输入、位移、蒙太奇、成本与取消规则。</li>
 <li>无敌帧窗口、伤害结算、受击与死亡。</li>
 <li>更新相关文档并分别提交代码/文档仓库与本地素材仓库。</li>
