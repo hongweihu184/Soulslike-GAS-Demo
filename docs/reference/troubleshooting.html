@@ -633,6 +633,22 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
   </ul>
 </section>
 
+<!-- ============ P30 ============ -->
+<section id="p30">
+  <h2>P30 · 体力条已满但攻击看似不扣体力:只夹了当前值,基础值仍能超上限 <span class="fix">代码已编译,待 PIE 验收</span></h2>
+  <p class="sym">症状:周期体力回复一段时间后,HUD 显示满体力,但攻击偶尔看起来没有扣体力。</p>
+  <h4>根因</h4>
+  <p><code>MyAttributeSet::PreAttributeChange</code> 只限制当前值,而周期 Gameplay Effect 会执行并修改基础值。基础 Stamina 若累积到 MaxStamina 以上,当前值仍可显示为满;攻击 Cost 先消耗隐藏的超额基础值,当前值和 HUD 因此暂时不变。UE 5.8 的 <code>UAttributeSet</code> 将基础值修改钩子单独提供为 <code>PreAttributeBaseChange</code>,并说明它用于基础值夹限;周期/瞬时执行后的最终值可在 <code>PostGameplayEffectExecute</code> 检查。</p>
+  <h4>解法</h4>
+  <p>在 <code>PreAttributeBaseChange</code> 对 Health/Stamina 限制到各自的 0~Max 范围;在 <code>PostGameplayEffectExecute</code> 对 Stamina 执行后再夹到 0~Max,作为执行效果后的兜底。完成编译后,PIE 验证满值后等待一段时间再攻击,体力应立即下降且永不超过上限。</p>
+  <h4>教训</h4>
+  <ul>
+    <li>GAS 的属性有 Base Value 与 Current Value;只看 HUD 或只夹 Current Value,无法证明基础值也受限</li>
+    <li>“满值时扣费像失效”要检查原始 Attribute 数值和 Base/Current,不能只看进度条</li>
+    <li>给上限规则同时考虑当前值变化与基础值变化,并在执行式 GE 后验证最终值</li>
+  </ul>
+</section>
+
 </main>
 </body>
 </html>
