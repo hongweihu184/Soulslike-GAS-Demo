@@ -2,7 +2,7 @@
 
 > 这份文件是项目 AI 助手的"记忆备份"。不是对话记录,是提炼后的关键上下文。
 > 如果你是刚被叫来协助本项目的 AI:**先读完这份文件,再开口说话**。读完约需 3 分钟,能避免你重蹈覆辙或问出用户已经回答过的问题。
-> 最近更新:2026-10-18(记录攻击位移时间窗口及滑步资源待办)
+> 最近更新:2026-10-18(记录攻击位移时间窗口、转向修复及 GitHub 自有资产恢复方案)
 
 ## 0. 新会话引导(上下文自救,先看这个)
 
@@ -18,9 +18,11 @@
 ## 1. 项目是什么
 
 - 魂类 ARPG 求职 demo,UE 5.8 + GAS(Gameplay Ability System),主角 Paragon Greystone,Boss Paragon Grux。
-- 仓库:https://github.com/hongweihu184/Soulslike-GAS-Demo (外层:代码/文档)
+- 仓库:https://github.com/hongweihu184/Soulslike-GAS-Demo (外层:代码/文档与自有资产快照)
 - 本地工程:`E:\UE5.8Project\ProjectUnreal`;引擎:`E:\UE_5.8`
-- 素材约 19GB 在 `Content/.git` 内层仓库,**只在本地,不在 GitHub**。迁移/重装时必须整文件夹对拷。
+- 完整 `Content/` 约 19GB，主体为 8 个 Paragon 资源包；`Content/.git` 本地历史约 12.44 GiB，禁止直接推送到 GitHub。
+- GitHub 通过 `ProjectContentSnapshot/Content/` 保存工程自有蓝图、输入、地图和外置 Actor 快照(182 个文件，约 32.49 MiB)；恢复细则见 `docs/reproduction/content-inventory.md`，复制脚本为 `Tools/Restore-ProjectContent.ps1`。
+- 换机时取得有权访问的 Paragon 资源包后再运行恢复脚本；脚本默认拒绝覆盖不同内容。新增/修改自有 `.uasset` 后，需同步更新快照并提交外层 Git。
 - 主线计划 12 章,见 `docs/index.html` 计划表。技术路线:**C++ 只打地基,90% 玩法在蓝图**。
 
 ## 2. 用户画像(重要,决定沟通方式)

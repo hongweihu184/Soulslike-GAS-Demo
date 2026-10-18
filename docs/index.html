@@ -208,23 +208,23 @@
     <h4>目标</h4>
     <p>工程纳入 git，建立可回滚的基线；轻量部分（代码/文档/配置）推 GitHub 公开仓库，作为简历可附的代码链接。</p>
     <h4>最终架构：嵌套双仓库（重要，先理解再操作）</h4>
-    <p>Content 有 19GB 素材，GitHub 单文件限 100MB、LFS 免费额度仅 1GB，全量上云需付费。因此采用嵌套仓库：</p>
+    <p>初始盘点将整个 Content 视为约 19GB 的本地素材库，因此采用嵌套仓库。2026-10-18 换机复现盘点后，已确认大部分体积来自可重新获取的 Paragon 包；当前 GitHub 同步的是工程自有资产快照，而非完整 Marketplace 素材库。</p>
     <ul>
       <li><strong>外层仓库</strong>（工程根目录 <code>.git</code>）：跟踪 <code>Source/ docs/ Config/ .uproject .gitignore</code> 等轻量文件，<code>.gitignore</code> 里排除 <code>Content/</code> 与引擎缓存。<strong>这个仓库推 GitHub</strong>，体积小、公开无压力。</li>
-      <li><strong>内层仓库</strong>（<code>Content/.git</code>）：独立跟踪全部 19GB 素材，<strong>只在本地</strong>，负责素材回滚。</li>
+      <li><strong>内层仓库</strong>（<code>Content/.git</code>）：本地跟踪完整工作副本与素材历史；其中 Paragon 原始资源包不上传 GitHub。</li>
     </ul>
-    <p>效果：GitHub 上看到的目录结构和本地完全一致（只是 Content 为空）；素材误删误改可以 <code>cd Content &amp;&amp; git checkout -- .</code> 单独回滚。</p>
-    <div class="note"><strong>日常口诀</strong>：改了代码/文档 → 根目录 commit；动了素材 → 进 Content 目录 commit；两者都动 → 各 commit 一次。推送 GitHub 只推外层。</div>
+    <p>外层仓库保留代码、配置和文档，并额外包含 <code>ProjectContentSnapshot/Content/</code>：筛选后的工程自有蓝图、输入、地图与外置 Actor 数据。换机时先重新取得 Paragon 依赖，再运行 <code>Tools/Restore-ProjectContent.ps1</code>。详情见 <a href="reproduction/content-inventory.md">资产盘点与干净环境恢复</a>。</p>
+    <div class="note"><strong>日常口诀</strong>：改代码/文档或自有资产快照 → 根目录 commit；动完整素材工作副本 → Content 目录本地 commit；Paragon 原始资源不推 GitHub。</div>
     <h4>已执行步骤</h4>
     <ol>
       <li><code>git config --global core.longpaths true</code>（Windows 必须，UE 路径很深）</li>
       <li><code>.gitattributes</code>：uasset/umap 标记 binary，防止换行符转换污染资产</li>
       <li>外层：<code>git init -b main</code> → 基线提交（uproject + Config + docs）</li>
-      <li>内层：<code>cd Content &amp;&amp; git init -b main</code> → 基线提交 19GB 素材（后台执行）</li>
+      <li>内层：<code>cd Content &amp;&amp; git init -b main</code> → 本地素材历史(包含 Paragon 资源包)</li>
       <li>GitHub：创建空公开仓库 → <code>git remote add origin</code> → <code>push -u origin main</code>（首次推送 Git Credential Manager 弹浏览器授权）</li>
     </ol>
     <h4>验收</h4>
-    <p>外层 <code>git status</code> 干净且不含 Content；内层提交完成；GitHub 仓库可访问、结构与本地一致。</p>
+    <p>外层 <code>git status</code> 干净且不含完整 Content；内层素材历史保存在本地；GitHub 另外保存 182 个工程自有内容资产快照，可按文档恢复。</p>
     <h4>实际执行记录</h4>
     <p>2026-10-05 完成。外层 3 笔提交（骨架基线 → 架构说明 → C++ 化），内层 Content 基线 1 笔（19GB 素材）。远端 <a href="https://github.com/hongweihu184/Soulslike-GAS-Demo">github.com/hongweihu184/Soulslike-GAS-Demo</a> 已推送 main。首次推送直连被重置，给 git 配本机代理（127.0.0.1:7897）后成功（见附录 C-3）。</p>
   </div>

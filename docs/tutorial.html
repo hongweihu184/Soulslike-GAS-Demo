@@ -100,21 +100,21 @@
 <!-- ==================== 第 0 步 ==================== -->
 <section id="step0">
   <h2>第 0 步 · 版本管理:嵌套双仓库</h2>
-  <p><strong>目标</strong>:工程纳入 Git,可回滚;轻量文件推 GitHub,巨型素材本地管理。</p>
+  <p><strong>目标</strong>:工程纳入 Git,可回滚;代码、文档和工程自有资产快照推 GitHub,Paragon 原始素材按账号权限重新获取。</p>
   <h4>为什么是两仓库?</h4>
-  <p>UE 工程的 <code>Content/</code> 动辄十几 GB,GitHub 单文件限 100MB、LFS 免费额度 1GB,全量上云不现实。解法:</p>
+  <p>UE 工程的 <code>Content/</code> 动辄十几 GB,主要由 Paragon 原始资源包构成；本仓库只保存工程自有资产快照。完整盘点与恢复步骤见<a href="reproduction/content-inventory.md">资产恢复文档</a>:</p>
   <ul>
-    <li><strong>外层仓库</strong>(工程根目录):跟踪 <code>Source/ Config/ docs/ .uproject</code> 等,.gitignore 排除 <code>Content/</code> 与缓存 → 推 GitHub</li>
-    <li><strong>内层仓库</strong>(<code>Content/.git</code>):独立跟踪全部素材 → 只留本地,负责素材回滚</li>
+    <li><strong>外层仓库</strong>(工程根目录):跟踪代码/文档/配置及筛选后的 <code>ProjectContentSnapshot/Content/</code> → 推 GitHub</li>
+    <li><strong>内层仓库</strong>(<code>Content/.git</code>):本地跟踪完整工作素材与 Paragon 包历史,不直接推送现有历史</li>
   </ul>
   <h4>操作</h4>
   <pre>git config --global core.longpaths true        # Windows 必须
 # .gitattributes 把 *.uasset *.umap 标记为 binary,防换行符污染
 git init -b main                                # 外层,基线提交
-cd Content && git init -b main                  # 内层,素材基线提交
+cd Content && git init -b main                  # 内层,本地素材历史
 # GitHub 建空白公开仓库(不勾 README),git remote add origin ... && git push -u origin main</pre>
   <div class="note bad"><strong>⚠️ 翻车实录</strong>:首次 <code>git push</code> 报 <code>Connection was reset</code>——本机代理(Clash 7897 端口)只对走系统代理的程序生效,git 默认直连。解法:<code>git config --global http.proxy http://127.0.0.1:7897</code>(https 同理)。代理关闭后记得 unset。(错题本 P12)</div>
-  <p class="meta">日常口诀:改代码/文档 → 根目录 commit;动素材 → Content 目录 commit;推送只推外层。</p>
+  <p class="meta">日常口诀:改代码/文档或快照 → 根目录 commit;动完整素材 → Content 目录本地 commit;Paragon 原包不推 GitHub。</p>
 </section>
 
 <!-- ==================== 第 1 步 ==================== -->

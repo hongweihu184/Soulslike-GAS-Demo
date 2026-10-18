@@ -17,12 +17,23 @@
 
 - `Source/` — C++ 模块(GAS 地基:AttributeSet / BaseCharacter)
 - `Config/` — 含 GameplayTags 配置
-- `Content/` — 素材(本地内层 git 仓库管理,不在远端,约 19GB Paragon 资产)
+- `Content/` — 当前完整工作素材库(含本地内层 Git 和 Paragon 包,不整体推送)
+- `ProjectContentSnapshot/Content/` — GitHub 可恢复的工程自有蓝图、地图与输入资产快照
 - `docs/` — 全部教程、笔记、错题本、调研报告
+
+## 在新电脑恢复
+
+`Content/` 中的大部分体积来自 Epic Paragon 资源包，不由本仓库重新分发。GitHub 保存了我们自己的 Unreal 资产快照；恢复清单、资源包依赖说明和安全复制脚本见 [资产盘点与干净环境恢复](docs/reproduction/content-inventory.md)。取得有权访问的 Paragon 资源后，在工程根目录运行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Tools\Restore-ProjectContent.ps1
+```
+
+该脚本将自有资产复制回 `Content/`，发现同路径内容不同时会停止，只有显式传入 `-Overwrite` 才覆盖。
 
 ## 进度
 
-截至 2026-10-17,按代码、双仓库提交及用户确认同步:
+截至 2026-10-18,按代码、仓库提交及用户确认同步:
 
 - 已完成:工程 C++ 化、GAS 基础、主角接入、三连击与伤害、攻击体力消耗。
 - 已接入:玩家血条/体力条;空中禁普攻使用虚幻自带功能配置实现。
