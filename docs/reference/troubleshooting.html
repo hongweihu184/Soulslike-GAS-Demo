@@ -649,6 +649,22 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
   </ul>
 </section>
 
+<!-- ============ P31 ============ -->
+<section id="p31">
+  <h2>P31 · 停止移动后攻击转回默认朝向:零输入仍进入目标旋转计算 <span class="fix">已解决</span></h2>
+  <p class="sym">症状:持续移动时攻击按当前输入正确转向;停下后再攻击则稳定转回角色出生时的默认朝向。</p>
+  <h4>定位</h4>
+  <p>在 <code>ANS_AttackTurnWindow</code> 的 <code>Received Notify Begin</code> 打印 <code>BP_Player.Current Move Input</code>:停止后攻击为 <code>(0,0)</code>,移动中攻击为 <code>(1,0)</code>/<code>(-1,0)</code> 等有效输入。由此排除输入没有清零,问题位于零向量继续进入旋转计算。</p>
+  <h4>解法</h4>
+  <p>计算 <code>Vector2D Length(Current Move Input)</code>,与 <code>0.1</code> 比较。若长度 <code>&lt;=0.1</code>,Branch True 直接结束本次更新,不执行 <code>Set Actor Rotation</code>;仅 False(有有效输入)进入方向转换和插值。用户确认修复后,停止移动再攻击会保留当前朝向。</p>
+  <h4>教训</h4>
+  <ul>
+    <li>Vector2D 零输入没有有效方向,不能把零向量交给 <code>Make Rot from X</code> 当作目标朝向</li>
+    <li>先在通知开始时打印输入,能快速区分“输入缓存错误”与“旋转链误处理零输入”</li>
+    <li>无有效输入时应跳过朝向写入,而不是猜测或生成默认朝向</li>
+  </ul>
+</section>
+
 </main>
 </body>
 </html>
