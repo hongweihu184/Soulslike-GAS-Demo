@@ -2,7 +2,16 @@
 
 > 这份文件是项目 AI 助手的"记忆备份"。不是对话记录,是提炼后的关键上下文。
 > 如果你是刚被叫来协助本项目的 AI:**先读完这份文件,再开口说话**。读完约需 3 分钟,能避免你重蹈覆辙或问出用户已经回答过的问题。
-> 最近更新:2026-10-18(记录攻击位移时间窗口、转向修复及 GitHub 自有资产恢复方案)
+
+> 最近更新：2026-10-19 收工。用户确认翻滚第一版可用并授权 Git/GitHub 同步。最新基线以下文和日志06末节为准。
+
+> 当前翻滚：Mixamo Stand To Roll → Greystone，IA_Roll=左 Shift，GA_Roll→AM_Roll，UpperBody 插槽，蒙太奇 Rate Scale=2；序列根运动关闭、强制根锁定开启，ANS_AttackLungeWindow 驱动位移，ANS_AttackTurnWindow 转向。移动取消与翻滚后摇接攻击已配置。
+
+> 已修复：AbilityRoll 默认标签容器为空（P33）；新蒙太奇默认插槽不匹配（P22）；混出后打断使旧翻滚不退出，已开启 Allow Interrupt After Blend Out（P32）；攻击输入误查 RollCancelWindow，现改查 AttackCancelWindow（P34）。用户做 PIE 手感验收，AI 只读复核保存资产，没有另跑完整回归。
+
+> 下一步：三段攻击已放 RollCancelWindow（各两段），但当前翻滚输入只检查 IsFalling 后激活，尚未消费该窗口；先补判断并核对早段/后段窗口意图，再接翻滚体力成本、无敌帧、受击死亡。GA_Roll 的 Cost/Cooldown 为空，勿写成已实现。原三连击阻止矩阵保留。
+
+> 归档：Content 内层 Git 保存完整已保存资产，只在本地提交；GitHub 保存自有玩法快照，不上传 Mixamo 动作序列及源预览资源。原 FBX 和本轮变更资产压缩包在 LocalBackups（被外层 Git 忽略）。恢复见 docs/reproduction/content-inventory.md；详情见 docs/log/06-翻滚动画导入与重定向.md。
 
 ## 0. 新会话引导(上下文自救,先看这个)
 
@@ -11,7 +20,7 @@
 2. `docs/checklist.html` —— 当前施工单,干活按这个走,别另起炉灶
 3. `docs/reference/troubleshooting.html` —— 错题本 P1~P27,踩过的坑都在,开口给方案前先查它(P19 铁律:节点名/命令/格式必须先在引擎源码或错题本里验证,不许凭记忆)
 
-当前状态一句话:**三连击、命中伤害、体力消耗/回复、HUD、攻击期间按输入平滑转向，以及时间窗口攻击位移已完成并由用户确认可用。无输入时的零向量转向问题已修复(输入长度<=0.1跳过旋转)。攻击位移与现有腿部动画不匹配会滑步,已作为未来资源任务排期;Demo 阶段接受当前表现。体力基础值上限保护已补并编译成功,待 PIE 验证;之后进入翻滚、无敌帧与受击死亡。**
+当前状态一句话：**三连击、伤害、攻击体力消耗/回复、HUD、攻击转向和翻滚第一版已完成。下一步补攻击中翻滚窗口输入判断，再做翻滚体力、无敌帧与受击死亡。**
 
 同步规则:每次改动同步对应文档与接手点。C++ 接口以 Source 为准;蓝图配置以保存资产和用户确认为准;提交标题仅作线索。未运行的检查不可写成已验收。
 
@@ -21,7 +30,7 @@
 - 仓库:https://github.com/hongweihu184/Soulslike-GAS-Demo (外层:代码/文档与自有资产快照)
 - 本地工程:`E:\UE5.8Project\ProjectUnreal`;引擎:`E:\UE_5.8`
 - 完整 `Content/` 约 19GB，主体为 8 个 Paragon 资源包；`Content/.git` 本地历史约 12.44 GiB，禁止直接推送到 GitHub。
-- GitHub 通过 `ProjectContentSnapshot/Content/` 保存工程自有蓝图、输入、地图和外置 Actor 快照(182 个文件，约 32.49 MiB)；恢复细则见 `docs/reproduction/content-inventory.md`，复制脚本为 `Tools/Restore-ProjectContent.ps1`。
+- GitHub 通过 `ProjectContentSnapshot/Content/` 保存工程自有蓝图、输入、地图和外置 Actor 快照（192 个文件，约 32.87 MiB）；恢复细则见 `docs/reproduction/content-inventory.md`，复制脚本为 `Tools/Restore-ProjectContent.ps1`。
 - 换机时取得有权访问的 Paragon 资源包后再运行恢复脚本；脚本默认拒绝覆盖不同内容。新增/修改自有 `.uasset` 后，需同步更新快照并提交外层 Git。
 - 主线计划 12 章,见 `docs/index.html` 计划表。技术路线:**C++ 只打地基,90% 玩法在蓝图**。
 
@@ -55,17 +64,17 @@
 - 蓝图注册武器碰撞组件,ANS_AttackWindow 开关判定,C++ 每次挥击目标去重,命中事件携带 Target 与 TargetData;GA 应用 GE_Damage,属性集结算伤害。
 - 三个攻击 GA 已补 CommitAbility,每段消耗 20 体力,失败时结束技能(P27)。
 - WBP_HUD 已接入生命/体力显示;敌人血条和锁定指示尚待后续章节。
-- 当前 DefaultGameplayTags.ini 有 15 条显式注册,分 Ability / State / Event。
+- 当前 DefaultGameplayTags.ini 有 19 条显式注册,分 Ability / State / Event。
 
 ## 5. 当前接手点
 
-2026-10-17 用户确认最新版本正常并授权提交 ANS_AttackWindow 改动。当前基线依据 Source/Config、近期双仓库提交与用户确认;本轮未新增编译或运行验收。
+本次素材提交 `cca12f5`；公开自有资产快照 192 文件、约 32.87 MiB，完整清单见 docs/reproduction/project-content-manifest.json。缺动作时先看 docs/notes/mixamo-animation-workflow.md，其中记录下载选项、无模型 FBX 的处理、重定向边界和可复用提示词；不要直接运行 Roll 专用脚本覆盖既有资源。
 
-攻击转向:蓝图 AnimNotifyState `ANS_AttackTurnWindow` 在通知状态 Tick 中读取 `BP_Player.Current Move Input`,按控制器 Yaw 合成相机相对方向,再用 `RInterp To Constant`(初始 360°/秒)驱动 `Set Actor Rotation`;用户已确认效果成功。三个攻击 Montage 已引用新状态,旧单次通知资产 `AN_AttackTurnToInput` 已删除。临时诊断函数 `BaseCharacter::DebugLogAttackTurn` 仍被 `BP_Player` 蓝图引用,移除调用并清理 C++ 函数之前需先在编辑器确认调用点。
+用户在 2026-10-19 确认基础翻滚版本可用并要求收工备份。接手时先读日志06的“收工基线”，再读错题本 P22、P32~P34。不要按旧预研把整段攻击/翻滚标签当成互相禁止条件，取消时机由时间轴窗口决定。
 
-下一步:实现翻滚输入、位移与资源消耗 → 无敌帧与受击死亡 → 敌人 AI。体力回复与攻击转向已完成,第 5~8 章预研只作参考,其中现有配置假设需按当前实现复核。不要重新施工第 4 章。
+复核窗口接线时区分 RollCancelWindow（攻击上，允许滚）和 AttackCancelWindow（翻滚上，允许攻击）。当前只完成后者的输入查询；攻击中翻滚窗口尚待补接。不要把“通知已放”当成“窗口已被输入消费”。
 
-近期历史基线:外层 8ea1c71,内层 d154238。2026-10-18 用户确认新的 `ANS_AttackLungeWindow` 时间窗口位移工作正常,但因攻击动画腿部没有对应走步而呈现滑步。暂不扩展下半身状态机/分层混合,后续安排动画资源或动画制作解决。停下后攻击回默认朝向的问题已定位为零输入进入转向计算;`Current Move Input` 长度<=0.1 时跳过旋转,用户已确认修复。旧单次冲量通知资产 `AN_AttackLunge` 仍在本地 Content 目录,删除前需确认三个攻击 Montage 已无引用。本轮行动记录 `docs/log/05-体力回复与攻击转向.md`;当前入口见 checklist.html,设计契约见 design/战斗系统策划案.md,排错见 P24~P31。
+临时 DebugLogAttackTurn 仍在 C++，可能仍有蓝图引用；清理前先核对。体力基础值上限保护已编译，长期满体力再扣费的专项验收仍待确认。攻击位移曾因滑步被关闭，最终攻击蒙太奇仍有位移通知；后续修改以实际窗口和速度为准，不擅自删除用户调参结果。
 
 ## 6. 关键教训(血泪,别再犯)
 

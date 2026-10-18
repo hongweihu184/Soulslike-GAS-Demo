@@ -1,12 +1,12 @@
 # 工程资产盘点与干净环境恢复
 
-> 盘点日期：2026-10-18
+> 盘点日期：2026-10-18；翻滚版本快照更新：2026-10-19
 > 工程：Unreal Engine 5.8 / `ProjectUnreal`
 > 目标：把工程自有蓝图、地图、C++ 和文档放入 GitHub，同时不把 Epic Paragon 素材包重新托管到 GitHub。
 
 ## 结论
 
-当前 `Content` 目录约 19GB，其中绝大多数是 8 个 `Paragon*` 资源包。工程自有内容集中在 `Gameplay/`、`Input/`、`Maps/` 和地图外置 Actor 数据中。本仓库通过 `ProjectContentSnapshot/Content/` 保存了这部分自有资产的快照，快照共 182 个文件、约 32.49 MiB；恢复时运行 `Tools/Restore-ProjectContent.ps1` 即可按原相对路径复制回工程 `Content/`。
+当前 `Content` 目录约 19GB，其中绝大多数是 8 个 `Paragon*` 资源包。工程自有内容集中在 `Gameplay/`、`Input/`、`Maps/` 和地图外置 Actor 数据中。本仓库通过 `ProjectContentSnapshot/Content/` 保存了这部分自有资产的快照，当前快照共 192 个文件、约 32.87 MiB；恢复时运行 `Tools/Restore-ProjectContent.ps1` 即可按原相对路径复制回工程 `Content/`。
 
 Paragon 资源包不包含在 GitHub 快照中。恢复完整工程时，需要使用有权访问这些资源的 Epic 账号重新安装/添加资源包，并保持它们在 `Content/Paragon.../` 下的路径。资源包目录记录在下表；当前盘点只确认文件夹名和体积，未逐项核实 Epic 账户中的可获取状态、Marketplace/Fab 商品标识或版本。
 
@@ -63,3 +63,17 @@ Paragon 目录体积（本机 2026-10-18 实测，GiB）：
 - 只有经确认需要自托管、且许可允许的自有文件才纳入快照。大型外部资源仍通过原来源获取。
 
 - Unreal 资产是二进制文件；Git 会保留版本，但无法像 C++ 一样展示蓝图节点/连线的逐行差异。重要图表改动应同步写入执行文档或附上编辑器截图。
+
+## 2026-10-19 翻滚版本依赖与备份
+
+本次更新自有玩法、输入、攻击/翻滚蒙太奇和重定向配置；精确文件清单与 SHA-256 见 `project-content-manifest.json`。上方 2026-10-18 目录表保留为首次盘点历史。
+
+翻滚来自 Adobe Mixamo 的 **Stand To Roll**。公开仓库不含原始 FBX、`Gameplay/Anims/Roll/Source/` 或 `AS_Greystone_StandToRoll.uasset`。因此仅恢复 GitHub 快照会缺少这个动画依赖，不能声称完整工程无缺失。Mixamo 原始动作文件不作公开再分发，参见 [Adobe 社区分发说明](https://community.adobe.com/questions-696/mixamo-faq-licensing-royalties-ownership-eula-and-tos-589400?lang=en)。
+
+恢复翻滚的方式：
+
+1. 同一使用者换机时，从自己的完整 Content 备份恢复 Roll 目录；本轮备份压缩包在旧机 LocalBackups/Roll-v1-2026-10-19，内有本轮修改资产和原始 FBX，未上传公开 GitHub。它是增量备份，不含整个 19GB Paragon 素材库。
+2. 或自行从 Mixamo 取得 Stand To Roll 的无模型 FBX，放到 Tools/prepare_roll_source.py 指定的位置，依次运行准备、导入重定向、根运动生成脚本。生成后按最终玩法把序列 Enable Root Motion 关闭、Force Root Lock 开启；AM_Roll 已保存 Rate Scale=2 和时间轴通知。第三方源动作姿势/比例可能因选择的 Mixamo 角色不同而变化，需重新预览验证。
+3. 恢复后确认原三连击、GA_Roll、窗口通知和输入引用正确，再由用户 PIE 验收。
+
+Content 内层本地 Git 仍包含上述完整动画资产，不添加远程、不推送整段 Paragon 历史。公开快照中的蒙太奇与 IK 资产会引用需要本地恢复的动画/源骨架，属于有记录的外部依赖。

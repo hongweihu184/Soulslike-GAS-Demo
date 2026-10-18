@@ -90,6 +90,9 @@
   <a href="#p25">P25 后摇被自己人打断(阻止标签只填自己)</a>
   <a href="#p26">P26 持续移动时无法挥刀(收刀轮询竞态)</a>
   <a href="#p27">P27 体力配置全对但永不消耗(缺 CommitAbility)</a>
+  <a href="#p32">P32 翻滚被攻击打断后永久无法再次激活</a>
+  <a href="#p33">P33 激活标签变量默认值为空</a>
+  <a href="#p34">P34 攻击与翻滚取消窗口查询混用</a>
 </nav>
 
 <main>
@@ -472,6 +475,7 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
 <!-- ============ P22 ============ -->
 <section id="p22">
   <h2>P22 · 技能激活成功但蒙太奇不播放 <span class="fix">已解决</span></h2>
+  <p><strong>2026-10-18 翻滚接入时再次遇到同类问题，用户要求补记：新建蒙太奇后，第一时间对照正常工作的攻击蒙太奇检查插槽名。</strong></p>
   <p class="sym">症状:GA 激活正常(Print 有字、体力被扣),角色动画纹丝不动,日志零报错</p>
   <h4>原因(两层)</h4>
   <ol>
@@ -480,10 +484,16 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
   </ol>
   <h4>解法</h4>
   <p>ABP 动画图表:状态机 → <strong>Slot 节点(插槽名改为 UpperBody)</strong> → 输出姿势。平时透传状态机,蒙太奇播放时切换。</p>
+  <h4>复发案例：AM_Roll 使用默认插槽（2026-10-18）</h4>
+  <p>用户从重定向后的动画序列创建 <code>AM_Roll</code>，接好 <code>GA_Roll</code> 和左 Shift 输入后，报告角色完全不播放翻滚。只读检查已保存资产：<code>IMC_Default</code> 中左 Shift 已映射 <code>IA_Roll</code>；<code>BP_Player.StartupAbilities</code> 已包含 <code>GA_Roll</code>；技能资产标签为 <code>Ability.Roll</code>。这些配置正确，但不能单凭静态配置证明运行时技能已激活。</p>
+  <p><strong>明确发现的配置不匹配：</strong>攻击蒙太奇 <code>Attack_PrimaryA_Montage</code> 使用 <code>UpperBody</code>，新建 <code>AM_Roll</code> 使用 <code>DefaultSlot</code>。现有动画蓝图的蒙太奇通道为 <code>UpperBody</code>，翻滚应复用此插槽。打开 <code>AM_Roll</code>，在插槽轨道右键选择 Slot Name（插槽名称）→ <code>UpperBody</code>，保存并重新 PIE 验证。本次已定位并给出修改步骤，修改后的播放结果尚未单独验收。</p>
+  <p><strong>不要混淆根运动与插槽：</strong>用户当时关闭了动画的 Enable Root Motion 并开启 Force Root Lock，用于先测原地翻滚。这不应使姿势完全不播放。插槽决定蒙太奇姿势进入哪条动画图通道；根运动决定如何提取运动驱动角色，根锁定用于约束根骨骼。先解决动画显示，再测试位移。另：<code>UpperBody</code> 只是当前插槽名，是否仅影响上半身取决于动画图是否配置分层混合，名称本身不限制骨骼范围。</p>
   <h4>教训</h4>
   <ul>
     <li>蒙太奇不播排查三问:ABP 有 Slot 节点吗?Slot 名和蒙太奇插槽一致吗?蒙太奇引用有效吗?</li>
     <li>第三方素材包的蒙太奇插槽名不是 DefaultSlot,接入前先查二进制或打开蒙太奇看轨道名</li>
+    <li><strong>从动画序列新建蒙太奇后，固定检查：有正确动画片段 → 插槽与动画蓝图一致 → 保存；本项目先对照能播放的攻击蒙太奇 <code>UpperBody</code>。</strong></li>
+    <li>若改正插槽后仍不播，再逐段验证 <code>IA_Roll.Started</code> 是否触发、技能是否成功激活、CommitAbility 是否通过以及播放节点的蒙太奇引用；不要仅凭输入映射存在就认定事件已执行。</li>
   </ul>
 </section>
 
@@ -665,6 +675,40 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
   </ul>
 </section>
 
+<!-- ============ P32 ============ -->
+<section id="p32">
+  <h2>P32 · 翻滚被攻击打断后永久无法再次激活：混出后的打断未触发技能收尾 <span class="fix">用户确认已解决</span></h2>
+  <p class="sym">症状：翻滚与攻击衔接多次后，角色已经站立，再按翻滚没有反应；GA_Roll 的 ActivateAbility 入口打印也不出现。复现依赖打断时机，不一定每次出现。</p>
+  <h4>证据与机制</h4>
+  <p>运行时调试截图右上显示 <code>BlockedAbilityTags: Ability.Roll (1)</code>，角色 Owned Tags 为空，说明仍保留一份阻止翻滚的计数；这不同于窗口 GE 授予的状态标签残留。GA_Roll 存活时阻止 Ability.Roll，自身未退出就会阻止后续激活。</p>
+  <p>检查 UE 5.8 源码 <code>AbilityTask_PlayMontageAndWait.cpp</code>：蒙太奇正常开始混出与最终结束是两个时刻。混出后再遭打断时，<code>OnMontageEnded</code> 的 interrupted 分支要求 <code>bAllowInterruptAfterBlendOut</code> 才广播 OnInterrupted；任务结束本身不等于所属 GA 结束。只接 OnCompleted / OnInterrupted / OnCancelled，仍可能漏掉未开启此选项时的这条路径。</p>
+  <h4>修复与验收</h4>
+  <ol>
+    <li>在 GA_Roll 的 PlayMontageAndWait 节点勾选 <strong>Allow Interrupt After Blend Out（允许混出后响应打断）</strong>。</li>
+    <li>On Completed、On Interrupted、On Cancelled 分别连接 EndAbility，保留 Stop When Ability Ends。</li>
+    <li>测试“翻滚 → 起身混出时攻击 → 攻击结束 → 再翻滚”，确认可再次发动，旧技能退出后 Ability.Roll 阻止计数释放。2026-10-19 用户确认问题解决。</li>
+  </ol>
+  <h4>以后如何定位</h4>
+  <ul>
+    <li>入口打印放在 ActivateAbility 后、CommitAbility 前；分支成功后的打印不能证明入口是否执行。</li>
+    <li>故障出现后保留 PIE，控制台执行 <code>showdebug abilitysystem</code>，再执行 <code>AbilitySystem.Debug.SetCategory Ability</code> 查看玩家技能是否仍为 Active；BlockedAbilityTags 计数是线索，技能页能进一步确认活跃实例。</li>
+    <li>此开关只补齐打断后的退出通知，不决定何时允许取消。允许攻击接管翻滚的时机，仍由蒙太奇通知窗口决定。</li>
+    <li>不要删除阻止自身的 Ability.Roll 配置来掩盖未结束的技能，也不要无条件在 On Blend Out 结束技能来提前释放仍应生效的动作规则。</li>
+  </ul>
+</section>
+
+<section id="p33">
+  <h2>P33 · 输入有响应但 GA_Roll 不进入：AbilityRoll 变量默认值为空 <span class="fix">用户确认已解决</span></h2>
+  <p>翻滚技能已授予，左 Shift 已映射，但 ActivateAbility 的入口打印不出现。用户定位为 TryActivateAbilitiesByTag 的 AbilityRoll 标签容器变量默认值为空，填写 Ability.Roll 后成功。创建标签变量不代表已经赋值；需要检查实际传入的容器，而非只看标签注册表。</p>
+  <p>检查顺序：输入 Started 打印 → 激活节点 Target 为自身 ASC → 标签容器包含 Ability.Roll → StartupAbilities 已授予技能 → 激活返回值。某次打断后才不能重复发动，另查 P32。</p>
+</section>
+<section id="p34">
+  <h2>P34 · 以为窗口 GE 没挂上，实际攻击输入查了反方向的窗口 <span class="fix">查询已修正，用户确认第一版可用</span></h2>
+  <p>只读检查发现 GE_RollCancelWindow 为 Infinite，授予 State.RollCancelWindow；通知 Begin 与 End 引用正确。明确错误在攻击输入：State.Rolling 为真后查询了 State.RollCancelWindow，应该查询 State.AttackCancelWindow。</p>
+  <table><tr><th>标签</th><th>放置位置</th><th>用途</th></tr><tr><td>State.RollCancelWindow</td><td>攻击蒙太奇</td><td>允许翻滚取消攻击</td></tr><tr><td>State.AttackCancelWindow</td><td>翻滚蒙太奇</td><td>允许攻击取消翻滚</td></tr></table>
+  <p>2026-10-19 最终复核：攻击输入已改查 State.AttackCancelWindow，AM_Roll 已放对应通知。三段攻击虽有 RollCancelWindow 通知，但当前翻滚输入仍仅经过 IsFalling 检查就激活，尚未消费该窗口；不要把“已放窗口”写成“双向取消规则已全部接通”。</p>
+  <p>动画编辑器预览角色没有玩家 ASC，预览时 GetAbilitySystemComponent 返回空不能单独证明 PIE 玩家上的 GE 应用失败。应在实际玩家上查看标签。</p>
+</section>
 </main>
 </body>
 </html>

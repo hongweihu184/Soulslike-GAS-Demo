@@ -45,8 +45,8 @@
 <body>
 <main>
 <h1>复工清单 · 当前开发基线</h1>
-<div class="sub">2026-10-18 同步 · <a href="index.html">回主文档</a> · <a href="design/战斗系统策划案.md">战斗系统策划案</a></div>
-<div class="ok">用户确认攻击转向与新的攻击位移窗口可用。已修复无移动输入时攻击转回默认朝向的问题。三连击、伤害、体力消耗及玩家血条/体力条已完成。攻击位移仍有明显滑步,已登记为未来动画资源任务,当前为保证 Demo 进度接受该表现。</div>
+<div class="sub">2026-10-19 同步 · <a href="index.html">回主文档</a> · <a href="design/战斗系统策划案.md">战斗系统策划案</a></div>
+<div class="ok">用户确认翻滚第一版可用：左 Shift、Mixamo 重定向动作、窗口位移、移动取消和翻滚后摇接攻击。已修复混出后打断导致翻滚技能不退出。三连击、伤害、攻击体力消耗/回复及 HUD 已完成。具体取消规则以保存资产和日志 06 为准。</div>
 <h2>当前规则(不要按旧方案重做)</h2>
 <ul>
 <li>BP_Player 组合输入门控,C++ 只提供动词/查询;空中禁普攻使用虚幻自带功能配置,自定义 IsAirborne 已删除。</li>
@@ -59,14 +59,16 @@
 <h2>攻击转向窗口(用户确认可用)</h2>
 <p>三个攻击 Montage 使用蓝图 AnimNotifyState <code>ANS_AttackTurnWindow</code> 与 <code>ANS_AttackLungeWindow</code>。转向状态 Tick 读取 <code>BP_Player.Current Move Input</code>,按控制器 Yaw 合成相机相对方向,通过 <code>RInterp To Constant</code> 平滑更新角色旋转;输入向量长度不大于 0.1 时直接跳过转向,避免零向量被解释成默认朝向。位移状态 Tick 使用 <code>LungeSpeed × Frame Delta Time</code> 计算水平位移,并以 Sweep 移动角色。旧单次转向通知已删除;旧单次冲量通知 <code>AN_AttackLunge</code> 待确认无 Montage 引用后清理。攻击位移与腿部动画不匹配造成滑步,属于当前动画资源限制,作为未来资源/动画任务排期,暂不阻挡 Demo。临时诊断 C++ 函数仍被 BP_Player 引用,清理前先在蓝图里移除调用。详细记录见 <a href="log/05-体力回复与攻击转向.md">行动日志 05</a>。</p>
 <h2>下一步 · 第 5 章</h2>
+<p>2026-10-19：翻滚第一版由用户确认可用；AM_Roll 使用 UpperBody，Rate Scale=2，序列根运动关闭、强制根锁定开启。翻滚 GA 自带 State.Rolling，阻止自身重入，播放任务开启 Allow Interrupt After Blend Out。攻击输入在翻滚中检查 State.AttackCancelWindow。见 <a href="log/06-翻滚动画导入与重定向.md">行动日志 06</a>。</p>
 <ol>
 <li>✅ 体力回复已通过无限周期 Gameplay Effect 配置,攻击标签作为持续标签排除条件,用户已验证生效。基础值上限保护已编译通过,待 PIE 验收。</li>
-<li>翻滚输入、位移、蒙太奇、成本与取消规则。</li>
+<li>✅ 翻滚输入、位移、蒙太奇、移动取消及翻滚后摇接攻击已做出第一版。下次补齐攻击中翻滚输入对 State.RollCancelWindow 的读取，核对重复窗口是否为有意配置。</li>
+<li>翻滚体力成本与回复规则，随后无敌帧；目前 GA_Roll 的 Cost/Cooldown 为空。</li>
 <li>无敌帧窗口、伤害结算、受击与死亡。</li>
 <li>更新相关文档并分别提交代码/文档仓库与本地素材仓库。</li>
 </ol>
 <p>第 5~8 章预研属于研究材料,配置假设需按现有实现核对。节点名称先查本机引擎源码或错题本 P19。</p>
-<p class="meta">状态依据:当前代码/配置、近期提交、2026-10-18 用户确认。文档随每次实现变更同步,不能仅按提交标题推断功能。</p>
+<p class="meta">状态依据:2026-10-19 保存资产只读复核和用户 PIE 确认；未做额外完整战斗回归。</p>
 </main>
 </body>
 </html>

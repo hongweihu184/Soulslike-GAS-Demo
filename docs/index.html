@@ -68,6 +68,7 @@
   <div class="sub">GAS · UE5.8 · 求职作品集<br>落地与复习文档</div>
   <a href="tutorial.html">★ 跟做教程(全程实录)</a>
   <a href="checklist.html">★ 复工清单(当前开发基线)</a>
+  <a href="notes/mixamo-animation-workflow.md">Mixamo 动画流程与复用提示词</a>
   <div class="grp">总览</div>
   <a href="#overview">项目总览</a>
   <a href="#plan">总体计划表</a>
@@ -159,7 +160,7 @@
     <tr><td>2</td><td>GAS 地基</td><td>ASC + AttributeSet(HP/体力) + 初始化 GE，属性面板可见数值</td><td>ASC / AttributeSet / GE / GameplayTag</td><td>2 次</td><td><span class="tag t-done">完成</span></td></tr>
     <tr><td>3</td><td>主角接入</td><td>Greystone 可跑跳、相机/输入完整，替代默认角色</td><td>Enhanced Input / AnimBP / CharacterMovement</td><td>1–2 次</td><td><span class="tag t-done">完成</span></td></tr>
     <tr><td>4</td><td>三连击 + 伤害</td><td>鼠标连点出三段连击；命中木桩扣血；体力消耗</td><td>GA / AbilityTask / GameplayEvent / 伤害 GE</td><td>2–3 次</td><td><span class="tag t-done">完成</span></td></tr>
-    <tr><td>5</td><td>翻滚 + 无敌帧 + 受击死亡</td><td>翻滚躲伤害；被打有硬直；血空播死亡</td><td>AnimNotifyState / GrantedTag / Immunity</td><td>2 次</td><td><span class="tag t-todo">待做</span></td></tr>
+    <tr><td>5</td><td>翻滚 + 无敌帧 + 受击死亡</td><td>翻滚第一版完成；无敌帧、体力成本与受击死亡待做</td><td>AnimNotifyState / GAS / 取消窗口</td><td>2 次</td><td><span class="tag t-doing">进行中</span></td></tr>
     <tr><td>6</td><td>敌人与 AI</td><td>小兵会巡逻/追击/攻击/受击/死亡，2–3 只围殴有走位</td><td>StateTree / EQS / AI 挂 ASC</td><td>2–3 次</td><td><span class="tag t-todo">待做</span></td></tr>
     <tr><td>7</td><td>锁定系统</td><td>按键锁定最近敌人，相机注视，可切换/断锁</td><td>目标打分 / 相机控制 / LOS</td><td>1–2 次</td><td><span class="tag t-todo">待做</span></td></tr>
     <tr><td>8</td><td>UI</td><td>玩家血条+体力条、敌人头顶血条、锁定指示</td><td>UMG / 属性委托绑定</td><td>1–2 次</td><td><span class="tag t-todo">待做</span></td></tr>
@@ -338,7 +339,7 @@
     <h4>要点</h4>
     <ul>
       <li><strong>体力回复</strong>：Periodic GE（每 0.1s +x），或用 Duration GE + 延迟回复（魂游是"停止消耗后约 1s 开始回"——用 GE 的 GrantedTag <code>State.Stamina.RegenBlock</code> 抑制回复是标准做法）。</li>
-      <li><strong>翻滚</strong>：GA_Dodge 播翻滚蒙太奇（素材选型：Paragon 无专用 Roll，可用 TravelMode 系动画加速播放，或从 Fab 找免费翻滚动画重定向——执行时定）。位移用 Root Motion 或 GA 内 Launch。</li>
+      <li><strong>翻滚第一版已完成</strong>：Mixamo Stand To Roll 重定向到 Greystone；GA_Roll 播放 AM_Roll，左 Shift 输入，UpperBody 插槽，蒙太奇 Rate Scale=2。当前序列关闭根运动、开启强制根锁定，ANS_AttackLungeWindow 驱动位移。移动取消和攻击取消分别由时间轴窗口配置。</li>
       <li><strong>无敌帧</strong>：翻滚蒙太奇上 AnimNotifyState 窗口内 Apply GE_State_Invulnerable（GrantedTag: <code>State.Invulnerable</code>）；GE_Damage 配置 Application Immunity 检查该 Tag——免伤在结算层统一生效，任何伤害源都躲得掉。参考：<a href="https://www.quodsoler.com/blog/i-frames-are-animation-data-not-code">i-frames 专题</a>。</li>
       <li><strong>受击</strong>：被击 → GA_HitReact 播四方向受击动画（按伤害来源方位选）。</li>
       <li><strong>死亡</strong>：PostGameplayEffectExecute 检测 HP≤0 → 打 <code>State.Dead</code> → GA_Death 播 Death 动画 → 禁用输入/碰撞。</li>
@@ -346,6 +347,7 @@
     <h4>验收</h4>
     <p>木桩测试：翻滚穿过攻击不掉血；体力打空后无法翻滚；连续受击有硬直；HP 归零正确死亡。</p>
     <h4>实际执行记录</h4>
+    <p>2026-10-19 收尾：用户确认翻滚第一版可用。修复空的 AbilityRoll 默认标签、蒙太奇插槽不匹配、混出后被打断导致旧 GA 不结束、攻击输入误查 RollCancelWindow 等问题。GA_Roll 开启 Allow Interrupt After Blend Out；翻滚上的 AttackCancelWindow 已接攻击查询。三段攻击已有 RollCancelWindow 通知，但当前保存的翻滚输入尚未读取该窗口，下次补齐。翻滚 Cost/Cooldown 均为空，无敌帧尚未接入。详见 <a href="log/06-翻滚动画导入与重定向.md">日志 06</a>、错题本 <a href="reference/troubleshooting.html#p32">P32</a>、<a href="reference/troubleshooting.html#p33">P33</a>、<a href="reference/troubleshooting.html#p34">P34</a>。本轮用户完成 PIE 手感验收，AI 只读复核保存资产，未另行运行完整战斗验收。</p>
     <p>2026-10-17:体力回复已完成。用户创建 GE_StaminaRegen,设为 Infinite,Period=1 秒,每周期 Stamina +1;关闭“应用时执行周期影响”,并在持续标签要求的“必须不能有标签”中加入 State.Attacking,因此攻击期间暂停回复。用户确认生效。后续:翻滚输入/位移/成本/取消,再做无敌帧与受击死亡。</p>
   </div>
 </section>

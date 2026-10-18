@@ -1,0 +1,781 @@
+{
+  "date": "2026-10-19",
+  "snapshot_files": 192,
+  "snapshot_mib": 32.87,
+  "excluded_mixamo_assets": [
+    "Gameplay/Anims/Roll/AS_Greystone_StandToRoll.uasset",
+    "Gameplay/Anims/Roll/Source/AS_Mixamo_StandToRoll.uasset",
+    "Gameplay/Anims/Roll/Source/SK_MixamoRollPreview.uasset",
+    "Gameplay/Anims/Roll/Source/StandToRoll_SourcePreview_Skeleton.uasset"
+  ],
+  "files": [
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/0C/8QH9L5LFXTQU71WX2866NC.uasset",
+      "sha256": "f43ef475ad8868647c4ff77092bed0b5386300705a248dc15896399bae6d5322"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/6C/3VF32ZDCFT539KA1R6VJND.uasset",
+      "sha256": "d8e39db9b17de4d0b22c587584924bde03a07782a7cb8466084113fe1bac1aa3"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/6X/XC4NQOIAHOUWYF5Y02OE2A.uasset",
+      "sha256": "5f59115bc8019eba4e6c7cbbe6dac90958c9853ee0ec2375a979d1cb3e2e25c7"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/9M/IVXY59HSYRUND3QD2JQ6FL.uasset",
+      "sha256": "b333579de0ffcd72e4b67ffa3dad621aefcb5768fc7f1e22465dd8e6604963ce"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/DU/KUWRZ3Y1EYZ0QB2RKTT2B7.uasset",
+      "sha256": "90f85823872d340100ed67677585c382c09ce43660c77e6bc7eb84505c5471dd"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/IG/JDX5IBJO7Z9HMDPSFG1PSR.uasset",
+      "sha256": "f2babc1c724d16a720d74906e7145b41ecb0cc76f3e33b1c51a5eeabe08ebb8b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/IP/17K2MRN27BR9FR3DPVRC7J.uasset",
+      "sha256": "5c93262eafbd75a31b3df989c19c0c0c92b4ad519f88167d09b134ab72cbb149"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/K8/KR4MOME0Q9EHHAY19LM47K.uasset",
+      "sha256": "f772f21aae3d41035f5ad32ee2dec629c5e78c64d3a7f721ca5bf4d642d1fbaa"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/N8/COA6RG9N2HZXTGSJTPAUS4.uasset",
+      "sha256": "e833655e2554644f438d00048b701d067617d6297aaa62898ce85288391ceab4"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/OF/8RIPQTZMSECJLQDTLIEY87.uasset",
+      "sha256": "78ba33025d21f282e7d4626a6a95b6977f2a24f5701d22b06354f4dc3e3f0c28"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/OX/2E9E3NRR30UNQ7LG7XYN71.uasset",
+      "sha256": "eec0c8e6a808090d9f98f02c6c2fac32f22d67777c787b53e455dec722de9cbc"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/0/QE/10GL7VDT3NTXY663PYRD4Y.uasset",
+      "sha256": "b60d3a8bebb20e6e6e627f49b9bde9ffe9444640133a439c8490c049a22d64e7"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/1S/D69CYWAX0W8RT1MMCP3SOA.uasset",
+      "sha256": "211ef59b4ac229bfa960e27c4528a374b3742415fb1dadddfdfe83f85ea3cba8"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/5X/B72T1E6WB6P9B722O3MDFE.uasset",
+      "sha256": "53ec02b8433f8455c2390cace2ac51cbae7838d3490f2f7d348ab0652f1ce3a1"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/8S/Q5RPEJCDBTFNXVAK875N90.uasset",
+      "sha256": "0fe7e84dc496ccae7a1384aa7374ee91a3597ff4e3d1e222741393857547634e"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/94/S8DD1W4PXXUTNHE5GV1EGL.uasset",
+      "sha256": "53cbb0fbb8aaa8b93aa6d32aadfed5c4412bac41d615cdb4d7885e2c065d9602"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/9O/UBWCZ1UOV6O06AZNXOGHRR.uasset",
+      "sha256": "3d41efbf3ab52febec2a698cfa8b1b9c1653f6c1d210e8551e50c3eb1052a884"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/A2/USXJ510VJSP46Z7EF7RM17.uasset",
+      "sha256": "f6e18722e3e05d3dcbafb8889fb9ac599748dc17db8ecd14911898c4bc49b65d"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/D3/4Z2GB9AES9WPD9BLFZWPVO.uasset",
+      "sha256": "83192e70925910569b7882d4b9e9226c1e7e01b7ef3fbde6d3a38bdcf76736e1"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/P6/4FU1H6CYH4B9T3TXUI8OEW.uasset",
+      "sha256": "e961f17c1bc321f48ccb2bd232a20487c6c76ed97cf4e74196a6d0ac50fbed52"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/RJ/YMV71CZT1I4LM4G6OL7HSZ.uasset",
+      "sha256": "82916e431dd657656af2ab2f0af25cd6de2fb46b2ac432b45c25ce552738f981"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/S9/MHHOUCQ5URQHHP6I0VUTVB.uasset",
+      "sha256": "2b2ec56ced6cc0a322083bf6a46a3125ab85ee58212263735a4ebfcf2e09de87"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/SL/FDRR8KPGR1GKWPC8ZRPAW3.uasset",
+      "sha256": "db6305bd18897e628fd3e99ca9076185d5e5a259ea2f8f2404031616c0947481"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/VI/M1L3CGXKDKDWGJP9H9DSZF.uasset",
+      "sha256": "99d4c9cb9c3756153adbf95ba03dffa4d323ad8f8aff7a7eb669c5ac8a8377ee"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/1/Y7/THXEXE8C7Z8X364XCEU44L.uasset",
+      "sha256": "896d6e64fad85f62825ea03d63b6f6ad08a7edc604ebdbce7b67f463bd5f056b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/2/03/5D1TBGDXP0INATGUOGEYW3.uasset",
+      "sha256": "dc53d1220ccffa2530b712ec9b9a8688f02fb42dfaffb7e154186656490ad62b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/2/2F/EHXEAEZXGGDTUFUJHLH0EE.uasset",
+      "sha256": "c24b6c91bf2afdc4b560d50b903eedaf3738ed781f6a1d7fc2cfc21853481d0f"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/2/IS/KU1RQBEIZ0F2EMT32CUIE5.uasset",
+      "sha256": "e589c092d143cfc8a280aa66c49f3fa4c79416781c15ee9cc52112a14b172e91"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/2/J4/WRN96VKTI839WVDGJHVO2N.uasset",
+      "sha256": "5becae42ba18ee0acf54cf678840a858193e3c893d8f495fe0463c929f38ddd4"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/2/YB/F2NUKS1PFN781QUJOGXBFI.uasset",
+      "sha256": "9ce56b3154a2f0d00a3558bfd942e6d5d5169b497e97b7688975c5049f83566b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/2/ZB/6M1WR2PTNKHIF1IKQTIMPJ.uasset",
+      "sha256": "c141e8a0ea0c1dda7f0cc3785cf7b1600cc742fee7878f96072d7c6258d0a0a0"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/56/3H9SUWCB8W2BDW0CSR1ZQK.uasset",
+      "sha256": "fecafcbc1a3da782dae832c48db987285a9f40c645ee41915df3cfdb76571696"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/8H/W4XW5LF8V84U9DXXO40DCZ.uasset",
+      "sha256": "c84092849b66655da829a962511cd4bf12b4e1a0a25570cd1fda61e01c018fcf"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/9Y/XJMB4I0OIEYHGBTFXAAQIK.uasset",
+      "sha256": "ce75591de381e2246bb8ca141f1d3ab4ee104f630affccb3f0630ddf36b434e5"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/IP/E5S34MI9I31TEB6M57IS7M.uasset",
+      "sha256": "1c13cf203c30aae404a2a434d0c0336c6b5552a1825edc3ecf58699ac9ef2070"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/JX/1PYRMHYJKTHEM77W57LQXM.uasset",
+      "sha256": "674585a0afd201a479394784e74e751ad8f6871f4f379976e98ef801ad7b1b8e"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/KW/T37EUQ2I007W1SUXMLX8B1.uasset",
+      "sha256": "551a407158cfb6ce7f7ca515c0f80c3b89b3439e9d5f9d48004c81e48db64105"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/SY/7FNVOOI1S076DKQU305SWJ.uasset",
+      "sha256": "906c35f5470244b9e49466279248add4fb463910c86642eb23e6a0e988aad89f"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/XV/N7NAI5BLFP6XUPRVG9092T.uasset",
+      "sha256": "640814b498d5321272b9680bedfe68f562b42c70aa15cc73df618c8f2bf35e03"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/Y3/3LTPYPR94QS6VINJ3V38MU.uasset",
+      "sha256": "3aad4a6ecf55009563a1d1be4c9c074c089b1ff64d344ed21c8c7966dbc7dc5e"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/Y5/U7177HZ4H89KMFVRZU45MS.uasset",
+      "sha256": "b7dd7b6681260b9b6536b451eeed864e44a317d565a209979bc6e94d68d4385a"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/3/YH/5Y6JSF0J7F5AO9OR1QLVZ2.uasset",
+      "sha256": "1be416a36f6737fe36d7603002fee2facc38e79fc1b88de54a67b70b5a66ebb9"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/2W/KXQ6PYOG90C66N1CJJXJHN.uasset",
+      "sha256": "6d26fcec371759288aa7e9ea9ba8b7a655a72b65b85b0bd9fec95378efa9b79f"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/59/4L9KR4JK4180UQ3PBI1B5L.uasset",
+      "sha256": "ac1afb5a5c5d9dea2714fe6fab1229bc8d31ed2da6c6b344dba1367b8db366fd"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/5C/DKAMLGTKCILDPHGCW667K6.uasset",
+      "sha256": "bfeec51857dea04df27b49321089793d40f3f409bfba4dd502d46904f75aa7b2"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/7C/C0ZOYMNGL25OJK5R1Y7MXY.uasset",
+      "sha256": "3a483ada3f2df79aef09c6c93b3ae596f13dd358e3cbd1712783cee5842b1b1d"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/A0/I6PGO2ZACY1WYF9I5EWTV6.uasset",
+      "sha256": "2d036557ffc65146421f9c8099481b99dfeb09f7985a91bc060c52ec7071e704"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/A2/ND9FMEFS3T1CTINSZTJD01.uasset",
+      "sha256": "60d555ede29cf80cc1cfe258b647fd696a3e81b13cfe68fed0430525b828e860"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/BR/9EXQAIFRX4Z4OC2OH93QVF.uasset",
+      "sha256": "347f9bdb8d03c2d97e0d903745d4132f665dd8552f828f18d57c5170136f4986"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/CH/3K1ELW8POX1476YIQIL90J.uasset",
+      "sha256": "c8cdd9f57f6335ec5a63ed1a777d77d45d16bb6a09103d44f2ba8e89b6acd4d2"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/E0/3DNHCYXL85IR1Z21BNAE4Z.uasset",
+      "sha256": "544e3c0fc2f903d1ff8c71cfc14674b5a2ba2b171b9bc2793528a528976a1820"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/FV/DMIYP3Z11CP73TNW8H76FN.uasset",
+      "sha256": "966b8b7832183e528fa7f711ed658f824bf38a2276bceb2c81eccdd74449f6cf"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/NT/ORO7HOQI4SPZC00FVB89RR.uasset",
+      "sha256": "2eb708e11d835f04e76aaa6839bb9948a64ba4eaef34797de375a6f360e52eeb"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/PR/AD3ZC87T0ZBOYRJO3J9ANR.uasset",
+      "sha256": "dde2c651c942702219b470a3db45e40a87a5f8a5f5e2fa2049b42b6558acb45b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/RJ/M67DA3SWIN3V9PF158JBJL.uasset",
+      "sha256": "63bced660adfaec5d52cc8ec7c49e86bba4e6e0db189260ee4f1c603cc744ab0"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/T0/SECY0RQVNA3LGX1MRFFWJR.uasset",
+      "sha256": "98750e24a19f4d22e61d793f54324062ee195d7f567d8e434d2a0151fa2ebdde"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/4/UM/OM3OWOPMCJIBQ3SCJBOTUL.uasset",
+      "sha256": "10a60ac8d66c2bb284a3b49923dd3e74b8b107fd80f30c3a0df56784353563b4"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/2A/NNNNTLKKAPOM5AN7Z5F358.uasset",
+      "sha256": "1c4eea8e786ea48e1dd5fb3a25b75f24fa368d16e760da84431cad47613ad4b2"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/6K/5OUTX4MN59ETEE8JHMZOAD.uasset",
+      "sha256": "2232422346544b65a5efb57da15d37bde963eb713af7eac1891cf8824cfec866"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/9J/O2IW7NMCQKXVD54OR4KVVT.uasset",
+      "sha256": "962b334b3f55851c6dcd1d9e149263f813057509494b540a17728762eb22b15c"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/C6/3MZ9SCO4KE8UN4S2S282VM.uasset",
+      "sha256": "bc3b086b37b562e314abaaa2fc53e4701032941259a54560789411136e35d80f"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/FJ/AF0IB6NERZTY60FT9IT1I5.uasset",
+      "sha256": "23ad848be60327266fd1c51f04374f0cb5df85ef8b087e125fb9acd9222db434"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/M9/SX8VF0FQF93AFYC9CTGBGZ.uasset",
+      "sha256": "42a20bbf229c10a7bd7f93d6e0a8d55de6f081b5b7764e371c775bc816b32338"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/NV/683JY7PQASBHKBGG1KHJZJ.uasset",
+      "sha256": "ce4c04c3e90714deea73e79e6b55c704133490edb6d1cedcaa527587cb492246"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/T9/Q071S8QNFVQYMEK9L4BU5G.uasset",
+      "sha256": "80cd28727eed43d3c775fdddab77715bbe08f9fd2c7d9e1dd7e459381e756da8"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/5/X6/BLSH9E41YJPK1ZY6Y0GV1N.uasset",
+      "sha256": "50c5d6352e30852196c2d1a5efc35a8151b75a1c665b46f57bfc6d0be5aa392b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/1Z/MTR97PWLYR7UZVTDU6VSFZ.uasset",
+      "sha256": "32f2cfda725b7deffe6ae437ce54e1f517c2e0960968749ca5433d16f7463ea9"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/A2/IUD4N0RYBDI9KWDE4O4BMG.uasset",
+      "sha256": "02ca8452608a15e195f94df12ed8bf7563e23b57170c3b7747c277898801dc90"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/C8/3G8JKEP9AAZ27SP07W7G2I.uasset",
+      "sha256": "1cd187862166673739c3d8941e6fc0003d55cded93cdee2d590d48666fed0f8b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/CR/NC8DF8MRQDB0NED2YK6543.uasset",
+      "sha256": "538fb064381762593daf8aae579d25c43d3162fd50ebebd0d8219fa0877f020a"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/GE/ZHFUNQS7XQDSTB1LX30BDC.uasset",
+      "sha256": "86e8c4ddc88f9c102a7491ade7540a7f40baf5a68caa4aa6433dc9582b2e0b6e"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/IC/2EH74WD6RTXHDI7ZVFOCS3.uasset",
+      "sha256": "c4788897f16e149d7e0c091d3b082511cd61f22d246e9cf45b8a2e151bbb2df2"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/R7/OLV86I0JEO5FH07W2RYUJB.uasset",
+      "sha256": "c97804aee6ae8299749147ba0082fe6a8016e136111d9cd297adf5fcf464e936"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/VO/XE7YNGKZFDGGV0LG9I64Y0.uasset",
+      "sha256": "56c32cfe24c65bb645456452f55dd09473562ff30dec9aa6a13f03e19b14ba42"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/YS/NPPZCARNDCI0B9YHNAH2TN.uasset",
+      "sha256": "5d7ff0335d352a6fa32cde8fba56a3ebe21b56043edbec434599688f282c6591"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/16/7RC33EWMXGZ7S6QMQHUQRB.uasset",
+      "sha256": "4665348af6b28c25059779eeeeeca4c40f007806ee6c9d0d8939507545b98b77"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/1M/UO3OI5US8RHIWEAU9K9G3K.uasset",
+      "sha256": "00996f35984bb84d6cb1066d3cf7f672e5c921585ace71cfe0895cfd163cdb67"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/2X/MN8VQWTLB3SJB8SY6MZWBJ.uasset",
+      "sha256": "e143b69a75d0cbf4caf60861f0c93fd6ae22ed1311e173cb3807c216ac1d2e7c"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/7O/ZZBED7LHDGKG3SH8THJYQZ.uasset",
+      "sha256": "74df935392405cb333deeb2597ceee568bce46a88b37b86214847977129cfec6"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/8Q/VJ59F2KE5EJH7KL11HW56U.uasset",
+      "sha256": "abc4184ae12e5386ead1b9a3d5f1d02535d44d6e537d95e99a6711f325f9c33e"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/L1/CT7K8ZOX7UTNYPTPL7QVGK.uasset",
+      "sha256": "396491c51b061bb89f5a5c92dced5ae8ef6a730227be7c8b10d53db4a9bba667"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/L6/6POW66O3Z1VDXTOY59QVI6.uasset",
+      "sha256": "d0704f53d517df99fd399af4d8531a60c4bf4877071171a9e03d688609f5041b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/PH/NKZN6IWOUN8DD8OZWXUSZY.uasset",
+      "sha256": "a667414758480119413e0046dbbd288a9ef32335f2c8fc6c6e4f657cb3c1aab0"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/7/PV/3F6BO7MT23VXF0F3BJ3SVV.uasset",
+      "sha256": "ba9502783bdd0c9f22698e23f856aae4cf1e5da8b9f10b03b26c4469c615736a"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/8/46/1UOQDLBZAISHOEDQ4GB3PA.uasset",
+      "sha256": "c9c0eeee3c805e7af53acfe977785e3789e54e52d39382de3fef973badf7e875"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/8/46/DX9Z6DKV510ZEYXSS0RAN0.uasset",
+      "sha256": "42f4761e34cc90565b94ac4bbc8f9e0842b9ec265fe717502e68218a0968e653"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/8/4N/06DE21DTP138DVNMNK1BEO.uasset",
+      "sha256": "a4002dcd5b2794aad7d73d7e710f2d2101e6ce10836cc92cc2abbf7698cda5c8"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/8/C7/Z7VCJMUUKO55YXUQ5F3HS5.uasset",
+      "sha256": "953bf2bf93aa95822fe3ce70480b3d213bb36e2e064bdae8f6782973763c219c"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/8/HH/0A3MDCOE49DJP22S4XYR53.uasset",
+      "sha256": "57e2f95a93f378d908cfb84838e9300b0a7bd326c7e974d224904e4efbfecc50"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/8/S7/L26QUYRJI0L8EO664T22GB.uasset",
+      "sha256": "bce399943dbf9c0be70fcb3b2883a450451e84fc4971ebed85047d0397a8d2d0"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/8/Y9/B2X2TWC98I4UROIW8EGUWZ.uasset",
+      "sha256": "11900219fd772d0033ba8866583acd8f499abfe5662efbda8b6e00267efb4734"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/8/ZI/VRIBNAXQJAWQR5GOWUC1SN.uasset",
+      "sha256": "cee47baca4800c0206a8cf76cb46b4acad78f835ea7c8cfdbe01ce5011e982c2"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/9/J5/GRW8SVMHEZYJTZLUS9H3VF.uasset",
+      "sha256": "0e2335727e3dade481e94d7692dafc916b44fb0508b722ed85543771cd033287"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/9/ML/0A2E1UWBY3YB38FNYNUELG.uasset",
+      "sha256": "27e995bb0cf801c94ca26f0356ca02dd985c64a1188ce81f5c23353771d11456"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/9/NJ/QESUL5YBJS1BBCHS2JSAVQ.uasset",
+      "sha256": "22b4fb569d0aea29b23ffce05d4673aa685cb226a43bb02f8bdc377014ffe6ae"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/9/VT/92KDU918NVZYZSWAO4J99C.uasset",
+      "sha256": "2a71fab7fa1f52a979d64777ab8da869530e72b16de8db2ba82e73da3f735417"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/9/VY/QB5F3DJE5C8G6LF6X17UUA.uasset",
+      "sha256": "421cfde10406ce36192e8fa168b6c6cff67b6bcd7cb6c23e30c58812f62050f6"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/9/WP/6NFSDY4DTFF14D3C9ONM8B.uasset",
+      "sha256": "eb40e5a2ef002e1b585aae1e8a34c71beb84651da21044f97ffd32efab99f29e"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/9/X5/8R7UVDYHDOYNJB2ZLAO9OO.uasset",
+      "sha256": "02c6bd3c6fa07979f3a2aa72ac28677fdb8048e8e4b2866dec920bc437e9591c"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/A/F5/OP4SOY7NOSDSEO6RKNBWYF.uasset",
+      "sha256": "b29a10b233fd402c78be26c8f0bf074816812b8280641830a214a785e582f2be"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/A/M3/YGAKLOJIAA2VBD0UNT6XTY.uasset",
+      "sha256": "1a4f48a4d459fc77e7f843b2d97d7ed4c2f5ff1af4ed3d94ff5ce397c2f5f78f"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/A/W0/9UVZPR6FU0QJW26SZGZ6XW.uasset",
+      "sha256": "886f8d1f5ac91cb6a78670510e7a0f3c073ec44ceb140555e397b6fd0f281fdf"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/A/XH/PJTFEAV6UIEEMKM1GJ2X2C.uasset",
+      "sha256": "7547054d608c8404a277557c1a1be8eb74b786df07d507621312e93b2ff713b3"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/A/YP/F85QFOQL6YKZ6YT6SJ8Y8J.uasset",
+      "sha256": "c5209f077795d290c342f0d133b41a1c9f771b3eabb0b8b28ee3194c1a2b3eb7"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/38/5WQUG4Z7YE3VRLFVRYNMC7.uasset",
+      "sha256": "952a2164c32b2c6d522e51626b79971d6eee4f023f9431dc2178927f8d31d25b"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/5T/HBIFHE0BQV6W2MT3MSIBBP.uasset",
+      "sha256": "520b5420892cec45225563a27fc00b1cfa0c252266f52cc156e451c19c8ca0cd"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/6H/84RKNU609EH5C98EZOP1PG.uasset",
+      "sha256": "5d52f102a51d154d6e553466be2f8a7e02c7e1704e98ecc59ee879b0f5c6e2cb"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/E2/FB68B8QWD9882N88F07FTI.uasset",
+      "sha256": "a2ed79bc196a4ade36d238575165075149c78d703aaf3836e2eb7bfbc03767f4"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/FE/XWU87CPB9QZZOQNI11XCVC.uasset",
+      "sha256": "fdefacb3b6a07f2e3bb5fe60b8ddc29cdec925504bd5da94b871339eca6e5ea2"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/IL/MSF8LFCPXXQ2XMCJ5ILBM9.uasset",
+      "sha256": "fba1fd9e5c7561e3911357a111db691f14d962064cdbd7f05906608d43de25e5"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/LV/B5QHCEB8WSLM63E0NGXVMZ.uasset",
+      "sha256": "e51a377973403a5e9498e5075719e6372147a620e8fb7cf9eb9bf42e61615336"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/MY/7YJ0QD4AQOUIDHM9IC9TQI.uasset",
+      "sha256": "0fff6c31dccbaf5e0fc4b3449f67ea742d4a58a4eb83b9349e11d22bb605af07"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/S6/RG3PSH1J7Q7EVO6YI43I7E.uasset",
+      "sha256": "d6eda63b8e779c948256438f9671fa0c1612d947aa9327dd785834eb6f36ecbc"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/SI/T7QOSKKISAD7TW2ET44AJH.uasset",
+      "sha256": "a97158feb40eaca30557c5c1336e1d62eb97ff890f7cecdadb56f5c64da69d72"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/TO/OJHZ0V9P2R25UM4WQ6NI0Y.uasset",
+      "sha256": "3ae9fba66930a6c31ff36b70f6762166608b0a8bf64fa5edebcc32abfce13d20"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/VB/TDPTR8SQ20EHZWPF4P6UXP.uasset",
+      "sha256": "2d019267daabac56a7823789d99e73db47d593265702f8609dc70c3a94a7740c"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/X6/4JM3OOF6XJPFG17TLNQ1PG.uasset",
+      "sha256": "4a43409640f2b82684c527778dfe0fa8fa4dd27f982c0dc1a6746f12c1b50c00"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/C/8J/VJRDR3W6XTZKK6V9IRRSG9.uasset",
+      "sha256": "2bbbe592881e3bc549ef1e630f975fd506c092133e573404c68d949bc95e288a"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/C/BW/RA2KM5I66ZNSU53VCRY2SI.uasset",
+      "sha256": "e1f075b891c47284c720ac2cdea77021a557901c95517a8cc6fcd2777e67dd91"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/C/PC/NOFCOKUNMS5V2UN59JU9XG.uasset",
+      "sha256": "2f77db28b77b7421bbeb68d59f33bdfb3bf9f45ab61d15baea4be7786d8c2838"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/C/R7/JC7KQ4ZPXIVLIAUVHGG94K.uasset",
+      "sha256": "aa2ece276ac1a756215ab1fb31a7d3a9c7518cd43a9959b4e006e5c1e78fd37e"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/D/AR/W0W40E79SDBRJBO8KUQ77Y.uasset",
+      "sha256": "cb4994f9b8a3f4c880a559a47fc90c06d81b83ee74dc9fb50933c06d19fc7989"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/D/BP/HX6DS58PJGIP7DAP1N8PJ0.uasset",
+      "sha256": "1acda15bc7b25cf41136597dc703f1ae05eed023e79fbd04944c47bef27a18c3"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/D/DI/V62YEPXPX8WWK4R2FV85YD.uasset",
+      "sha256": "20130ed49c9610b829d9d1d19cacab4cbea421fdcfffe359f70f18ec2de8bc9d"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/D/IS/NONLJVRGAK4TFU2PO3RCS9.uasset",
+      "sha256": "3b253db215b6e540d62bdf42ca087fe17063b00342536d9687258f584d5e8940"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/D/NJ/3NCEMTAN1HQK4YDBV2A6EG.uasset",
+      "sha256": "c4776f1e0604baeaccf395c5656a52c6d8d836574a3c5a5a9c60713e09bdcea9"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/D/XB/WBW1UWYEJSRM0YAXQL9R11.uasset",
+      "sha256": "15c7279b6095f65c4fb82c3beb9a2525642088bd87d82a56b59e52a1df95d86c"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/D/ZW/A2WEVA63Z2MF3DRHDQ3A8I.uasset",
+      "sha256": "9c992eb4df6b2ca351695433c9e1106ea0ca41d694756592c3df3e80d51c2c41"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/2P/4GOJL0B7MYGQSP4C3VFAZJ.uasset",
+      "sha256": "1fd016e66f079176f19c9e62970b09d57320395a53f4bd664a0bac198a4580df"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/33/PXHJ6L701GSTUSERM7L7M8.uasset",
+      "sha256": "1988459823e765fdf325914515f0385d124ef1d8253fda6f09200a34d55c549f"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/85/ND2LBN0Y13W6NNXN1UWAAO.uasset",
+      "sha256": "65366e4f41200bae7db8f48e6f6097084fd1a40c2c084b3ef4df1212dbf7a21c"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/B3/VKY8WZWDOJUIEFGKEQSJKY.uasset",
+      "sha256": "7ac0c429dd3f73c81f6fb85c5deafca6e632a36944219d36644bb3128e609953"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/HP/LU8EKCDKP0TL42NE2BIE38.uasset",
+      "sha256": "6f71202ca23d5ba3235b5248cd480f7eb8f94ec45232820527ce1778ee321858"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/KS/VDPNXHR04TUNS8ZYBYPT4O.uasset",
+      "sha256": "cec3afe190858048f2911edc3aa2da02c2ca2a2bcd65b0b8edc085950400451c"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/MU/ZTQ5H3ILVU9UJ72Y5W3J3T.uasset",
+      "sha256": "46681b1105b6ea7caa263f5c5cd0fd7ee6f3cd1657d7d9222a07220fbf2d2652"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/VE/G86XT6C01J32PZHFXA1KHO.uasset",
+      "sha256": "380597fda8afb1701a2931f202bd5c328f6060640f7797071411fd0b428dfc04"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/WQ/XGGG0WAMG1XPGUSTU0HKB0.uasset",
+      "sha256": "27854b9a363e3a4857d68e4ea2a8705a5a89a740bccca3e799ddd98021839358"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/E/ZL/PMLP0JQ8B0R86U5UMIKN7M.uasset",
+      "sha256": "f0d4ee6f66975ac0599e2c989ca98b5ab5fe3aa36a0306404d75489ce0340e25"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/F/0P/6IK7QNJ3GVBD1FYM95RX7Q.uasset",
+      "sha256": "a2533dfb90f012dc88fd08da5eb3694b2cf735adec7bf9e65efe469c39c28a9a"
+    },
+    {
+      "path": "__ExternalObjects__/Maps/NewMap/1/OY/AAUEUUV18NF6M2K28T9RE2.uasset",
+      "sha256": "49f549f22b078c5c8de0a57fb23f02c374858d7abbbafa92889f19ff0f64546b"
+    },
+    {
+      "path": "__ExternalObjects__/Maps/NewMap/4/S0/NGAU94BV2F559EHNTPSSBV.uasset",
+      "sha256": "11f1390b9cf0a773404a49448b5d740a428e56fbcf30bea9d88d52eeb56010da"
+    },
+    {
+      "path": "__ExternalObjects__/Maps/NewMap/6/3M/ZEFXAEX0HV3TIZWTU363JO.uasset",
+      "sha256": "9f964615dbcc151fb7846a7bdd38244297a038940acbc0c2fad183bebdd8f87d"
+    },
+    {
+      "path": "__ExternalObjects__/Maps/NewMap/A/GD/MF84NVBBXEU474DJ8ZVZAE.uasset",
+      "sha256": "b63ed6afb460964a0b9ead7328f868c1790ac5fbef015d9186f92279a99e1ee1"
+    },
+    {
+      "path": "__ExternalObjects__/Maps/NewMap/B/1I/0IU8TM862LV9H1H1NLM65H.uasset",
+      "sha256": "4a69536337642735dd2ffe05272a296bcfa35f822e6c163e8e28370d27d23f51"
+    },
+    {
+      "path": "Gameplay/Anims/ABP_Greystone.uasset",
+      "sha256": "dc38a1c0e225e722b5ee35ab1f1ada5aabaffaa3646c2a5501cca3b930ed4963"
+    },
+    {
+      "path": "Gameplay/Anims/BS_Jog.uasset",
+      "sha256": "f63bbb1d43aa93ca90d89d22f56c6e84a3d37147601b70c4bf52f6d8a20de4a0"
+    },
+    {
+      "path": "Gameplay/Anims/Combo/Attack_PrimaryA_Montage.uasset",
+      "sha256": "f70ddc0425ee7bf42475597eee10f5da1250102f20ded7ad2ac824c3eacd9056"
+    },
+    {
+      "path": "Gameplay/Anims/Combo/Attack_PrimaryB_Montage.uasset",
+      "sha256": "185668c94a4f874f1318303a4dbd41aa0dba28022421b5e3ae86b7b365e4cb94"
+    },
+    {
+      "path": "Gameplay/Anims/Combo/Attack_PrimaryC_Montage.uasset",
+      "sha256": "1993bbd9237976c865fd052d314619a7a08bd97873f425e001a7ae51503aba0f"
+    },
+    {
+      "path": "Gameplay/Anims/Roll/AM_Roll.uasset",
+      "sha256": "d6800c0b5b32e90fcd0d9a73f9678d9798c540d34861d0a777d123fbaab8483e"
+    },
+    {
+      "path": "Gameplay/Anims/Roll/IK_GreystoneRoll.uasset",
+      "sha256": "e303747cc533fe2d505d96dbd2b442c673e1d0814659c987b5f3f4f0c148da5c"
+    },
+    {
+      "path": "Gameplay/Anims/Roll/IK_MixamoRoll.uasset",
+      "sha256": "205ab44bf14c427ee177ee196c2b5769b33af9967f319108f1135a619ffb4b75"
+    },
+    {
+      "path": "Gameplay/Anims/Roll/RTG_Mixamo_Greystone_Roll.uasset",
+      "sha256": "43c22c70d896d91617e15a3ad7a7713ffd91e89756d05d45da79a7122d2993cb"
+    },
+    {
+      "path": "Gameplay/BP_GameMode.uasset",
+      "sha256": "a67543877a065e1545d8bd491291338c4f96b05054fa95fd12a2d2861ba72e4f"
+    },
+    {
+      "path": "Gameplay/BP_PlayerController.uasset",
+      "sha256": "dd2bbf8e001fdf934b69586f69b22e1e1369de44e9e53480f54c51fffde8f562"
+    },
+    {
+      "path": "Gameplay/Characters/BP_BaseCharacter.uasset",
+      "sha256": "02e203e53dbda8aaffff181e69f49ffed4499afce1351745e5f13bfb88a6f7c1"
+    },
+    {
+      "path": "Gameplay/Characters/BP_Dummy.uasset",
+      "sha256": "d9268a5208f08e7f590dcfa6eafbd5c3bf5a7c33873cfc7e8f89f0cd336a4ddd"
+    },
+    {
+      "path": "Gameplay/Characters/BP_Player.uasset",
+      "sha256": "f773e1e37523c05b9729d9ffeec73eb62811ea31f54899a76c42636089ceab19"
+    },
+    {
+      "path": "Gameplay/GAS/Abilities/GA_Attack_Light_1.uasset",
+      "sha256": "daa95ebc271b149918bde33745fed9133e88bd76258a1159780b62fa7ec3cb72"
+    },
+    {
+      "path": "Gameplay/GAS/Abilities/GA_Attack_Light_2.uasset",
+      "sha256": "fbdde0c363430230b46040463c2a43229a5853e1658912259e1e96a364e5ab17"
+    },
+    {
+      "path": "Gameplay/GAS/Abilities/GA_Attack_Light_3.uasset",
+      "sha256": "9521ca7634e1f76a2866d9d81aa0ecef26ca4ddfb336b4006e60cc7d39fd9f66"
+    },
+    {
+      "path": "Gameplay/GAS/Abilities/GA_Roll.uasset",
+      "sha256": "ba2d32297b73e40e2281276edb0afb7227b0bb00ed15daadbf27f7213a581cb2"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_AttackCancelWindow.uasset",
+      "sha256": "ba30745e5e1f0a2be9e32aecdf0ef4149a6f2d863a77fafbca3caf66755fecd5"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_ComboWindow.uasset",
+      "sha256": "098898a25fe186da442edd4f4ffd57699618446632515335a0e30e2a05a14194"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_ComboWindow_1.uasset",
+      "sha256": "5995d23bb7c1b6250aa50cb0a9af938f17e443b7f67033d793939d9f518c88b1"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_ComboWindow_2.uasset",
+      "sha256": "2f5c7f44046b96b857148393ede794251c4cc463025204e927ba653e7bf11a99"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_Cost.uasset",
+      "sha256": "66fc300e4321147118b57031ff589b8701b0404c769a1628be9d5a56ca6abffa"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_Damage.uasset",
+      "sha256": "78fe03df96bd6eb8842ad774751c490d8c8583336abd922c8ee689bb23fcca4f"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_InitAttributes.uasset",
+      "sha256": "d9044551fc6903257b315d5dfe208955e9415a8248dcb3e1f28031966b429c5a"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_MoveCancelWindow.uasset",
+      "sha256": "c2d7b20c71e73e0a6ff515dcccef9a783c5063371df4df498e364eec5b46f3c0"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_MoveLock.uasset",
+      "sha256": "1ca0c52720ad5a7f0cf5656555016596e4e833ace9e3f26102a6477b0a23ed48"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_RollCancelWindow.uasset",
+      "sha256": "972c9c31b74d0b9dd7ceba03aebefeab456696a5958f68c9129807d4b642e646"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_StaminaRegen.uasset",
+      "sha256": "c74d9875dc003fb35fbd9c1b4d85f2e4d2a9426e7e3d074258adb0f11bcf3354"
+    },
+    {
+      "path": "Gameplay/Notify/AN/AN_AttackLunge.uasset",
+      "sha256": "bb9d4e9bd53344f8e9348106af63cc5efe40858fbc2dccf4dc5e8e425450d8d4"
+    },
+    {
+      "path": "Gameplay/Notify/AN/AN_SendGameplayEvent.uasset",
+      "sha256": "ab5cd7c8441fa40e055532a1ddff79fe38cc7cd20791e3d530f46d78eef4fc9e"
+    },
+    {
+      "path": "Gameplay/Notify/ANS/ANS_AttackCancelWindow.uasset",
+      "sha256": "47f23bd110152729328fe8f541e223481d1af506d6e94d738d12555fc8f840ec"
+    },
+    {
+      "path": "Gameplay/Notify/ANS/ANS_AttackLungeWindow.uasset",
+      "sha256": "d675ae1b62328c32264ac052b47f2893a3c94b7d7161a74bba09e9214b1c9507"
+    },
+    {
+      "path": "Gameplay/Notify/ANS/ANS_AttackTurnWindow.uasset",
+      "sha256": "7e7ef375df9d7f39885bc9bbc122a56dd826d06b93d3f7039df0a48b6456cc26"
+    },
+    {
+      "path": "Gameplay/Notify/ANS/ANS_AttackWindow.uasset",
+      "sha256": "b0263cee7413ea6a238661523f2cc900bfde04fa92650db419a39faea6e865b2"
+    },
+    {
+      "path": "Gameplay/Notify/ANS/ANS_MoveCancelWindow.uasset",
+      "sha256": "9f2141f8573a7c6dcd8adba9be11c42116c990d8db71f2d3b3d3f7b5e0eb7612"
+    },
+    {
+      "path": "Gameplay/Notify/ANS/ANS_MoveLock.uasset",
+      "sha256": "875eb39ba9877b2bc880f38a8130fdf7c82dd3fe4c84ae8db2868cf1a5feb721"
+    },
+    {
+      "path": "Gameplay/Notify/ANS/ANS_RollCancelWindow.uasset",
+      "sha256": "1c934693beba59290f5c2e36eba6fabbd5709d2b177244cd00ff95460d21be85"
+    },
+    {
+      "path": "Gameplay/WBP/WBP_HUD.uasset",
+      "sha256": "703e383b966a7da668011a4406a02a5603c0af6a8128b9b70628cf952a989f8e"
+    },
+    {
+      "path": "Input/IA_Attack.uasset",
+      "sha256": "1515fd52e94cf07d92ba879d05cae25e4a464e599871a9e860cb4dc9ee544ac8"
+    },
+    {
+      "path": "Input/IA_Jump.uasset",
+      "sha256": "5c8559b3193188974f5a0564c45ce1e84924eb269919a8e30e550477d3ccd80b"
+    },
+    {
+      "path": "Input/IA_Look.uasset",
+      "sha256": "03f72b79e9570d3c486933291a78e9524a61660334b4191374b0f68266e998d0"
+    },
+    {
+      "path": "Input/IA_Move.uasset",
+      "sha256": "5175ab4e39581d225781fba848f0a24713af7a16eaa295519d9afb79c2c668a0"
+    },
+    {
+      "path": "Input/IA_Roll.uasset",
+      "sha256": "9093a283584a01516c4cba6cfcbe6cb5921c035c79eb8590d0c28c10dab90e38"
+    },
+    {
+      "path": "Input/IMC_Default.uasset",
+      "sha256": "d8542b626c98725e125279ac8dd69c650c401806811b42655951b0a03c2943c2"
+    },
+    {
+      "path": "Maps/NewMap.umap",
+      "sha256": "d55d2ccaefe7cf4ea42195af18ec77f559fe66c75088937dbc1e2a44100ec881"
+    },
+    {
+      "path": "NewMap.umap",
+      "sha256": "2f0e1155ec8b10cbee349f5a87a6529fdd3a92fd7df6e500d31d7c3472c3b30d"
+    },
+    {
+      "path": "NewMap_HLOD0_Instancing.uasset",
+      "sha256": "69caca8f2eef9a9f93e144d50ab4bb88b19d7e934ab16ef6044d2beec963d5bb"
+    }
+  ]
+}

@@ -13,6 +13,7 @@ Saved/
 
 # 素材库由独立的嵌套仓库管理（Content/.git，仅本地）
 /Content/
+/LocalBackups/
 *.slnx
 Automation_*.sln
 
