@@ -93,6 +93,8 @@
   <a href="#p32">P32 翻滚被攻击打断后永久无法再次激活</a>
   <a href="#p33">P33 激活标签变量默认值为空</a>
   <a href="#p34">P34 攻击与翻滚取消窗口查询混用</a>
+  <a href="#p35">P35 Jump 节点选错与成本分支漏接</a>
+  <a href="#p36">P36 跳跃时体力仍回复：技能提前结束</a>
 </nav>
 
 <main>
@@ -708,6 +710,19 @@ git config --global https.proxy http://127.0.0.1:7897</pre>
   <table><tr><th>标签</th><th>放置位置</th><th>用途</th></tr><tr><td>State.RollCancelWindow</td><td>攻击蒙太奇</td><td>允许翻滚取消攻击</td></tr><tr><td>State.AttackCancelWindow</td><td>翻滚蒙太奇</td><td>允许攻击取消翻滚</td></tr></table>
   <p>2026-10-19 最终复核：攻击输入已改查 State.AttackCancelWindow，AM_Roll 已放对应通知。三段攻击虽有 RollCancelWindow 通知，但当前翻滚输入仍仅经过 IsFalling 检查就激活，尚未消费该窗口；不要把“已放窗口”写成“双向取消规则已全部接通”。</p>
   <p>动画编辑器预览角色没有玩家 ASC，预览时 GetAbilitySystemComponent 返回空不能单独证明 PIE 玩家上的 GE 应用失败。应在实际玩家上查看标签。</p>
+</section>
+<section id="p35">
+  <h2>P35 · 跳跃技能选成蒙太奇跳转，或提交结果没有进入分支 <span class="fix">已纠正</span></h2>
+  <p>GA_Jump 中不能使用 Montage Jump to Section；它仅跳转蒙太奇章节，不会让角色起跳。从 Cast To BP_Player 的 As BP_Player 引脚拖线搜索 Jump，选择 Target is Character 的版本。</p>
+  <p>CommitAbility.Return Value 必须连到后续 Branch.Condition。只接白色执行线而条件保持勾选，会固定走 True，忽略提交结果。Can Jump 先判断，成本提交成功才 Jump；失败与 Cast Failed 路径结束技能。</p>
+</section>
+<section id="p36">
+  <h2>P36 · 跳跃期间仍回复体力：State.Jump 随技能立即结束而消失 <span class="fix">用户确认已解决</span></h2>
+  <p class="sym">症状：GA_Jump 有 State.Jump，回复 GE 的持续标签排除列表也有它，但跳到空中仍然回复。</p>
+  <p>2026-10-19 只读核对两侧标签一致。根因是 Jump → EndAbility：Jump 仅请求起跳，不等待落地，GA 立即结束，ActivationOwnedTags 立即移除。标签寿命没有覆盖期望的腾空过程，回复 GE 配置本身没有错。</p>
+  <p>修复：Jump → WaitMovementModeChange（New Mode=Walking），On Change → EndAbility。前面的 Can Jump=false、CommitAbility=false、Cast Failed 仍结束技能；不要用等待任务的普通执行输出直接结束。用户确认修复成功。</p>
+  <p>松开按键继续 Stop Jumping，不因此提前 EndAbility；正常落地时再释放跳跃状态。当前实现不包含未来多段跳等扩展规则。</p>
+  <p>教训：动作启动节点执行完不等于动作过程结束。需要状态覆盖整个动作时，技能或效果的生命周期必须匹配实际结束事件；不要靠固定 Delay 猜落地时间。</p>
 </section>
 </main>
 </body>

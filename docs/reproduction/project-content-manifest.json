@@ -1,7 +1,7 @@
 {
   "date": "2026-10-19",
-  "snapshot_files": 192,
-  "snapshot_mib": 32.87,
+  "snapshot_files": 195,
+  "snapshot_mib": 32.94,
   "excluded_mixamo_assets": [
     "Gameplay/Anims/Roll/AS_Greystone_StandToRoll.uasset",
     "Gameplay/Anims/Roll/Source/AS_Mixamo_StandToRoll.uasset",
@@ -639,23 +639,43 @@
     },
     {
       "path": "Gameplay/Characters/BP_Player.uasset",
-      "sha256": "f773e1e37523c05b9729d9ffeec73eb62811ea31f54899a76c42636089ceab19"
+      "sha256": "d6ac93d23c0b395670cde2bdc45efc68e47062c822b596688e59f1de8abcab7a"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_1.uasset",
-      "sha256": "daa95ebc271b149918bde33745fed9133e88bd76258a1159780b62fa7ec3cb72"
+      "sha256": "41f0fd71a066ff9ed868b0e2e5588cd0a8edc9300c14b14d797954bb84d89401"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_2.uasset",
-      "sha256": "fbdde0c363430230b46040463c2a43229a5853e1658912259e1e96a364e5ab17"
+      "sha256": "e1ae3e033e2a62bfb563dce00259f00367d2625e97d4ebd1189a493df38981d4"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_3.uasset",
-      "sha256": "9521ca7634e1f76a2866d9d81aa0ecef26ca4ddfb336b4006e60cc7d39fd9f66"
+      "sha256": "15c0452a68d3f61fc7c1a56e884798465c5755a377904638bc624c26e07dcecb"
+    },
+    {
+      "path": "Gameplay/GAS/Abilities/GA_Jump.uasset",
+      "sha256": "444c2901b1f76cb86d4d5a2995fe64b529aa024f8b0ecc903841f9d6dab7f2c9"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Roll.uasset",
-      "sha256": "ba2d32297b73e40e2281276edb0afb7227b0bb00ed15daadbf27f7213a581cb2"
+      "sha256": "b3653ca4cd13fdaf045d2f59965240f3d8d45748bd0faebba77340cf08aff12c"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/Cost/GE_Cost_Attack.uasset",
+      "sha256": "af5094ed7a9d3e0aa166de860be71eaf10b6439cda9c922d13ce8abc1fe2ff31"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/Cost/GE_Cost_Jump.uasset",
+      "sha256": "5c26362bbfb52ed0532f8492b40327358e1ada2026ed15b856718e07eac0b782"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/Cost/GE_Cost_Roll.uasset",
+      "sha256": "75dd8e173d963d5b119d94274313420ee2ef7757bbca272ec9870cb470a3c72c"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/Cost/GE_StaminaRegen.uasset",
+      "sha256": "2de2f6c41ce24a8e5d6b1a03e4868ffd068ac5c90ca444705d82c05859fb4bae"
     },
     {
       "path": "Gameplay/GAS/Effects/GE_AttackCancelWindow.uasset",
@@ -672,10 +692,6 @@
     {
       "path": "Gameplay/GAS/Effects/GE_ComboWindow_2.uasset",
       "sha256": "2f5c7f44046b96b857148393ede794251c4cc463025204e927ba653e7bf11a99"
-    },
-    {
-      "path": "Gameplay/GAS/Effects/GE_Cost.uasset",
-      "sha256": "66fc300e4321147118b57031ff589b8701b0404c769a1628be9d5a56ca6abffa"
     },
     {
       "path": "Gameplay/GAS/Effects/GE_Damage.uasset",
@@ -696,10 +712,6 @@
     {
       "path": "Gameplay/GAS/Effects/GE_RollCancelWindow.uasset",
       "sha256": "972c9c31b74d0b9dd7ceba03aebefeab456696a5958f68c9129807d4b642e646"
-    },
-    {
-      "path": "Gameplay/GAS/Effects/GE_StaminaRegen.uasset",
-      "sha256": "c74d9875dc003fb35fbd9c1b4d85f2e4d2a9426e7e3d074258adb0f11bcf3354"
     },
     {
       "path": "Gameplay/Notify/AN/AN_AttackLunge.uasset",
@@ -739,7 +751,7 @@
     },
     {
       "path": "Gameplay/WBP/WBP_HUD.uasset",
-      "sha256": "703e383b966a7da668011a4406a02a5603c0af6a8128b9b70628cf952a989f8e"
+      "sha256": "37f3d1d11019387535cf7a9541a152b66dcbcd05085074522214ee7fdee0b410"
     },
     {
       "path": "Input/IA_Attack.uasset",

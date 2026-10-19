@@ -3,13 +3,15 @@
 > 这份文件是项目 AI 助手的"记忆备份"。不是对话记录,是提炼后的关键上下文。
 > 如果你是刚被叫来协助本项目的 AI:**先读完这份文件,再开口说话**。读完约需 3 分钟,能避免你重蹈覆辙或问出用户已经回答过的问题。
 
-> 最近更新：2026-10-19 收工。用户确认翻滚第一版可用并授权 Git/GitHub 同步。最新基线以下文和日志06末节为准。
+> 最近更新：2026-10-19 体力与跳跃续作。用户确认翻滚第一版可用并授权 Git/GitHub 同步。最新基线以下文和日志06末节为准。
 
 > 当前翻滚：Mixamo Stand To Roll → Greystone，IA_Roll=左 Shift，GA_Roll→AM_Roll，UpperBody 插槽，蒙太奇 Rate Scale=2；序列根运动关闭、强制根锁定开启，ANS_AttackLungeWindow 驱动位移，ANS_AttackTurnWindow 转向。移动取消与翻滚后摇接攻击已配置。
 
 > 已修复：AbilityRoll 默认标签容器为空（P33）；新蒙太奇默认插槽不匹配（P22）；混出后打断使旧翻滚不退出，已开启 Allow Interrupt After Blend Out（P32）；攻击输入误查 RollCancelWindow，现改查 AttackCancelWindow（P34）。用户做 PIE 手感验收，AI 只读复核保存资产，没有另跑完整回归。
 
-> 下一步：三段攻击已放 RollCancelWindow（各两段），但当前翻滚输入只检查 IsFalling 后激活，尚未消费该窗口；先补判断并核对早段/后段窗口意图，再接翻滚体力成本、无敌帧、受击死亡。GA_Roll 的 Cost/Cooldown 为空，勿写成已实现。原三连击阻止矩阵保留。
+> 最新体力：成本 GE 整理至 Gameplay/GAS/Effects/Cost，攻击/翻滚/跳跃当前都是25；GA_Jump 已授予并接入输入，State.Jump 随技能保持至落地。Jump → WaitMovementModeChange（Walking）→ On Change → EndAbility，修复跳跃状态瞬间消失导致空中回复的问题（P36），用户确认成功。GE_StaminaRegen 当前每0.05秒+2，持续排除 State.Attacking / State.Rolling / State.Jump。成本选择暂用复制 GE，未实现动态通用成本。详见日志07，素材提交9ce6c33。
+
+> 下一步：继续无敌帧、受击死亡；此前攻击上的 RollCancelWindow 仍需核对输入消费及早段/后段意图，本轮未施工该规则。原三连击阻止矩阵保留。
 
 > 归档：Content 内层 Git 保存完整已保存资产，只在本地提交；GitHub 保存自有玩法快照，不上传 Mixamo 动作序列及源预览资源。原 FBX 和本轮变更资产压缩包在 LocalBackups（被外层 Git 忽略）。恢复见 docs/reproduction/content-inventory.md；详情见 docs/log/06-翻滚动画导入与重定向.md。
 
@@ -20,7 +22,7 @@
 2. `docs/checklist.html` —— 当前施工单,干活按这个走,别另起炉灶
 3. `docs/reference/troubleshooting.html` —— 错题本 P1~P27,踩过的坑都在,开口给方案前先查它(P19 铁律:节点名/命令/格式必须先在引擎源码或错题本里验证,不许凭记忆)
 
-当前状态一句话：**三连击、伤害、攻击体力消耗/回复、HUD、攻击转向和翻滚第一版已完成。下一步补攻击中翻滚窗口输入判断，再做翻滚体力、无敌帧与受击死亡。**
+当前状态一句话：**三连击、伤害、攻击体力消耗/回复、HUD、攻击转向和翻滚第一版已完成。翻滚、跳跃体力已接入，空中暂停回复、落地恢复；下一步核对取消窗口输入，继续无敌帧与受击死亡。**
 
 同步规则:每次改动同步对应文档与接手点。C++ 接口以 Source 为准;蓝图配置以保存资产和用户确认为准;提交标题仅作线索。未运行的检查不可写成已验收。
 
@@ -30,7 +32,7 @@
 - 仓库:https://github.com/hongweihu184/Soulslike-GAS-Demo (外层:代码/文档与自有资产快照)
 - 本地工程:`E:\UE5.8Project\ProjectUnreal`;引擎:`E:\UE_5.8`
 - 完整 `Content/` 约 19GB，主体为 8 个 Paragon 资源包；`Content/.git` 本地历史约 12.44 GiB，禁止直接推送到 GitHub。
-- GitHub 通过 `ProjectContentSnapshot/Content/` 保存工程自有蓝图、输入、地图和外置 Actor 快照（192 个文件，约 32.87 MiB）；恢复细则见 `docs/reproduction/content-inventory.md`，复制脚本为 `Tools/Restore-ProjectContent.ps1`。
+- GitHub 通过 `ProjectContentSnapshot/Content/` 保存工程自有蓝图、输入、地图和外置 Actor 快照（195 个文件，约 32.94 MiB）；恢复细则见 `docs/reproduction/content-inventory.md`，复制脚本为 `Tools/Restore-ProjectContent.ps1`。
 - 换机时取得有权访问的 Paragon 资源包后再运行恢复脚本；脚本默认拒绝覆盖不同内容。新增/修改自有 `.uasset` 后，需同步更新快照并提交外层 Git。
 - 主线计划 12 章,见 `docs/index.html` 计划表。技术路线:**C++ 只打地基,90% 玩法在蓝图**。
 
@@ -64,11 +66,13 @@
 - 蓝图注册武器碰撞组件,ANS_AttackWindow 开关判定,C++ 每次挥击目标去重,命中事件携带 Target 与 TargetData;GA 应用 GE_Damage,属性集结算伤害。
 - 三个攻击 GA 已补 CommitAbility,每段消耗 20 体力,失败时结束技能(P27)。
 - WBP_HUD 已接入生命/体力显示;敌人血条和锁定指示尚待后续章节。
-- 当前 DefaultGameplayTags.ini 有 19 条显式注册,分 Ability / State / Event。
+- 当前 DefaultGameplayTags.ini 有 21 条显式注册,分 Ability / State / Event。
 
 ## 5. 当前接手点
 
-本次素材提交 `cca12f5`；公开自有资产快照 192 文件、约 32.87 MiB，完整清单见 docs/reproduction/project-content-manifest.json。缺动作时先看 docs/notes/mixamo-animation-workflow.md，其中记录下载选项、无模型 FBX 的处理、重定向边界和可复用提示词；不要直接运行 Roll 专用脚本覆盖既有资源。
+2026-10-19 最新续作：先读日志07及 P35/P36。翻滚成本已完成，旧段落“Cost为空”仅为此前基线。跳跃 GA 必须等落地再结束；成本目录移动后不要恢复旧 GE_Cost / 旧路径 GE_StaminaRegen。当前成本和回复数值见日志07。
+
+本次素材提交 `cca12f5`；公开自有资产快照 195 文件、约 32.94 MiB，完整清单见 docs/reproduction/project-content-manifest.json。缺动作时先看 docs/notes/mixamo-animation-workflow.md，其中记录下载选项、无模型 FBX 的处理、重定向边界和可复用提示词；不要直接运行 Roll 专用脚本覆盖既有资源。
 
 用户在 2026-10-19 确认基础翻滚版本可用并要求收工备份。接手时先读日志06的“收工基线”，再读错题本 P22、P32~P34。不要按旧预研把整段攻击/翻滚标签当成互相禁止条件，取消时机由时间轴窗口决定。
 

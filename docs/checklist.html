@@ -54,7 +54,7 @@
 <li>窗口事件只授予对应 GE,不立即 EndAbility。蒙太奇完成/取消/打断时结束 GA,Stop When Ability Ends 保持勾选。</li>
 <li>GA_2/3 分别要求 State.Combo.Window.1/2。阻止矩阵:GA_1=.1;GA_2=.1+.2;GA_3=.1+.2+.3。</li>
 <li>ANS_AttackWindow 开关武器碰撞,C++ 每次挥击目标去重,发送带 TargetData 的命中事件,GA 应用 GE_Damage。</li>
-<li>三个攻击 GA 均调用 CommitAbility,每段 -20 体力,失败时结束技能。WBP_HUD 读取生命/体力百分比接口。</li>
+<li>普攻、翻滚、跳跃均由 CommitAbility 检查成本；当前保存数值均为 -25。GE 在 Effects/Cost 下按动作配置。WBP_HUD 读取生命/体力百分比接口。</li>
 </ul>
 <h2>攻击转向窗口(用户确认可用)</h2>
 <p>三个攻击 Montage 使用蓝图 AnimNotifyState <code>ANS_AttackTurnWindow</code> 与 <code>ANS_AttackLungeWindow</code>。转向状态 Tick 读取 <code>BP_Player.Current Move Input</code>,按控制器 Yaw 合成相机相对方向,通过 <code>RInterp To Constant</code> 平滑更新角色旋转;输入向量长度不大于 0.1 时直接跳过转向,避免零向量被解释成默认朝向。位移状态 Tick 使用 <code>LungeSpeed × Frame Delta Time</code> 计算水平位移,并以 Sweep 移动角色。旧单次转向通知已删除;旧单次冲量通知 <code>AN_AttackLunge</code> 待确认无 Montage 引用后清理。攻击位移与腿部动画不匹配造成滑步,属于当前动画资源限制,作为未来资源/动画任务排期,暂不阻挡 Demo。临时诊断 C++ 函数仍被 BP_Player 引用,清理前先在蓝图里移除调用。详细记录见 <a href="log/05-体力回复与攻击转向.md">行动日志 05</a>。</p>
@@ -63,7 +63,7 @@
 <ol>
 <li>✅ 体力回复已通过无限周期 Gameplay Effect 配置,攻击标签作为持续标签排除条件,用户已验证生效。基础值上限保护已编译通过,待 PIE 验收。</li>
 <li>✅ 翻滚输入、位移、蒙太奇、移动取消及翻滚后摇接攻击已做出第一版。下次补齐攻击中翻滚输入对 State.RollCancelWindow 的读取，核对重复窗口是否为有意配置。</li>
-<li>翻滚体力成本与回复规则，随后无敌帧；目前 GA_Roll 的 Cost/Cooldown 为空。</li>
+<li>✅ 翻滚和跳跃成本已接入；GA_Jump 等待 Walking 再结束，空中暂停回复、落地恢复。GE_StaminaRegen 在 Effects/Cost，Period=0.05 秒、每次+2，持续排除攻击/翻滚/跳跃。见 <a href="log/07-翻滚跳跃体力与回复.md">日志07</a>。</li>
 <li>无敌帧窗口、伤害结算、受击与死亡。</li>
 <li>更新相关文档并分别提交代码/文档仓库与本地素材仓库。</li>
 </ol>
