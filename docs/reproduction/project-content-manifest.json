@@ -1,7 +1,7 @@
 {
-  "date": "2026-10-19",
-  "snapshot_files": 195,
-  "snapshot_mib": 32.94,
+  "date": "2026-10-20",
+  "snapshot_files": 198,
+  "snapshot_mib": 33.02,
   "excluded_mixamo_assets": [
     "Gameplay/Anims/Roll/AS_Greystone_StandToRoll.uasset",
     "Gameplay/Anims/Roll/Source/AS_Mixamo_StandToRoll.uasset",
@@ -635,11 +635,19 @@
     },
     {
       "path": "Gameplay/Characters/BP_Dummy.uasset",
-      "sha256": "d9268a5208f08e7f590dcfa6eafbd5c3bf5a7c33873cfc7e8f89f0cd336a4ddd"
+      "sha256": "cea9e03e36804ee2ed5e4cc325023868baed32851b03bb9facca2e22600a9f07"
     },
     {
       "path": "Gameplay/Characters/BP_Player.uasset",
-      "sha256": "d6ac93d23c0b395670cde2bdc45efc68e47062c822b596688e59f1de8abcab7a"
+      "sha256": "8932b831a7cce98ca19075106ac5279a580d61f5e6dc47bf2846df368ae107bd"
+    },
+    {
+      "path": "Gameplay/Data/DT_CharacterStats.uasset",
+      "sha256": "cfdd32252087e8c556f5740f665c36ab85d786388409892cfe7bef17c6ef2b45"
+    },
+    {
+      "path": "Gameplay/Data/ST_CharacterStats.uasset",
+      "sha256": "46cb68231d8d41b610213e7b69a603d9ac9ed2c21420927e76fb5d198c7c7c60"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_1.uasset",
@@ -682,10 +690,6 @@
       "sha256": "ba30745e5e1f0a2be9e32aecdf0ef4149a6f2d863a77fafbca3caf66755fecd5"
     },
     {
-      "path": "Gameplay/GAS/Effects/GE_ComboWindow.uasset",
-      "sha256": "098898a25fe186da442edd4f4ffd57699618446632515335a0e30e2a05a14194"
-    },
-    {
       "path": "Gameplay/GAS/Effects/GE_ComboWindow_1.uasset",
       "sha256": "5995d23bb7c1b6250aa50cb0a9af938f17e443b7f67033d793939d9f518c88b1"
     },
@@ -694,8 +698,16 @@
       "sha256": "2f5c7f44046b96b857148393ede794251c4cc463025204e927ba653e7bf11a99"
     },
     {
+      "path": "Gameplay/GAS/Effects/GE_ComboWindow.uasset",
+      "sha256": "098898a25fe186da442edd4f4ffd57699618446632515335a0e30e2a05a14194"
+    },
+    {
       "path": "Gameplay/GAS/Effects/GE_Damage.uasset",
       "sha256": "78fe03df96bd6eb8842ad774751c490d8c8583336abd922c8ee689bb23fcca4f"
+    },
+    {
+      "path": "Gameplay/GAS/Effects/GE_InitAttributes_FromTable.uasset",
+      "sha256": "694eab2d020ea8e0d0a954d40ed5a316469dd060b94a8dc8e1a246afc3ba9369"
     },
     {
       "path": "Gameplay/GAS/Effects/GE_InitAttributes.uasset",
@@ -751,7 +763,7 @@
     },
     {
       "path": "Gameplay/WBP/WBP_HUD.uasset",
-      "sha256": "37f3d1d11019387535cf7a9541a152b66dcbcd05085074522214ee7fdee0b410"
+      "sha256": "9b47a57c3fd66f1d03df0da17fe3bcc005f20b6cadc70cf2f011e7c5cd171741"
     },
     {
       "path": "Input/IA_Attack.uasset",
@@ -782,12 +794,12 @@
       "sha256": "d55d2ccaefe7cf4ea42195af18ec77f559fe66c75088937dbc1e2a44100ec881"
     },
     {
-      "path": "NewMap.umap",
-      "sha256": "2f0e1155ec8b10cbee349f5a87a6529fdd3a92fd7df6e500d31d7c3472c3b30d"
-    },
-    {
       "path": "NewMap_HLOD0_Instancing.uasset",
       "sha256": "69caca8f2eef9a9f93e144d50ab4bb88b19d7e934ab16ef6044d2beec963d5bb"
+    },
+    {
+      "path": "NewMap.umap",
+      "sha256": "2f0e1155ec8b10cbee349f5a87a6529fdd3a92fd7df6e500d31d7c3472c3b30d"
     }
   ]
 }

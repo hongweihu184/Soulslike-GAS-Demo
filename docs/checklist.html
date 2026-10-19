@@ -59,6 +59,7 @@
 <h2>攻击转向窗口(用户确认可用)</h2>
 <p>三个攻击 Montage 使用蓝图 AnimNotifyState <code>ANS_AttackTurnWindow</code> 与 <code>ANS_AttackLungeWindow</code>。转向状态 Tick 读取 <code>BP_Player.Current Move Input</code>,按控制器 Yaw 合成相机相对方向,通过 <code>RInterp To Constant</code> 平滑更新角色旋转;输入向量长度不大于 0.1 时直接跳过转向,避免零向量被解释成默认朝向。位移状态 Tick 使用 <code>LungeSpeed × Frame Delta Time</code> 计算水平位移,并以 Sweep 移动角色。旧单次转向通知已删除;旧单次冲量通知 <code>AN_AttackLunge</code> 待确认无 Montage 引用后清理。攻击位移与腿部动画不匹配造成滑步,属于当前动画资源限制,作为未来资源/动画任务排期,暂不阻挡 Demo。临时诊断 C++ 函数仍被 BP_Player 引用,清理前先在蓝图里移除调用。详细记录见 <a href="log/05-体力回复与攻击转向.md">行动日志 05</a>。</p>
 <h2>下一步 · 第 5 章</h2>
+<p>最新用户顺序：角色数值表 → UI 优化 → 敌兵行为树。用户决定优先蓝图学习，本轮数值表新增 C++ 已撤除；待创建蓝图结构体、重建数据表并接初始化。操作见 <a href="log/08-角色数值表.md">日志08</a>。下列无敌帧、受击死亡等继续保留为未完成项。</p>
 <p>2026-10-19：翻滚第一版由用户确认可用；AM_Roll 使用 UpperBody，Rate Scale=2，序列根运动关闭、强制根锁定开启。翻滚 GA 自带 State.Rolling，阻止自身重入，播放任务开启 Allow Interrupt After Blend Out。攻击输入在翻滚中检查 State.AttackCancelWindow。见 <a href="log/06-翻滚动画导入与重定向.md">行动日志 06</a>。</p>
 <ol>
 <li>✅ 体力回复已通过无限周期 Gameplay Effect 配置,攻击标签作为持续标签排除条件,用户已验证生效。基础值上限保护已编译通过,待 PIE 验收。</li>

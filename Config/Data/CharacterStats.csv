@@ -1,0 +1,4 @@
+Name,MaxHealth,MaxStamina
+Player,100,100
+Enemy_Melee,100,100
+TrainingDummy,100,100
