@@ -48,6 +48,7 @@
 <div class="sub">2026-10-19 同步 · <a href="index.html">回主文档</a> · <a href="design/战斗系统策划案.md">战斗系统策划案</a></div>
 <div class="ok">用户确认翻滚第一版可用：左 Shift、Mixamo 重定向动作、窗口位移、移动取消和翻滚后摇接攻击。已修复混出后打断导致翻滚技能不退出。三连击、伤害、攻击体力消耗/回复及 HUD 已完成。具体取消规则以保存资产和日志 06 为准。</div>
 <h2>当前规则(不要按旧方案重做)</h2>
+<p>2026-10-20 最新：BaseCharacter（C++）→ BP_CombatCharacter → BP_Player / BP_Dummy。共用父类读 DT_CharacterStats，玩家行 Player、木桩行 Enemy_Melee。差异化表值 PIE 验证通过，原技能授予保留；战斗手感回归、属性插件与纯蓝图迁移仍待完成。见 <a href="log/10-角色与敌兵继承整理.md">日志10</a>。</p>
 <ul>
 <li>BP_Player 组合输入门控,C++ 只提供动词/查询;空中禁普攻使用虚幻自带功能配置,自定义 IsAirborne 已删除。</li>
 <li>无锁无收刀窗:正常移动;State.MoveLocked:吞输入;未锁且 State.MoveCancelWindow 存在:取消攻击后移动。</li>

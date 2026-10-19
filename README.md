@@ -34,6 +34,8 @@ powershell -ExecutionPolicy Bypass -File .\Tools\Restore-ProjectContent.ps1
 
 ## 进度
 
+- 2026-10-20：新增共同蓝图父类 BP_CombatCharacter，玩家和木桩分别读取 Player / Enemy_Melee 行；差异表值已通过 PIE 验证。见[日志10](docs/log/10-角色与敌兵继承整理.md)。仍保留现有 C++ GAS 基础，尚未完成纯蓝图迁移。
+
 截至 2026-10-19,按已保存资产和用户确认同步:
 
 - 已完成:工程 C++ 化、GAS 基础、主角接入、三连击与伤害、攻击体力消耗。

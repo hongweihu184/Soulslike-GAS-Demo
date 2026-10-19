@@ -1,5 +1,7 @@
 # AI 交接备忘录(给下一位进场的 AI 助手)
 
+> 最新完成（2026-10-20）：官方MCP已完成继承整理，C++ BaseCharacter → 新BP_CombatCharacter → 原BP_Player / BP_Dummy。共同父类拥有读表函数、CharacterStatsRowName和出生初始化/回复，玩家行Player、木桩行Enemy_Melee；清空玩家旧InitAttributesEffect以防C++覆盖表值，GE顺序改为先上限后当前。三蓝图编译通过，PIE差异表值玩家200/150、敌兵300/80正确，已恢复100/100；玩家五个技能保留。尚未手动战斗回归；EasyGas未安装，C++未删。详见日志10，以本段替代此前“未改继承”的旧状态。
+
 > 最新迁移状态（2026-10-20）：用户接受先评估蓝图属性替代，但明确优先免费，不购买。官方UE5.8.3 MCP已启用并成功测试创建/接线/编译独立蓝图，测试资产已清理；现有玩法未改。免费属性候选EasyGas须从Fab取得完整UE5.8包，尚未安装验证。BP_Player行名=Player，BP_Dummy无行名属性，旧BP_BaseCharacter路径疑似重定向至Player，需审计后重建共同父类。详见日志09后半节。不得直接删除旧属性集。
 
 > 2026-10-20 收工：用户已建蓝图结构/数值表（Player、Enemy_Melee，木桩共用敌兵行）、初始化 GE 和读表函数。最后截图为 BeginPlay → 体力回复GE → Initialize Stats from Table，节点 Target is BP Player，未显示父类 BeginPlay；下次核对函数归属、父类执行顺序、角色行名和最终 GE 配置后再 PIE 测试。尚未验收，用户睡觉，详见日志08末节。

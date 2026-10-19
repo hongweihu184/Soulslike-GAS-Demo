@@ -1,7 +1,7 @@
 {
   "date": "2026-10-20",
-  "snapshot_files": 198,
-  "snapshot_mib": 33.02,
+  "snapshot_files": 199,
+  "snapshot_mib": 33.04,
   "excluded_mixamo_assets": [
     "Gameplay/Anims/Roll/AS_Greystone_StandToRoll.uasset",
     "Gameplay/Anims/Roll/Source/AS_Mixamo_StandToRoll.uasset",
@@ -634,12 +634,16 @@
       "sha256": "02e203e53dbda8aaffff181e69f49ffed4499afce1351745e5f13bfb88a6f7c1"
     },
     {
+      "path": "Gameplay/Characters/BP_CombatCharacter.uasset",
+      "sha256": "c8622dc54b500400fda7116cf78c9ff1c18c16659b0e764b50e552bd77a50ed3"
+    },
+    {
       "path": "Gameplay/Characters/BP_Dummy.uasset",
-      "sha256": "cea9e03e36804ee2ed5e4cc325023868baed32851b03bb9facca2e22600a9f07"
+      "sha256": "f4c753f5b2a9fa599a862f4fa522c051f9c624216f98bc5b2ba8eecbe5f8938f"
     },
     {
       "path": "Gameplay/Characters/BP_Player.uasset",
-      "sha256": "8932b831a7cce98ca19075106ac5279a580d61f5e6dc47bf2846df368ae107bd"
+      "sha256": "cb51b828dc9ad57e2261b0bd427fb38de21ce8e02f66423380cd83a56d1f9441"
     },
     {
       "path": "Gameplay/Data/DT_CharacterStats.uasset",
@@ -707,7 +711,7 @@
     },
     {
       "path": "Gameplay/GAS/Effects/GE_InitAttributes_FromTable.uasset",
-      "sha256": "694eab2d020ea8e0d0a954d40ed5a316469dd060b94a8dc8e1a246afc3ba9369"
+      "sha256": "7ba2d90991608e85aa2054fc3fa1f2d69a305a1f359a9784a6e8459c16b8f049"
     },
     {
       "path": "Gameplay/GAS/Effects/GE_InitAttributes.uasset",
