@@ -1,5 +1,7 @@
 # AI 交接备忘录(给下一位进场的 AI 助手)
 
+> 最新迁移状态（2026-10-20）：用户接受先评估蓝图属性替代，但明确优先免费，不购买。官方UE5.8.3 MCP已启用并成功测试创建/接线/编译独立蓝图，测试资产已清理；现有玩法未改。免费属性候选EasyGas须从Fab取得完整UE5.8包，尚未安装验证。BP_Player行名=Player，BP_Dummy无行名属性，旧BP_BaseCharacter路径疑似重定向至Player，需审计后重建共同父类。详见日志09后半节。不得直接删除旧属性集。
+
 > 2026-10-20 收工：用户已建蓝图结构/数值表（Player、Enemy_Melee，木桩共用敌兵行）、初始化 GE 和读表函数。最后截图为 BeginPlay → 体力回复GE → Initialize Stats from Table，节点 Target is BP Player，未显示父类 BeginPlay；下次核对函数归属、父类执行顺序、角色行名和最终 GE 配置后再 PIE 测试。尚未验收，用户睡觉，详见日志08末节。
 
 > 学习提醒（2026-10-20）：用户明确说 GE / Spec / Context、为什么需要 Spec 是知识盲区，目前尚未理解，要求记录以便以后复习。详见 docs/notes/gas-spec-context.md。解释过不等于掌握；教学先讲每个节点目的、输入输出，再接线，避免用更多术语解释术语。当前绿色 Make Context / Make Outgoing Spec 是纯节点，不接白线；Assign 共用同一个 Spec，串联只是更清楚，不是唯一有效接法。角色数值表蓝图已由用户创建，初始化函数正教学接线，尚未确认调用与 PIE 验收。
