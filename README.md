@@ -34,6 +34,8 @@ powershell -ExecutionPolicy Bypass -File .\Tools\Restore-ProjectContent.ps1
 
 ## 进度
 
+- 2026-10-21 体力与连滚完成：正体力即可启动攻击/翻滚/跳跃，扣后最低归零；翻滚可在用户放置的后摇窗口接下一滚。用户确认手感舒适、本轮改好。统一输入缓存后续再做，见[日志13](docs/log/13-正体力启动与翻滚衔接.md)。
+
 - 2026-10-21 收工：双层资源条已接生命/体力HUD，支持消耗拖尾、独立长度比例与实例颜色。用户确认体力基本正常、体力条变绿；生命消耗暂未测。日志与combat-design skill同步，详见[日志12](docs/log/12-双层资源条与HUD.md)。下一步简查UI遗留后推进近战敌兵行为树。
 
 - 2026-10-20：移动与视角已迁到 BP_Player 的 MoveFromInput / LookFromInput，旧 C++ 接口已删除，完整编译及 PIE 执行输出验证通过；待手动手感复核。取消 EasyGas 方案，原生属性集暂留。见[日志11](docs/log/11-移动与视角蓝图化.md)。

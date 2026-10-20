@@ -1,7 +1,7 @@
 {
   "date": "2026-10-21",
   "snapshot_files": 200,
-  "snapshot_mib": 33.29,
+  "snapshot_mib": 33.52,
   "excluded_mixamo_assets": [
     "Gameplay/Anims/Roll/AS_Greystone_StandToRoll.uasset",
     "Gameplay/Anims/Roll/Source/AS_Mixamo_StandToRoll.uasset",
@@ -607,7 +607,7 @@
     },
     {
       "path": "Gameplay/Anims/Roll/AM_Roll.uasset",
-      "sha256": "c0d22f1a126a5775731d14f6f3c5c19ee89867d0223166606023280aa4311585"
+      "sha256": "010a5c3f0eabe998db9ce238130ca8625370b77261237d6674f69a0f64395810"
     },
     {
       "path": "Gameplay/Anims/Roll/IK_GreystoneRoll.uasset",
@@ -655,23 +655,23 @@
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_1.uasset",
-      "sha256": "41f0fd71a066ff9ed868b0e2e5588cd0a8edc9300c14b14d797954bb84d89401"
+      "sha256": "592ee542acfed0e97b3e87c0d6021c0bd67a0537b7a5ed5deff69dff3f69fb47"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_2.uasset",
-      "sha256": "e1ae3e033e2a62bfb563dce00259f00367d2625e97d4ebd1189a493df38981d4"
+      "sha256": "fc194fb97d6602573ca8f262fe132d38dddb9ff2c7147f9c5e200a28402fc3c4"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_3.uasset",
-      "sha256": "15c0452a68d3f61fc7c1a56e884798465c5755a377904638bc624c26e07dcecb"
+      "sha256": "87caa2b7ba035c533d1841f5933eb5b71eeaed559cc8fc29fe8109d9890d3b39"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Jump.uasset",
-      "sha256": "444c2901b1f76cb86d4d5a2995fe64b529aa024f8b0ecc903841f9d6dab7f2c9"
+      "sha256": "2bda6dfb72bd6839e9f4c64e741cf87be4b74cbc685644b0c21fb1b2239d5e46"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Roll.uasset",
-      "sha256": "b3653ca4cd13fdaf045d2f59965240f3d8d45748bd0faebba77340cf08aff12c"
+      "sha256": "d7809006f6f2d915bbaeece0b2d7e152e276919beeca377ddeaa3ec48bf28902"
     },
     {
       "path": "Gameplay/GAS/Effects/Cost/GE_Cost_Attack.uasset",

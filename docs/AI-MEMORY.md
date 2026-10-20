@@ -1,5 +1,13 @@
 # AI 交接备忘录(给下一位进场的 AI 助手)
 
+> **2026-10-21 本轮已验收并授权同步，优先于下方待审核记录**：用户试玩翻滚衔接反馈“很好，很舒适”，随后明确“这个我们改好了”，要求 Git/GitHub/skill/日志同步。正体力启动且扣后归零、五个 GA 主动成本 GE、GA_Roll 窗口重触发按本轮完成归档。用户自行调整并保存 AM_Roll 通知，编辑器已正常关闭。日志13记录实现与证据范围，不补写逐项边界测试。统一输入缓存已列清单、暂不做；用户同意后续先讲清小块蓝图再修改、改完沿线复盘。保留无敌帧、受击死亡、旧攻击取消窗口核对及近战敌兵行为树等待办。素材六文件及外层快照、skill案例004/005随本轮同步。
+
+> **2026-10-21 翻滚接翻滚配置已保存**：用户授权 MCP 配置，通知轨道位置由用户自行放置。已仅修改 GA_Roll：bRetriggerInstancedAbility=true，移除 BlockAbilitiesWithTag 自身 Ability.Roll；CanActivateAbility 保留体力/属性有效性并增加“非 State.Rolling 或 State.RollCancelWindow”。复用原 ANS_RollCancelWindow / GE_RollCancelWindow，未新建 RollChainWindow；成功扣费到蒙太奇之间和 OnEndAbility 各清理一次 State.RollCancelWindow。严格编译和节点/配置核对通过；AM_Roll 哈希不变，已打开蒙太奇和通知资产。用户下一步在 AM_Roll 后摇放 ANS_RollCancelWindow，再测连滚；尚无窗口内外衔接或位移清理的实机验收。无输入缓存、无提交推送。修改前 GA_Roll 备份 LocalBackups/RollChain-2026-10-21；审计 Saved/RollChainBeforeAudit.json、RollChainAfterAudit.json。下方“此项尚未修改”等为历史。
+
+> **后续讨论**：用户要求将统一输入缓存列入后续清单，暂不实现；已记入策划案第9节。翻滚接翻滚先讨论“窗口内按键打断后摇”，不含缓存。只读 MCP 确认 GA_Roll 的 InstancingPolicy=InstancedPerActor、bRetriggerInstancedAbility=false，BlockAbilitiesWithTag 包含 Ability.Roll；后续若采用原生重触发需移除此自阻止并在 CanActivateAbility 中限制正在翻滚时必须有衔接窗口。此项尚未修改资产。
+
+> **2026-10-21 体力规则续作，待用户审核**：用户明确要纯蓝图“Stamina > 0 即可发动，扣后最低归零”，不做负数透支，并授权通过虚幻 MCP 修改。已改并保存 GA_Attack_Light_1/2/3、GA_Roll、GA_Jump：默认 Cost 槽清空，K2_CanActivateAbility 用传入 ActorInfo 的 ASC 读体力并判断 >0；激活图再次检查、CommitAbility 成功后主动应用原 GE_Cost 一次，再进入原动作。三段攻击实际旧节点为 CommitAbilityCost 且结果未分支，本轮已统一为 CommitAbility+成功分支。C++、原成本 GE、恢复 GE 未改。五个蓝图 warnings_as_errors 编译和接线审计通过，PIE 启停通过，尚未实际验证5点/0点边界和连续动作手感。已打开第一段攻击供审核，未提交推送，未更新快照。修改前五个资产备份在 LocalBackups/StaminaPositiveGate-2026-10-21；前后审计在 Saved/StaminaBeforeAudit.json、StaminaAfterAudit.json。下方“余额必须足额”“Cost由Commit自动扣”等旧说明已被本条更新。
+
 > **2026-10-21 最新收工，优先于下方历史计划**：用户要求保存、Git/GitHub和skill同步，今天停止。新WBP_ResourceBar已接HUD两份，变量绑定Percent；首次同步、消耗等待0.3秒、恒速追赶0.5比例/秒、回复同步、数值不变不重置倒计时；长度按MaxValue×LengthPerPoint并Clamp至MaxLength，厚度独立覆盖，BarColor实例控制前条颜色。用户确认体力基本正常及体力条变绿，生命消耗因暂无可战斗敌兵暂不测。预览刷新、默认BarColor透明度/白条背景及实际长度调参仍待复核。编辑器已关闭，按已落盘UI和AM_Roll存档；不要写成新完整回归。日志12和skill案例002/003已同步，EasyGas已放弃、原生属性集保留。下次先简查UI遗留，再第一只近战敌兵行为树及战斗闭环；继续保留无敌帧、受击死亡和取消窗口待办。用户希望蓝图学习，说明时分清变量Get与同名绑定函数，不能在绑定函数递归调用自身。
 
 > 最新（2026-10-20）：用户否决EasyGas，不再作为下一步；保留原生属性集，继续玩法蓝图化。已把移动/视角迁到BP_Player.MoveFromInput / LookFromInput，删除C++ Move2D/Look2D；原门控/输入未改。完整C++编译、重开蓝图编译、PIE初始化及临时探针实际位移/Yaw/Pitch输出均通过，临时资产已清理。尚待用户手动键鼠与取消窗口验收。详见日志11，优先于下方历史“先装EasyGas”的旧计划。

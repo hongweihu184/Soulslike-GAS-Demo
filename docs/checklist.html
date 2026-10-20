@@ -48,7 +48,7 @@
 <div class="sub">2026-10-19 同步 · <a href="index.html">回主文档</a> · <a href="design/战斗系统策划案.md">战斗系统策划案</a></div>
 <div class="ok">用户确认翻滚第一版可用：左 Shift、Mixamo 重定向动作、窗口位移、移动取消和翻滚后摇接攻击。已修复混出后打断导致翻滚技能不退出。三连击、伤害、攻击体力消耗/回复及 HUD 已完成。具体取消规则以保存资产和日志 06 为准。</div>
 <h2>当前规则(不要按旧方案重做)</h2>
-<p><strong>2026-10-21 最新收工：</strong>双层资源条与 HUD 已接，用户确认体力基本正常及绿色配置生效；生命消耗暂不测。长度按最大值乘独立比例尺并设硬上限，高度独立覆盖。下次先复核默认颜色透明度、白条背景与预览，再推进第一只近战敌兵行为树。EasyGas 已放弃，保留原生属性集；下方历史“先装插件”的计划已过时。见 <a href="log/12-双层资源条与HUD.md">日志12</a>。</p>
+<p><strong>2026-10-21 最新：</strong>正体力即可启动攻击、翻滚、跳跃，扣后最低归零；翻滚后摇窗口允许接下一滚。用户自行调整通知后反馈“很好，很舒适”，确认本轮完成。统一输入缓存后续再做；保留无敌帧、受击死亡及近战敌兵行为树待办。见 <a href="log/13-正体力启动与翻滚衔接.md">日志13</a>。此前双层资源条、UI遗留检查见 <a href="log/12-双层资源条与HUD.md">日志12</a>；下方历史计划不覆盖本条。</p>
 <p>最新：用户不采用 EasyGas，改为保留原生属性集、逐项迁移玩法。移动与视角已在 BP_Player 的 MoveFromInput / LookFromInput 中实现；C++ Move2D/Look2D 已删除，原门控分支不变。编译与 PIE 执行验证通过，待用户手动复核。见 <a href="log/11-移动与视角蓝图化.md">日志11</a>。</p>
 <p>2026-10-20 收工：用户手动测试走、跑、跳，暂未发现 bug。明日先验证免费 EasyGas 的 UE5.8 属性方案，成功后继续剩余 C++ 蓝图迁移；随后 UI，再敌兵行为树。攻击/翻滚完整战斗与 HUD 视觉尚未重新验收。素材本地存档，外层自有快照与日志同步 GitHub。</p>
 <p>2026-10-20 最新：BaseCharacter（C++）→ BP_CombatCharacter → BP_Player / BP_Dummy。共用父类读 DT_CharacterStats，玩家行 Player、木桩行 Enemy_Melee。差异化表值 PIE 验证通过，原技能授予保留；战斗手感回归、属性插件与纯蓝图迁移仍待完成。见 <a href="log/10-角色与敌兵继承整理.md">日志10</a>。</p>
@@ -58,18 +58,19 @@
 <li>窗口事件只授予对应 GE,不立即 EndAbility。蒙太奇完成/取消/打断时结束 GA,Stop When Ability Ends 保持勾选。</li>
 <li>GA_2/3 分别要求 State.Combo.Window.1/2。阻止矩阵:GA_1=.1;GA_2=.1+.2;GA_3=.1+.2+.3。</li>
 <li>ANS_AttackWindow 开关武器碰撞,C++ 每次挥击目标去重,发送带 TargetData 的命中事件,GA 应用 GE_Damage。</li>
-<li>普攻、翻滚、跳跃均由 CommitAbility 检查成本；当前保存数值均为 -25。GE 在 Effects/Cost 下按动作配置。WBP_HUD 读取生命/体力百分比接口。</li>
+<li>普攻、翻滚、跳跃按 Stamina &gt; 0 检查，默认 Cost 槽清空；CommitAbility 成功后主动应用一次对应成本 GE，当前均为 -25，扣后最低归零。GE 在 Effects/Cost 下按动作配置。</li>
 </ul>
 <h2>攻击转向窗口(用户确认可用)</h2>
 <p>三个攻击 Montage 使用蓝图 AnimNotifyState <code>ANS_AttackTurnWindow</code> 与 <code>ANS_AttackLungeWindow</code>。转向状态 Tick 读取 <code>BP_Player.Current Move Input</code>,按控制器 Yaw 合成相机相对方向,通过 <code>RInterp To Constant</code> 平滑更新角色旋转;输入向量长度不大于 0.1 时直接跳过转向,避免零向量被解释成默认朝向。位移状态 Tick 使用 <code>LungeSpeed × Frame Delta Time</code> 计算水平位移,并以 Sweep 移动角色。旧单次转向通知已删除;旧单次冲量通知 <code>AN_AttackLunge</code> 待确认无 Montage 引用后清理。攻击位移与腿部动画不匹配造成滑步,属于当前动画资源限制,作为未来资源/动画任务排期,暂不阻挡 Demo。临时诊断 C++ 函数仍被 BP_Player 引用,清理前先在蓝图里移除调用。详细记录见 <a href="log/05-体力回复与攻击转向.md">行动日志 05</a>。</p>
 <h2>下一步 · 第 5 章</h2>
 <p>最新用户顺序：角色数值表 → UI 优化 → 敌兵行为树。用户决定优先蓝图学习，本轮数值表新增 C++ 已撤除；待创建蓝图结构体、重建数据表并接初始化。操作见 <a href="log/08-角色数值表.md">日志08</a>。下列无敌帧、受击死亡等继续保留为未完成项。</p>
-<p>2026-10-19：翻滚第一版由用户确认可用；AM_Roll 使用 UpperBody，Rate Scale=2，序列根运动关闭、强制根锁定开启。翻滚 GA 自带 State.Rolling，阻止自身重入，播放任务开启 Allow Interrupt After Blend Out。攻击输入在翻滚中检查 State.AttackCancelWindow。见 <a href="log/06-翻滚动画导入与重定向.md">行动日志 06</a>。</p>
+<p>翻滚第一版见 <a href="log/06-翻滚动画导入与重定向.md">日志06</a>。2026-10-21已解除自身重入阻止，开启 Retrigger Instanced Ability，以 State.Rolling 和 State.RollCancelWindow 判断后摇连滚。轨道通知由用户调整，见日志13。原翻滚后摇接攻击窗口保留。</p>
 <ol>
 <li>✅ 体力回复已通过无限周期 Gameplay Effect 配置,攻击标签作为持续标签排除条件,用户已验证生效。基础值上限保护已编译通过,待 PIE 验收。</li>
 <li>✅ 翻滚输入、位移、蒙太奇、移动取消及翻滚后摇接攻击已做出第一版。下次补齐攻击中翻滚输入对 State.RollCancelWindow 的读取，核对重复窗口是否为有意配置。</li>
 <li>✅ 翻滚和跳跃成本已接入；GA_Jump 等待 Walking 再结束，空中暂停回复、落地恢复。GE_StaminaRegen 在 Effects/Cost，Period=0.05 秒、每次+2，持续排除攻击/翻滚/跳跃。见 <a href="log/07-翻滚跳跃体力与回复.md">日志07</a>。</li>
 <li>无敌帧窗口、伤害结算、受击与死亡。</li>
+<li>统一输入缓存：用户要求后续再做，当前不缓存窗口前的翻滚请求；管理位置和消费规则尚未定案。</li>
 <li>更新相关文档并分别提交代码/文档仓库与本地素材仓库。</li>
 </ol>
 <p>第 5~8 章预研属于研究材料,配置假设需按现有实现核对。节点名称先查本机引擎源码或错题本 P19。</p>
