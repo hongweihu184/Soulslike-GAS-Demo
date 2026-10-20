@@ -42,12 +42,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestJump();
 
-	UFUNCTION(BlueprintCallable, Category = "Input")
-	void Move2D(const FVector2D Axis);
-
-	UFUNCTION(BlueprintCallable, Category = "Input")
-	void Look2D(const FVector2D Axis);
-
 	// ---- 纯查询:供 BP 策略分支读取 ----
 	UFUNCTION(BlueprintPure, Category = "Combat")
 	bool IsMoveLocked() const;

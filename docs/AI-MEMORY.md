@@ -1,5 +1,7 @@
 # AI 交接备忘录(给下一位进场的 AI 助手)
 
+> 最新（2026-10-20）：用户否决EasyGas，不再作为下一步；保留原生属性集，继续玩法蓝图化。已把移动/视角迁到BP_Player.MoveFromInput / LookFromInput，删除C++ Move2D/Look2D；原门控/输入未改。完整C++编译、重开蓝图编译、PIE初始化及临时探针实际位移/Yaw/Pitch输出均通过，临时资产已清理。尚待用户手动键鼠与取消窗口验收。详见日志11，优先于下方历史“先装EasyGas”的旧计划。
+
 > **最新收工基线（2026-10-20，优先于下方历史提示）**：用户已手动测试走、跑、跳，暂未发现bug，并授权Git/GitHub存档。AI已完成三个角色蓝图编译、双方差异表值PIE验证，数值恢复100/100。继承为 C++ BaseCharacter → BP_CombatCharacter → BP_Player / BP_Dummy；敌兵读Enemy_Melee，玩家读Player。素材本地提交2b1d778，外层功能快照d6da680；本轮追加日志后推送外层main，完整Content不推送。明日先检查/获取免费EasyGas的UE5.8包并在测试属性集验证，成功后分步迁移剩余C++；未安装前不删除MyAttributeSet。之后继续UI黄条即时扣、白条延迟追赶，再敌兵行为树。未验收攻击、翻滚完整战斗与HUD视觉，不把走跑跳验收扩写为全功能通过。旧BP_BaseCharacter路径为历史资产，使用新共同父类，不按旧段落重做。
 
 > 最新完成（2026-10-20）：官方MCP已完成继承整理，C++ BaseCharacter → 新BP_CombatCharacter → 原BP_Player / BP_Dummy。共同父类拥有读表函数、CharacterStatsRowName和出生初始化/回复，玩家行Player、木桩行Enemy_Melee；清空玩家旧InitAttributesEffect以防C++覆盖表值，GE顺序改为先上限后当前。三蓝图编译通过，PIE差异表值玩家200/150、敌兵300/80正确，已恢复100/100；玩家五个技能保留。尚未手动战斗回归；EasyGas未安装，C++未删。详见日志10，以本段替代此前“未改继承”的旧状态。

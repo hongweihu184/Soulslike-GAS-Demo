@@ -34,6 +34,8 @@ powershell -ExecutionPolicy Bypass -File .\Tools\Restore-ProjectContent.ps1
 
 ## 进度
 
+- 2026-10-20：移动与视角已迁到 BP_Player 的 MoveFromInput / LookFromInput，旧 C++ 接口已删除，完整编译及 PIE 执行输出验证通过；待手动手感复核。取消 EasyGas 方案，原生属性集暂留。见[日志11](docs/log/11-移动与视角蓝图化.md)。
+
 - 2026-10-20 收工：用户手动测试走、跑、跳，暂未发现问题；角色继承与数值表已归档。下一步验证免费蓝图属性插件与剩余 C++ 迁移，再推进 UI 和敌兵行为树。
 
 - 2026-10-20：新增共同蓝图父类 BP_CombatCharacter，玩家和木桩分别读取 Player / Enemy_Melee 行；差异表值已通过 PIE 验证。见[日志10](docs/log/10-角色与敌兵继承整理.md)。仍保留现有 C++ GAS 基础，尚未完成纯蓝图迁移。

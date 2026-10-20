@@ -216,26 +216,3 @@ void ABaseCharacter::OnWeaponOverlap(UPrimitiveComponent* OverlappedComponent, A
 	Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(OtherActor);
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, AttackHitEventTag, Payload);
 }
-
-void ABaseCharacter::Move2D(const FVector2D Axis)
-{
-	// 纯移动动词:锁吞输入/收刀策略已迁到 BP_Player 事件图(读取 IsMoveLocked 与 State.MoveCancelWindow)
-	if (!Controller)
-	{
-		return;
-	}
-
-	const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
-	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-	AddMovementInput(Forward, Axis.Y);
-	AddMovementInput(Right, Axis.X);
-}
-
-void ABaseCharacter::Look2D(const FVector2D Axis)
-{
-	AddControllerYawInput(Axis.X);
-	AddControllerPitchInput(Axis.Y);
-}
-

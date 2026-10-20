@@ -1,7 +1,7 @@
 {
   "date": "2026-10-20",
   "snapshot_files": 199,
-  "snapshot_mib": 33.04,
+  "snapshot_mib": 33.08,
   "excluded_mixamo_assets": [
     "Gameplay/Anims/Roll/AS_Greystone_StandToRoll.uasset",
     "Gameplay/Anims/Roll/Source/AS_Mixamo_StandToRoll.uasset",
@@ -643,7 +643,7 @@
     },
     {
       "path": "Gameplay/Characters/BP_Player.uasset",
-      "sha256": "cb51b828dc9ad57e2261b0bd427fb38de21ce8e02f66423380cd83a56d1f9441"
+      "sha256": "1c8b32bcbc02ad702535822fb2562a2b4b17483636e91ff2d01d4d39bbca4ac9"
     },
     {
       "path": "Gameplay/Data/DT_CharacterStats.uasset",
