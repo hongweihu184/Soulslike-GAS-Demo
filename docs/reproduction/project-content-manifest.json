@@ -1,7 +1,7 @@
 {
-  "date": "2026-10-20",
-  "snapshot_files": 199,
-  "snapshot_mib": 33.08,
+  "date": "2026-10-21",
+  "snapshot_files": 200,
+  "snapshot_mib": 33.29,
   "excluded_mixamo_assets": [
     "Gameplay/Anims/Roll/AS_Greystone_StandToRoll.uasset",
     "Gameplay/Anims/Roll/Source/AS_Mixamo_StandToRoll.uasset",
@@ -607,7 +607,7 @@
     },
     {
       "path": "Gameplay/Anims/Roll/AM_Roll.uasset",
-      "sha256": "d6800c0b5b32e90fcd0d9a73f9678d9798c540d34861d0a777d123fbaab8483e"
+      "sha256": "c0d22f1a126a5775731d14f6f3c5c19ee89867d0223166606023280aa4311585"
     },
     {
       "path": "Gameplay/Anims/Roll/IK_GreystoneRoll.uasset",
@@ -767,7 +767,11 @@
     },
     {
       "path": "Gameplay/WBP/WBP_HUD.uasset",
-      "sha256": "9b47a57c3fd66f1d03df0da17fe3bcc005f20b6cadc70cf2f011e7c5cd171741"
+      "sha256": "221fc1ea8c3314536151ed8f76054e91e82c89c83cd21830462ab2700f3ee65c"
+    },
+    {
+      "path": "Gameplay/WBP/WBP_ResourceBar.uasset",
+      "sha256": "57e49a33667ec7f51db20a0df61aacbeb1cfbb20cecce1ca1bc0aac8548c25d6"
     },
     {
       "path": "Input/IA_Attack.uasset",

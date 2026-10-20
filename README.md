@@ -34,6 +34,8 @@ powershell -ExecutionPolicy Bypass -File .\Tools\Restore-ProjectContent.ps1
 
 ## 进度
 
+- 2026-10-21 收工：双层资源条已接生命/体力HUD，支持消耗拖尾、独立长度比例与实例颜色。用户确认体力基本正常、体力条变绿；生命消耗暂未测。日志与combat-design skill同步，详见[日志12](docs/log/12-双层资源条与HUD.md)。下一步简查UI遗留后推进近战敌兵行为树。
+
 - 2026-10-20：移动与视角已迁到 BP_Player 的 MoveFromInput / LookFromInput，旧 C++ 接口已删除，完整编译及 PIE 执行输出验证通过；待手动手感复核。取消 EasyGas 方案，原生属性集暂留。见[日志11](docs/log/11-移动与视角蓝图化.md)。
 
 - 2026-10-20 收工：用户手动测试走、跑、跳，暂未发现问题；角色继承与数值表已归档。下一步验证免费蓝图属性插件与剩余 C++ 迁移，再推进 UI 和敌兵行为树。

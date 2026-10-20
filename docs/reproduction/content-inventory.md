@@ -6,7 +6,7 @@
 
 ## 结论
 
-当前 `Content` 目录约 19GB，其中绝大多数是 8 个 `Paragon*` 资源包。工程自有内容集中在 `Gameplay/`、`Input/`、`Maps/` 和地图外置 Actor 数据中。本仓库通过 `ProjectContentSnapshot/Content/` 保存了这部分自有资产的快照，当前快照共 195 个文件、约 32.94 MiB；恢复时运行 `Tools/Restore-ProjectContent.ps1` 即可按原相对路径复制回工程 `Content/`。
+当前 `Content` 目录约 19GB，其中绝大多数是 8 个 `Paragon*` 资源包。工程自有内容集中在 `Gameplay/`、`Input/`、`Maps/` 和地图外置 Actor 数据中。本仓库通过 `ProjectContentSnapshot/Content/` 保存了这部分自有资产的快照，当前快照共 200 个文件、约 33.29 MiB；恢复时运行 `Tools/Restore-ProjectContent.ps1` 即可按原相对路径复制回工程 `Content/`。
 
 Paragon 资源包不包含在 GitHub 快照中。恢复完整工程时，需要使用有权访问这些资源的 Epic 账号重新安装/添加资源包，并保持它们在 `Content/Paragon.../` 下的路径。资源包目录记录在下表；当前盘点只确认文件夹名和体积，未逐项核实 Epic 账户中的可获取状态、Marketplace/Fab 商品标识或版本。
 
@@ -81,3 +81,7 @@ Content 内层本地 Git 仍包含上述完整动画资产，不添加远程、�
 ## 2026-10-19 体力/跳跃续作快照
 
 新增 GA_Jump；成本与回复 GE 移至 Gameplay/GAS/Effects/Cost。旧 Gameplay/GAS/Effects/GE_Cost.uasset 和旧 GE_StaminaRegen.uasset 已不在快照。对干净工程按新路径恢复即可；若在已有旧版本上恢复，复制脚本不会删除旧文件，需在编辑器核对引用与重定向器后清理，不能只覆盖后就认为路径迁移完成。Mixamo 动画排除规则保持不变。
+
+## 2026-10-21 UI收工快照
+
+新增WBP_ResourceBar，更新WBP_HUD和用户已保存的AM_Roll；含此前共同角色父类与移动视角蓝图迁移。自有快照200文件、33.29MiB，完整清单与SHA256见project-content-manifest.json。完整素材本地提交a1f38bd，Paragon和Mixamo原素材排除规则不变。
