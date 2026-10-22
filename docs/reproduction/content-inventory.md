@@ -1,12 +1,12 @@
 # 工程资产盘点与干净环境恢复
 
-> 盘点日期：2026-10-18；翻滚版本快照更新：2026-10-19
+> 外部资源盘点：2026-10-18；工程自有资产快照更新：2026-10-23
 > 工程：Unreal Engine 5.8 / `ProjectUnreal`
 > 目标：把工程自有蓝图、地图、C++ 和文档放入 GitHub，同时不把 Epic Paragon 素材包重新托管到 GitHub。
 
 ## 结论
 
-当前 `Content` 目录约 19GB，其中绝大多数是 8 个 `Paragon*` 资源包。工程自有内容集中在 `Gameplay/`、`Input/`、`Maps/` 和地图外置 Actor 数据中。本仓库通过 `ProjectContentSnapshot/Content/` 保存了这部分自有资产的快照，当前快照共 200 个文件、约 33.52 MiB；恢复时运行 `Tools/Restore-ProjectContent.ps1` 即可按原相对路径复制回工程 `Content/`。
+当前 `Content` 目录约 19GB，其中绝大多数是 8 个 `Paragon*` 资源包。工程自有内容集中在 `Gameplay/`、`Input/`、`Maps/` 和地图外置 Actor 数据中。本仓库通过 `ProjectContentSnapshot/Content/` 保存了这部分自有资产的快照，当前快照共 218 个文件、约 35.03 MiB；恢复时运行 `Tools/Restore-ProjectContent.ps1` 即可按原相对路径复制回工程 `Content/`。
 
 Paragon 资源包不包含在 GitHub 快照中。恢复完整工程时，需要使用有权访问这些资源的 Epic 账号重新安装/添加资源包，并保持它们在 `Content/Paragon.../` 下的路径。资源包目录记录在下表；当前盘点只确认文件夹名和体积，未逐项核实 Epic 账户中的可获取状态、Marketplace/Fab 商品标识或版本。
 
@@ -14,11 +14,11 @@ Paragon 资源包不包含在 GitHub 快照中。恢复完整工程时，需要�
 
 | 当前 Content 路径 | 文件数 | 约占空间 | 分类与恢复方式 |
 | --- | ---: | ---: | --- |
-| `Gameplay/` | 30 | 1.24 MiB | 工程自有 Gameplay 蓝图、GAS 资产、攻击 Montage 与 HUD；快照中保存 |
-| `Input/` | 5 | 0.01 MiB | 工程输入资产；快照中保存 |
+| `Gameplay/` | 63 | 3.66 MiB | 工程自有 Gameplay 蓝图、GAS 资产、攻击 Montage 与 HUD；快照中保存 |
+| `Input/` | 6 | 0.01 MiB | 工程输入资产；快照中保存 |
 | `Maps/` | 1 | 0.01 MiB | 工程地图；快照中保存 |
-| `__ExternalActors__/` | 139 | 31.22 MiB | `NewMap` 的外置 Actor 数据；快照中保存。它可能引用 Paragon 内容 |
-| `__ExternalObjects__/` | 5 | 约 0.01 MiB | 地图外置对象数据；快照中保存 |
+| `__ExternalActors__/` | 141 | 31.34 MiB | `NewMap` 的外置 Actor 数据；快照中保存。它可能引用 Paragon 内容 |
+| `__ExternalObjects__/` | 5 | 0.01 MiB | 地图外置对象数据；快照中保存 |
 | 根目录 `NewMap.umap`、`NewMap_HLOD0_Instancing.uasset` | 2 | 少于 0.01 MiB | 根目录地图文件；快照中保存 |
 | 8 个 `Paragon*` 目录 | 13,812 | 约 18.90 GiB | Epic Paragon 角色资源包；不上传 GitHub，按账号权限重新获取 |
 
@@ -39,7 +39,7 @@ Paragon 目录体积（本机 2026-10-18 实测，GiB）：
 
 ## 为什么不直接推送当前 Content 内层仓库
 
-`Content/.git` 是本地素材仓库，没有远程地址；它的现有 Git 对象包约 12.44 GiB，并含有 Paragon 资源包的历史版本。直接把它接到 GitHub 并推送，会把历史中保留的 Marketplace 文件也一并上传。为避免这件事，外层仓库只保存经过筛选的 32.49 MiB 工程自有资产快照；原有内层仓库保持本地，用于现有素材历史和完整工作副本。
+`Content/.git` 是本地素材仓库，没有远程地址；它的现有 Git 对象包约 12.44 GiB，并含有 Paragon 资源包的历史版本。直接把它接到 GitHub 并推送，会把历史中保留的 Marketplace 文件也一并上传。为避免这件事，外层仓库只保存经过筛选的 35.03 MiB 工程自有资产快照；原有内层仓库保持本地，用于现有素材历史和完整工作副本。
 
 ## 在干净电脑恢复
 
@@ -89,3 +89,11 @@ Content 内层本地 Git 仍包含上述完整动画资产，不添加远程、�
 ## 2026-10-21 体力与翻滚衔接快照
 
 更新五个动作GA与用户保存的AM_Roll，共六个资产；正体力发动、扣后归零，翻滚后摇窗口重触发。完整素材本地提交beb7795；外层快照仍200文件，现33.52MiB，清单SHA256已更新并逐文件比对Content。用户确认本轮完成，日志13和combat-design案例004/005同步；不添加素材仓库远程，不推送Paragon/Mixamo原素材。
+
+## 2026-10-23 敌兵战斗闭环快照
+
+完整素材本地提交 `8ebb61c`；自有快照218文件、35.03 MiB，本轮新增18个、更新15个资产，全部SHA256与已保存Content一致。包含近战敌兵AI/动画、怪物血条与伤害跳字、角色移动速度表字段、DamageID伤害配置及双方零血销毁，详见日志14–22。
+
+更新自有快照可运行 `Tools/Update-ProjectContentSnapshot.ps1`，脚本仅选择既有自有目录，继续排除Paragon和Mixamo原动画，复制后逐文件校验哈希并更新清单。恢复仍使用Restore脚本。新敌兵动画蓝图、混合空间和攻击蒙太奇引用既有ParagonMinions资源路径；需要先恢复有权使用的资源包。
+
+运行验证摘录见 `combat-validation-2026-10-23.json`。测试通过表示所列技术链路通过，不等同于用户手感验收，也不是缺少外部资源时的完整恢复验收。

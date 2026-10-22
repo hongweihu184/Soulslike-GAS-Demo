@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-23",
+  "scope": "Actual PIE gameplay-effect, montage and overlap checks; not user play-feel acceptance",
+  "damage_id": {
+    "tests": [
+      {
+        "DamageID": "20001",
+        "before_fraction": 1.0,
+        "after_fraction": 0.875,
+        "damage": 25.0,
+        "window_observed": true
+      },
+      {
+        "DamageID": "20002",
+        "before_fraction": 0.875,
+        "after_fraction": 0.75,
+        "damage": 25.0,
+        "window_observed": true
+      },
+      {
+        "DamageID": "20003",
+        "before_fraction": 0.75,
+        "after_fraction": 0.550000011920929,
+        "damage": 40.0,
+        "window_observed": true
+      },
+      {
+        "DamageID": "30001",
+        "before_fraction": 1.0,
+        "after_fraction": 0.875,
+        "damage": 25.0,
+        "window_observed": true
+      }
+    ],
+    "monster_left_enabled": false,
+    "all_hitboxes_closed": true,
+    "windows_closed": true,
+    "monster_hitbox": "EnemyWeaponHitbox_R",
+    "geometry_preserved": true,
+    "passed": true
+  },
+  "cancel": {
+    "window_observed": true,
+    "window_closed": true,
+    "both_hitboxes_closed": true,
+    "health_unchanged": true,
+    "passed": true
+  },
+  "death": {
+    "tests": [
+      {
+        "actor": "monster",
+        "initial_health": 200.0,
+        "observer_bound": true,
+        "nonlethal_health": 1.0,
+        "nonlethal_marked_dead": false,
+        "nonlethal_alive": true,
+        "lethal_health": 0.0,
+        "marked_dead": true,
+        "window_closed": true,
+        "collision_disabled": true,
+        "destroyed": true
+      },
+      {
+        "actor": "player",
+        "initial_health": 200.0,
+        "observer_bound": true,
+        "nonlethal_health": 1.0,
+        "nonlethal_marked_dead": false,
+        "nonlethal_alive": true,
+        "lethal_health": 0.0,
+        "marked_dead": true,
+        "window_closed": true,
+        "collision_disabled": true,
+        "destroyed": true
+      }
+    ],
+    "passed": true,
+    "monster_controller_destroyed": true,
+    "player_controller_kept": true,
+    "reason": "passed",
+    "player_unpossessed": true
+  }
+}

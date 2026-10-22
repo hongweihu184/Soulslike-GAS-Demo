@@ -1,7 +1,7 @@
 {
-  "date": "2026-10-21",
-  "snapshot_files": 200,
-  "snapshot_mib": 33.52,
+  "date": "2026-10-23",
+  "snapshot_files": 218,
+  "snapshot_mib": 35.03,
   "excluded_mixamo_assets": [
     "Gameplay/Anims/Roll/AS_Greystone_StandToRoll.uasset",
     "Gameplay/Anims/Roll/Source/AS_Mixamo_StandToRoll.uasset",
@@ -235,7 +235,7 @@
     },
     {
       "path": "__ExternalActors__/Maps/NewMap/4/UM/OM3OWOPMCJIBQ3SCJBOTUL.uasset",
-      "sha256": "10a60ac8d66c2bb284a3b49923dd3e74b8b107fd80f30c3a0df56784353563b4"
+      "sha256": "5640b5ed40b087003bce9d9034d0ec8aaf9cd14ec76cff820a95d5f825aa5834"
     },
     {
       "path": "__ExternalActors__/Maps/NewMap/5/2A/NNNNTLKKAPOM5AN7Z5F358.uasset",
@@ -304,6 +304,10 @@
     {
       "path": "__ExternalActors__/Maps/NewMap/6/VO/XE7YNGKZFDGGV0LG9I64Y0.uasset",
       "sha256": "56c32cfe24c65bb645456452f55dd09473562ff30dec9aa6a13f03e19b14ba42"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/6/W0/DR3RUCELNRC26YUI0P28U1.uasset",
+      "sha256": "854f62ab0b9feb458033151befd1d9afe0ab440dac6db15318cfafd600034cfe"
     },
     {
       "path": "__ExternalActors__/Maps/NewMap/6/YS/NPPZCARNDCI0B9YHNAH2TN.uasset",
@@ -436,6 +440,10 @@
     {
       "path": "__ExternalActors__/Maps/NewMap/B/6H/84RKNU609EH5C98EZOP1PG.uasset",
       "sha256": "5d52f102a51d154d6e553466be2f8a7e02c7e1704e98ecc59ee879b0f5c6e2cb"
+    },
+    {
+      "path": "__ExternalActors__/Maps/NewMap/B/6N/3TKN3N25LJ2A080PLDV89K.uasset",
+      "sha256": "74260d50e7bc82de1253da8af21a9089af73a598d46d1145f15e41fbd7a6e313"
     },
     {
       "path": "__ExternalActors__/Maps/NewMap/B/E2/FB68B8QWD9882N88F07FTI.uasset",
@@ -586,6 +594,26 @@
       "sha256": "4a69536337642735dd2ffe05272a296bcfa35f822e6c163e8e28370d27d23f51"
     },
     {
+      "path": "Gameplay/AI/BB_Enemy.uasset",
+      "sha256": "a3795233f26e95fa30a5b7942c376a04fb321e3d8b8a3bb74988dda24a48834d"
+    },
+    {
+      "path": "Gameplay/AI/BP_EnemyAIController.uasset",
+      "sha256": "d3d8f13d534cbc6eb45aa3d3883866f70e342188632290c0e72f0bdd5a5c6e23"
+    },
+    {
+      "path": "Gameplay/AI/BT_Enemy.uasset",
+      "sha256": "08ed00abf7b4ae22d16f89a148f5d7cf13cab1d76a675dd86e0ad2f0dad5a9e4"
+    },
+    {
+      "path": "Gameplay/AI/BT_EnemyMeleeCombat.uasset",
+      "sha256": "f0da9c2868f988814ab2baa8b85ea1fb0fbf46145593fe347f44ee89233da86e"
+    },
+    {
+      "path": "Gameplay/AI/BTT_EnemyAttack.uasset",
+      "sha256": "a3c3b20478b53094f114012eb4551e68edb1213291fdf398e97bd9ebe3fe8e3a"
+    },
+    {
       "path": "Gameplay/Anims/ABP_Greystone.uasset",
       "sha256": "dc38a1c0e225e722b5ee35ab1f1ada5aabaffaa3646c2a5501cca3b930ed4963"
     },
@@ -595,15 +623,27 @@
     },
     {
       "path": "Gameplay/Anims/Combo/Attack_PrimaryA_Montage.uasset",
-      "sha256": "f70ddc0425ee7bf42475597eee10f5da1250102f20ded7ad2ac824c3eacd9056"
+      "sha256": "5edca07941ad3772ba73d6447f71cb63b156dbd869de12cd4f912cd6a7bac4a1"
     },
     {
       "path": "Gameplay/Anims/Combo/Attack_PrimaryB_Montage.uasset",
-      "sha256": "185668c94a4f874f1318303a4dbd41aa0dba28022421b5e3ae86b7b365e4cb94"
+      "sha256": "2913825102559e6afec30bae61baf5ba012377379c2517fe8e9bfb09f711e9da"
     },
     {
       "path": "Gameplay/Anims/Combo/Attack_PrimaryC_Montage.uasset",
-      "sha256": "1993bbd9237976c865fd052d314619a7a08bd97873f425e001a7ae51503aba0f"
+      "sha256": "fd7c7e61b6d089f4b75e948e4a04267d9dd182f4adf32da48863ab1a4de77080"
+    },
+    {
+      "path": "Gameplay/Anims/Enemy/ABP_EnemyMelee.uasset",
+      "sha256": "8f7f1f41b534a25a1fc5b771d2139841e627d4e2cd19f318e259020cf6dcb334"
+    },
+    {
+      "path": "Gameplay/Anims/Enemy/AM_EnemyAttack.uasset",
+      "sha256": "dbe455f2b5e6d44f2badab2e797f4a9352f96b09cbdc7cfc29462f0c7456350d"
+    },
+    {
+      "path": "Gameplay/Anims/Enemy/BS_EnemyMove.uasset",
+      "sha256": "e6d08c0515503b84968e01b5bf0b79ba3b794ebbd7998605cc8ad439fc26c53b"
     },
     {
       "path": "Gameplay/Anims/Roll/AM_Roll.uasset",
@@ -635,35 +675,47 @@
     },
     {
       "path": "Gameplay/Characters/BP_CombatCharacter.uasset",
-      "sha256": "c8622dc54b500400fda7116cf78c9ff1c18c16659b0e764b50e552bd77a50ed3"
+      "sha256": "8f7633e24daa2fdbff7f362466a1edf9d11bf65a37ee1dc6e321e00f384338f2"
     },
     {
       "path": "Gameplay/Characters/BP_Dummy.uasset",
-      "sha256": "f4c753f5b2a9fa599a862f4fa522c051f9c624216f98bc5b2ba8eecbe5f8938f"
+      "sha256": "08d12683d24f8e4dc986d3f42a97d4085e3d864f556288a036eb13bb591995fe"
     },
     {
       "path": "Gameplay/Characters/BP_Player.uasset",
-      "sha256": "1c8b32bcbc02ad702535822fb2562a2b4b17483636e91ff2d01d4d39bbca4ac9"
+      "sha256": "f98f7c0ec4a33a4dd966d81a346c279a6af85aca202c213cb5af309ef3ea9677"
+    },
+    {
+      "path": "Gameplay/Data/DT_AttackDamage.uasset",
+      "sha256": "2088649080eb02758d21b1136959c8cbf2cf62021e9fe79d3187601a016338a7"
     },
     {
       "path": "Gameplay/Data/DT_CharacterStats.uasset",
-      "sha256": "cfdd32252087e8c556f5740f665c36ab85d786388409892cfe7bef17c6ef2b45"
+      "sha256": "8738ed3289b57e669670dead7861cf2bdeacf79d3d32e162adcde0961fa249bd"
+    },
+    {
+      "path": "Gameplay/Data/ST_AttackDamage.uasset",
+      "sha256": "13fa1e8b0067df98d92668c2da05ba30c04c0c9b5964681156b0e48a69352273"
     },
     {
       "path": "Gameplay/Data/ST_CharacterStats.uasset",
-      "sha256": "46cb68231d8d41b610213e7b69a603d9ac9ed2c21420927e76fb5d198c7c7c60"
+      "sha256": "0e2f3a54e2f465a1a1d014620a4734ab302138b2f9aceab8b48a5d6ddc61a898"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_1.uasset",
-      "sha256": "592ee542acfed0e97b3e87c0d6021c0bd67a0537b7a5ed5deff69dff3f69fb47"
+      "sha256": "abe58b1d0983d1e1ee3e3b1385367225fb8f589ced30b3ed4273dd6a4f2e2c03"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_2.uasset",
-      "sha256": "fc194fb97d6602573ca8f262fe132d38dddb9ff2c7147f9c5e200a28402fc3c4"
+      "sha256": "ca59973abe5550cd663b0806b8812cc0bd0a8dba742999d60e5512aba6d77fb3"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Attack_Light_3.uasset",
-      "sha256": "87caa2b7ba035c533d1841f5933eb5b71eeaed559cc8fc29fe8109d9890d3b39"
+      "sha256": "bbb9941a5029cedf9e7797bd6f64af26d246d2c6d8263e8572d352fad8381073"
+    },
+    {
+      "path": "Gameplay/GAS/Abilities/GA_EnemyAttack.uasset",
+      "sha256": "1d4478535ec66d3d0ee4497457b35c9f4845f26fe9e78fd2435928d6f770e214"
     },
     {
       "path": "Gameplay/GAS/Abilities/GA_Jump.uasset",
@@ -707,7 +759,7 @@
     },
     {
       "path": "Gameplay/GAS/Effects/GE_Damage.uasset",
-      "sha256": "78fe03df96bd6eb8842ad774751c490d8c8583336abd922c8ee689bb23fcca4f"
+      "sha256": "21ec3bfab5a70d926aa4a724a3c4138fded53fd0e2bd9e324fe348d94ce81386"
     },
     {
       "path": "Gameplay/GAS/Effects/GE_InitAttributes_FromTable.uasset",
@@ -754,6 +806,14 @@
       "sha256": "b0263cee7413ea6a238661523f2cc900bfde04fa92650db419a39faea6e865b2"
     },
     {
+      "path": "Gameplay/Notify/ANS/ANS_ConfiguredDamageWindow.uasset",
+      "sha256": "282792e14dbb8b7a40b01c31005c8f8525f4ce081cc693515d1bf2978ce9547f"
+    },
+    {
+      "path": "Gameplay/Notify/ANS/ANS_EnemyAttackWindow.uasset",
+      "sha256": "b5c6e0f1cddafae413474f76bf9dd09698c971f7a667bc0bb141527c3bedb6c9"
+    },
+    {
       "path": "Gameplay/Notify/ANS/ANS_MoveCancelWindow.uasset",
       "sha256": "9f2141f8573a7c6dcd8adba9be11c42116c990d8db71f2d3b3d3f7b5e0eb7612"
     },
@@ -766,12 +826,24 @@
       "sha256": "1c934693beba59290f5c2e36eba6fabbd5709d2b177244cd00ff95460d21be85"
     },
     {
+      "path": "Gameplay/WBP/WBP_DamageNumber.uasset",
+      "sha256": "ea571e844b34075a9092dd6b51ed1dc1dc08f85fc5f385fbd6e6130df6ca4498"
+    },
+    {
+      "path": "Gameplay/WBP/WBP_DamageNumberUI.uasset",
+      "sha256": "a750caf43c07666604adec1fc1e849465c35fa99cb1905ddc9f0f5df1c2b890e"
+    },
+    {
+      "path": "Gameplay/WBP/WBP_EnemyHUD.uasset",
+      "sha256": "4d9c8760e0eae7f5ac3ca1170f2f27b917685152956316a917291444259770e7"
+    },
+    {
       "path": "Gameplay/WBP/WBP_HUD.uasset",
-      "sha256": "221fc1ea8c3314536151ed8f76054e91e82c89c83cd21830462ab2700f3ee65c"
+      "sha256": "512093dca4a19542384ec3537b62bcaa97df88b216e54f575862739d3c963c04"
     },
     {
       "path": "Gameplay/WBP/WBP_ResourceBar.uasset",
-      "sha256": "57e49a33667ec7f51db20a0df61aacbeb1cfbb20cecce1ca1bc0aac8548c25d6"
+      "sha256": "97a539e222a9e09e38771dcf84ea28f96413beea2c0a6f57d26e4fc2b4f68335"
     },
     {
       "path": "Input/IA_Attack.uasset",
