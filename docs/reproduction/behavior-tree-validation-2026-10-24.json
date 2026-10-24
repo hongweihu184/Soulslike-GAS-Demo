@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-24",
+  "active_tree": "/Game/Gameplay/AI/BT_EnemyMeleeCombat_V2",
+  "passed": true,
+  "reason": "finished",
+  "tests": [
+    {
+      "name": "chase_then_guard_approach",
+      "passed": true,
+      "final_distance": 148.4285430908203,
+      "max_speed": 300.0
+    },
+    {
+      "name": "guard_holds_170",
+      "passed": true,
+      "distance": 170.0
+    },
+    {
+      "name": "retreat_140_to_200_then_approach_190_to_150",
+      "passed": true,
+      "peak_distance": 197.9968719482422,
+      "final_distance": 147.9619598388672
+    },
+    {
+      "name": "guard_approach_to_150",
+      "passed": true,
+      "final_distance": 147.51402282714844
+    },
+    {
+      "name": "native_focus_finite_turn",
+      "passed": true,
+      "max_turn_rate": 180.00046644122008,
+      "final_yaw": 180.0
+    },
+    {
+      "name": "approach_face_attack_cooldown_chase",
+      "passed": true,
+      "gap": 5.160835299640894,
+      "chased_during_cooldown": true
+    },
+    {
+      "name": "committed_attack_not_aborted_by_range_or_turn",
+      "passed": true,
+      "yaw_change": 0.0,
+      "attack_duration": 1.1235649026930332
+    },
+    {
+      "name": "stopping_tree_stops_all_ai_movement",
+      "passed": true,
+      "max_speed": 0.0
+    },
+    {
+      "name": "invalid_target_fallback",
+      "passed": true
+    }
+  ],
+  "attack_starts": [
+    {
+      "time": 16.208141800016165,
+      "relative": 1.6166341006755829,
+      "distance": 176.87623596191406,
+      "yaw": 0.0,
+      "facing_error": 0.0
+    },
+    {
+      "time": 22.492542002350092,
+      "relative": 7.90103430300951,
+      "distance": 148.55584716796875,
+      "yaw": 0.0,
+      "facing_error": 0.0
+    }
+  ],
+  "attack_ends": [
+    {
+      "time": 17.331706702709198,
+      "next_attack_time": 22.331707000732422
+    },
+    {
+      "time": 23.609562199562788,
+      "next_attack_time": 22.331707000732422
+    }
+  ],
+  "limits": [
+    "User playtest pending",
+    "No new backward animation",
+    "No complex-obstacle or multiple-enemy test"
+  ],
+  "history": [
+    "Initial editor graph auto-arrange assertion and first PIE crash; restarted editor before final verification",
+    "Fixed missing AttackStarted success connection",
+    "Fixed chase speed recaching after behavior-tree restart"
+  ]
+}

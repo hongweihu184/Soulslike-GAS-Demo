@@ -1,0 +1,341 @@
+{
+  "date": "2026-10-25",
+  "source_ai": 110050,
+  "source_sha256": "2EDE2A0E37BC2FB49ADDD7F4CB60764A36D88EDBE66C910001CC8B51FFA0ED4F",
+  "passed": true,
+  "check_count": 22,
+  "runtime_tests": [
+    {
+      "name": "weights_far",
+      "passed": true,
+      "expected": {
+        "1": 15,
+        "2": 10,
+        "4": 0,
+        "5": 10,
+        "6": 45,
+        "12": 20
+      },
+      "actual": {
+        "1": 15.0,
+        "2": 10.0,
+        "4": 0.0,
+        "5": 10.0,
+        "6": 45.0,
+        "12": 20.0
+      }
+    },
+    {
+      "name": "weights_mid",
+      "passed": true,
+      "expected": {
+        "1": 20,
+        "2": 20,
+        "4": 15,
+        "5": 35,
+        "6": 0,
+        "12": 10
+      },
+      "actual": {
+        "1": 20.0,
+        "2": 20.0,
+        "4": 15.0,
+        "5": 35.0,
+        "6": 0.0,
+        "12": 10.0
+      }
+    },
+    {
+      "name": "weights_near",
+      "passed": true,
+      "expected": {
+        "1": 25,
+        "2": 15,
+        "4": 15,
+        "5": 45,
+        "6": 0,
+        "12": 0
+      },
+      "actual": {
+        "1": 25.0,
+        "2": 15.0,
+        "4": 15.0,
+        "5": 45.0,
+        "6": 0.0,
+        "12": 0.0
+      }
+    },
+    {
+      "name": "weights_3003_cooldown",
+      "passed": true,
+      "expected": {
+        "1": 20,
+        "2": 20,
+        "4": 15,
+        "5": 0,
+        "6": 0,
+        "12": 10
+      },
+      "actual": {
+        "1": 20.0,
+        "2": 20.0,
+        "4": 15.0,
+        "5": 0.0,
+        "6": 0.0,
+        "12": 10.0
+      }
+    },
+    {
+      "name": "weights_right",
+      "passed": true,
+      "expected": {
+        "1": 0,
+        "2": 30,
+        "5": 15,
+        "13": 55
+      },
+      "actual": {
+        "1": 0.0,
+        "2": 30.0,
+        "5": 15.0,
+        "13": 55.0
+      }
+    },
+    {
+      "name": "weights_behind",
+      "passed": true,
+      "expected": {
+        "1": 0,
+        "5": 0,
+        "13": 100
+      },
+      "actual": {
+        "1": 0.0,
+        "5": 0.0,
+        "13": 100.0
+      }
+    },
+    {
+      "name": "weights_spectator",
+      "passed": true,
+      "expected": {
+        "11": 60,
+        "12": 40
+      },
+      "actual": {
+        "11": 60.0,
+        "12": 40.0
+      }
+    },
+    {
+      "name": "weights_encircle",
+      "passed": true,
+      "expected": {
+        "6": 20,
+        "11": 50,
+        "12": 30
+      },
+      "actual": {
+        "6": 20.0,
+        "11": 50.0,
+        "12": 30.0
+      }
+    },
+    {
+      "name": "weights_event",
+      "passed": true,
+      "expected": {
+        "20": 100
+      },
+      "actual": {
+        "20": 100.0
+      }
+    },
+    {
+      "name": "weights_special144041",
+      "passed": true,
+      "expected": {
+        "20": 100
+      },
+      "actual": {
+        "20": 100.0
+      }
+    },
+    {
+      "name": "weights_special144040_weights",
+      "passed": true,
+      "expected": {
+        "20": 10,
+        "21": 20,
+        "6": 45
+      },
+      "actual": {
+        "20": 10.0,
+        "21": 20.0,
+        "6": 45.0
+      }
+    },
+    {
+      "name": "approach_then_committed_combo",
+      "passed": true,
+      "attack_ids": [
+        3000,
+        3001,
+        3002
+      ],
+      "first_attack_min_distance": 153.75747680664062,
+      "max_speed": 300.0
+    },
+    {
+      "name": "sideway_moves_and_holds_distance",
+      "passed": true,
+      "lateral": 165.31079397596187,
+      "distance_min": 386.1203918457031,
+      "distance_max": 450.0
+    },
+    {
+      "name": "retreat_is_executed",
+      "passed": true,
+      "distance": 428.0938415527344
+    },
+    {
+      "name": "long_action_uses_distinct_approach_and_advance",
+      "passed": true,
+      "start": {
+        "distance": 683.7274780273438,
+        "time": 1.2026422023773193
+      },
+      "min_distance": 123.63164520263672
+    },
+    {
+      "name": "stop_tree_cancels_attack_and_movement",
+      "passed": true,
+      "active": false,
+      "speed": 0.0
+    },
+    {
+      "name": "invalid_target_cancels_navigation",
+      "passed": true,
+      "speed": 0.0
+    }
+  ],
+  "damage_and_probability_tests": [
+    {
+      "name": "proxy_combo_applies_existing_damage_once_per_strike",
+      "passed": true,
+      "health_percent_samples": [
+        0.875,
+        0.75,
+        0.625,
+        0.5
+      ],
+      "drops": [
+        0.125,
+        0.125,
+        0.125
+      ]
+    },
+    {
+      "name": "after_attack_probability_far",
+      "passed": true,
+      "samples": 250,
+      "counts": {
+        "0": 118,
+        "3": 99,
+        "1": 33
+      },
+      "expected": {
+        "0": 0.5,
+        "1": 0.125,
+        "3": 0.375
+      },
+      "observed": {
+        "0": 0.472,
+        "1": 0.132,
+        "3": 0.396
+      }
+    },
+    {
+      "name": "after_attack_probability_mid",
+      "passed": true,
+      "samples": 250,
+      "counts": {
+        "0": 224,
+        "1": 16,
+        "2": 10
+      },
+      "expected": {
+        "0": 0.875,
+        "1": 0.075,
+        "2": 0.05
+      },
+      "observed": {
+        "0": 0.896,
+        "1": 0.064,
+        "2": 0.04
+      }
+    },
+    {
+      "name": "after_attack_probability_near",
+      "passed": true,
+      "samples": 250,
+      "counts": {
+        "0": 229,
+        "2": 18,
+        "1": 3
+      },
+      "expected": {
+        "0": 0.9,
+        "1": 0.025,
+        "2": 0.075
+      },
+      "observed": {
+        "0": 0.916,
+        "1": 0.012,
+        "2": 0.072
+      }
+    },
+    {
+      "name": "after_attack_probability_spectator",
+      "passed": true,
+      "samples": 250,
+      "counts": {
+        "0": 130,
+        "2": 120
+      },
+      "expected": {
+        "0": 0.5,
+        "2": 0.5
+      },
+      "observed": {
+        "0": 0.52,
+        "2": 0.48
+      }
+    }
+  ],
+  "final_binding": {
+    "archived": [
+      {
+        "old": "/Game/Gameplay/AI/BT_EnemyMeleeCombat_V2",
+        "archive": "/Game/Gameplay/AI/Archive/BeforeDS3BrokenSword/BT_EnemyMeleeCombat_V2"
+      },
+      {
+        "old": "/Game/Gameplay/AI/BT_EnemyMeleeCombat",
+        "archive": "/Game/Gameplay/AI/Archive/BeforeDS3BrokenSword/BT_EnemyMeleeCombat"
+      }
+    ],
+    "bindings": {
+      "BlackboardAsset": "/Game/Gameplay/AI/DS3BrokenSword/BB_DS3BrokenSword.BB_DS3BrokenSword",
+      "BTAsset": "/Game/Gameplay/AI/DS3BrokenSword/BT_DS3BrokenSword.BT_DS3BrokenSword",
+      "AbilityClass": "/Game/Gameplay/GAS/Abilities/GA_DS3BrokenSwordAttack.GA_DS3BrokenSwordAttack_C"
+    },
+    "pie": false,
+    "graph_layout": "66 main graph nodes positioned through public reflected property setters; no native auto-arrange"
+  },
+  "limitations": [
+    "Logical prototype, not an animation or native goal system replica",
+    "UnitScale=100 cm per source unit is an assumption",
+    "Existing project animations and lunge windows are substitutes",
+    "Actions 20005 and 20006 have no source spell effects"
+  ]
+}

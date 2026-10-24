@@ -20,3 +20,7 @@ Automation_*.sln
 # 外部工具垃圾(BepInEx 是别的程序的)
 BepInEx/
 preloader_*.log
+
+# Python 工具运行缓存
+__pycache__/
+*.pyc

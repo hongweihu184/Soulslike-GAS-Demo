@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-23",
+  "passed": true,
+  "main_tests": [
+    {
+      "name": "hold_band",
+      "passed": true,
+      "distance": 185.0
+    },
+    {
+      "name": "retreat",
+      "passed": true,
+      "distance": 185.51390075683594
+    },
+    {
+      "name": "approach",
+      "passed": true,
+      "distance": 182.80625915527344
+    },
+    {
+      "name": "finite_turn",
+      "passed": true,
+      "max_degrees_per_second": 180.0000066289809,
+      "final_yaw": 180.0
+    },
+    {
+      "name": "far_chase",
+      "passed": true,
+      "final_distance": 300.69970703125,
+      "maximum_speed": 300.0
+    },
+    {
+      "name": "attack_alignment_and_cooldown",
+      "passed": true,
+      "gap": 5.627296306192875,
+      "starts": [
+        {
+          "time": 11.440139669924974,
+          "relative": 0.9980086907744408,
+          "distance": 180.61837768554688,
+          "facing_error": 0.35843563079845353,
+          "location": [
+            553.4045730939067,
+            0.0
+          ],
+          "yaw": -0.35843563079845353
+        },
+        {
+          "time": 18.200646687299013,
+          "relative": 7.7585157081484795,
+          "distance": 182.16592407226562,
+          "facing_error": 0.0,
+          "location": [
+            650.677536354566,
+            -0.4344071795682789
+          ],
+          "yaw": 0.0
+        }
+      ]
+    },
+    {
+      "name": "committed_direction_and_enemy_advance",
+      "passed": true,
+      "yaw_change": 0.0015643692015601118,
+      "advance": 69.44025143980997
+    },
+    {
+      "name": "player_advance_A",
+      "passed": true,
+      "displacement": 48.78024011850357,
+      "expected": 40
+    },
+    {
+      "name": "player_advance_B",
+      "passed": true,
+      "displacement": 50.25201067328453,
+      "expected": 40
+    },
+    {
+      "name": "player_advance_C",
+      "passed": true,
+      "displacement": 59.32847410440445,
+      "expected": 50
+    }
+  ],
+  "additional_tests": [
+    {
+      "name": "enemy_hits_once_at_190",
+      "passed": true,
+      "health_fraction_loss": 0.125
+    },
+    {
+      "name": "cancel_stops_advance_and_hit",
+      "passed": true,
+      "drift": 0.0,
+      "health_fraction_loss": 0.0
+    },
+    {
+      "name": "sweep_prevents_passing_enemy",
+      "passed": true,
+      "advance": 41.07731192856704,
+      "distance": 68.92269134521484
+    },
+    {
+      "name": "roll_still_advances",
+      "passed": true,
+      "advance": 326.07355341315247
+    }
+  ],
+  "limits": [
+    "Not yet accepted by user keyboard/controller playtest",
+    "Existing animation assets reused; backward locomotion not added",
+    "Existing notify movement can exceed nominal distance at window boundaries",
+    "No complex obstacle or multiple-enemy test"
+  ],
+  "persistence": {
+    "tree_reloaded": true,
+    "attack_distance": 200.0,
+    "move_radius": "(DefaultValue=450.000000,Key=\"\")",
+    "ApproachStopDistance": 185.0,
+    "AttackStartDistance": 200.0
+  }
+}

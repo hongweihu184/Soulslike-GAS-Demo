@@ -1,12 +1,12 @@
 # 工程资产盘点与干净环境恢复
 
-> 外部资源盘点：2026-10-18；工程自有资产快照更新：2026-10-23
+> 外部资源盘点：2026-10-18；工程自有资产快照更新：2026-10-25
 > 工程：Unreal Engine 5.8 / `ProjectUnreal`
 > 目标：把工程自有蓝图、地图、C++ 和文档放入 GitHub，同时不把 Epic Paragon 素材包重新托管到 GitHub。
 
 ## 结论
 
-当前 `Content` 目录约 19GB，其中绝大多数是 8 个 `Paragon*` 资源包。工程自有内容集中在 `Gameplay/`、`Input/`、`Maps/` 和地图外置 Actor 数据中。本仓库通过 `ProjectContentSnapshot/Content/` 保存了这部分自有资产的快照，当前快照共 218 个文件、约 35.03 MiB；恢复时运行 `Tools/Restore-ProjectContent.ps1` 即可按原相对路径复制回工程 `Content/`。
+当前 `Content` 目录约 19GB，其中绝大多数是 8 个 `Paragon*` 资源包。工程自有内容集中在 `Gameplay/`、`Input/`、`Maps/` 和地图外置 Actor 数据中。本仓库通过 `ProjectContentSnapshot/Content/` 保存了这部分自有资产的快照，当前快照共 240 个文件、约 37.81 MiB；恢复时运行 `Tools/Restore-ProjectContent.ps1` 即可按原相对路径复制回工程 `Content/`。
 
 Paragon 资源包不包含在 GitHub 快照中。恢复完整工程时，需要使用有权访问这些资源的 Epic 账号重新安装/添加资源包，并保持它们在 `Content/Paragon.../` 下的路径。资源包目录记录在下表；当前盘点只确认文件夹名和体积，未逐项核实 Epic 账户中的可获取状态、Marketplace/Fab 商品标识或版本。
 
@@ -14,7 +14,7 @@ Paragon 资源包不包含在 GitHub 快照中。恢复完整工程时，需要�
 
 | 当前 Content 路径 | 文件数 | 约占空间 | 分类与恢复方式 |
 | --- | ---: | ---: | --- |
-| `Gameplay/` | 63 | 3.66 MiB | 工程自有 Gameplay 蓝图、GAS 资产、攻击 Montage 与 HUD；快照中保存 |
+| `Gameplay/` | 85 | 6.43 MiB | 工程自有 Gameplay 蓝图、GAS 资产、攻击 Montage 与 HUD；快照中保存 |
 | `Input/` | 6 | 0.01 MiB | 工程输入资产；快照中保存 |
 | `Maps/` | 1 | 0.01 MiB | 工程地图；快照中保存 |
 | `__ExternalActors__/` | 141 | 31.34 MiB | `NewMap` 的外置 Actor 数据；快照中保存。它可能引用 Paragon 内容 |
